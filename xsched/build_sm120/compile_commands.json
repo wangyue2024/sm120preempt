@@ -1,0 +1,932 @@
+[
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ipc/src",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -DRELEASE_MODE -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/ipc.dir/ipc.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/src/ipc.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/src/ipc.cpp",
+  "output": "3rdparty/ipc/src/CMakeFiles/ipc.dir/ipc.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ipc/src",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -DRELEASE_MODE -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/ipc.dir/msgq/msgq.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/src/msgq/msgq.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/src/msgq/msgq.cpp",
+  "output": "3rdparty/ipc/src/CMakeFiles/ipc.dir/msgq/msgq.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ipc/src",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -DRELEASE_MODE -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/ipc.dir/pipe/pipe.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/src/pipe/pipe.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/src/pipe/pipe.cpp",
+  "output": "3rdparty/ipc/src/CMakeFiles/ipc.dir/pipe/pipe.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ipc/3rdparty/boost-ipc/container",
+  "command": "/usr/bin/gcc-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -DRELEASE_MODE -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include    -O3 -DRELEASE_MODE -o CMakeFiles/boost_container.dir/src/alloc_lib.c.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/src/alloc_lib.c",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/src/alloc_lib.c",
+  "output": "3rdparty/ipc/3rdparty/boost-ipc/container/CMakeFiles/boost_container.dir/src/alloc_lib.c.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ipc/3rdparty/boost-ipc/container",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -DRELEASE_MODE -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include  -O3 -DRELEASE_MODE -std=c++20 -o CMakeFiles/boost_container.dir/src/dlmalloc.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/src/dlmalloc.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/src/dlmalloc.cpp",
+  "output": "3rdparty/ipc/3rdparty/boost-ipc/container/CMakeFiles/boost_container.dir/src/dlmalloc.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ipc/3rdparty/boost-ipc/container",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -DRELEASE_MODE -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include  -O3 -DRELEASE_MODE -std=c++20 -o CMakeFiles/boost_container.dir/src/global_resource.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/src/global_resource.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/src/global_resource.cpp",
+  "output": "3rdparty/ipc/3rdparty/boost-ipc/container/CMakeFiles/boost_container.dir/src/global_resource.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ipc/3rdparty/boost-ipc/container",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -DRELEASE_MODE -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include  -O3 -DRELEASE_MODE -std=c++20 -o CMakeFiles/boost_container.dir/src/monotonic_buffer_resource.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/src/monotonic_buffer_resource.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/src/monotonic_buffer_resource.cpp",
+  "output": "3rdparty/ipc/3rdparty/boost-ipc/container/CMakeFiles/boost_container.dir/src/monotonic_buffer_resource.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ipc/3rdparty/boost-ipc/container",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -DRELEASE_MODE -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include  -O3 -DRELEASE_MODE -std=c++20 -o CMakeFiles/boost_container.dir/src/pool_resource.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/src/pool_resource.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/src/pool_resource.cpp",
+  "output": "3rdparty/ipc/3rdparty/boost-ipc/container/CMakeFiles/boost_container.dir/src/pool_resource.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ipc/3rdparty/boost-ipc/container",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -DRELEASE_MODE -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include  -O3 -DRELEASE_MODE -std=c++20 -o CMakeFiles/boost_container.dir/src/synchronized_pool_resource.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/src/synchronized_pool_resource.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/src/synchronized_pool_resource.cpp",
+  "output": "3rdparty/ipc/3rdparty/boost-ipc/container/CMakeFiles/boost_container.dir/src/synchronized_pool_resource.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ipc/3rdparty/boost-ipc/container",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -DRELEASE_MODE -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include  -O3 -DRELEASE_MODE -std=c++20 -o CMakeFiles/boost_container.dir/src/unsynchronized_pool_resource.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/src/unsynchronized_pool_resource.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/src/unsynchronized_pool_resource.cpp",
+  "output": "3rdparty/ipc/3rdparty/boost-ipc/container/CMakeFiles/boost_container.dir/src/unsynchronized_pool_resource.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/jsoncpp/src/lib_json",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/jsoncpp/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/jsoncpp/src/lib_json/../../include  -O3 -DRELEASE_MODE -std=c++11 -Wall -Wconversion -Wshadow -Wextra -Wpedantic -Werror=strict-aliasing -o CMakeFiles/jsoncpp_static.dir/json_reader.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/jsoncpp/src/lib_json/json_reader.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/jsoncpp/src/lib_json/json_reader.cpp",
+  "output": "3rdparty/jsoncpp/src/lib_json/CMakeFiles/jsoncpp_static.dir/json_reader.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/jsoncpp/src/lib_json",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/jsoncpp/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/jsoncpp/src/lib_json/../../include  -O3 -DRELEASE_MODE -std=c++11 -Wall -Wconversion -Wshadow -Wextra -Wpedantic -Werror=strict-aliasing -o CMakeFiles/jsoncpp_static.dir/json_value.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/jsoncpp/src/lib_json/json_value.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/jsoncpp/src/lib_json/json_value.cpp",
+  "output": "3rdparty/jsoncpp/src/lib_json/CMakeFiles/jsoncpp_static.dir/json_value.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/jsoncpp/src/lib_json",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/jsoncpp/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/jsoncpp/src/lib_json/../../include  -O3 -DRELEASE_MODE -std=c++11 -Wall -Wconversion -Wshadow -Wextra -Wpedantic -Werror=strict-aliasing -o CMakeFiles/jsoncpp_static.dir/json_writer.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/jsoncpp/src/lib_json/json_writer.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/jsoncpp/src/lib_json/json_writer.cpp",
+  "output": "3rdparty/jsoncpp/src/lib_json/CMakeFiles/jsoncpp_static.dir/json_writer.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/screen.dir/src/ftxui/screen/box.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/screen/box.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/screen/box.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/screen.dir/src/ftxui/screen/box.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/screen.dir/src/ftxui/screen/color.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/screen/color.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/screen/color.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/screen.dir/src/ftxui/screen/color.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/screen.dir/src/ftxui/screen/color_info.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/screen/color_info.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/screen/color_info.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/screen.dir/src/ftxui/screen/color_info.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/screen.dir/src/ftxui/screen/image.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/screen/image.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/screen/image.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/screen.dir/src/ftxui/screen/image.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/screen.dir/src/ftxui/screen/screen.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/screen/screen.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/screen/screen.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/screen.dir/src/ftxui/screen/screen.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/screen.dir/src/ftxui/screen/string.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/screen/string.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/screen/string.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/screen.dir/src/ftxui/screen/string.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/screen.dir/src/ftxui/screen/terminal.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/screen/terminal.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/screen/terminal.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/screen.dir/src/ftxui/screen/terminal.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/automerge.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/automerge.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/automerge.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/automerge.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/selection_style.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/selection_style.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/selection_style.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/selection_style.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/blink.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/blink.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/blink.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/blink.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/bold.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/bold.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/bold.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/bold.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/border.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/border.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/border.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/border.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/box_helper.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/box_helper.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/box_helper.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/box_helper.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/canvas.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/canvas.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/canvas.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/canvas.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/clear_under.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/clear_under.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/clear_under.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/clear_under.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/color.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/color.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/color.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/color.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/composite_decorator.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/composite_decorator.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/composite_decorator.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/composite_decorator.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/dbox.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/dbox.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/dbox.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/dbox.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/dim.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/dim.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/dim.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/dim.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/flex.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/flex.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/flex.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/flex.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/flexbox.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/flexbox.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/flexbox.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/flexbox.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/flexbox_config.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/flexbox_config.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/flexbox_config.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/flexbox_config.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/flexbox_helper.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/flexbox_helper.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/flexbox_helper.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/flexbox_helper.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/focus.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/focus.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/focus.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/focus.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/frame.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/frame.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/frame.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/frame.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/gauge.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/gauge.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/gauge.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/gauge.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/graph.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/graph.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/graph.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/graph.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/gridbox.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/gridbox.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/gridbox.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/gridbox.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/hbox.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/hbox.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/hbox.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/hbox.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/hyperlink.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/hyperlink.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/hyperlink.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/hyperlink.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/inverted.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/inverted.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/inverted.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/inverted.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/italic.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/italic.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/italic.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/italic.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/linear_gradient.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/linear_gradient.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/linear_gradient.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/linear_gradient.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/node.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/node.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/node.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/node.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/node_decorator.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/node_decorator.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/node_decorator.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/node_decorator.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/paragraph.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/paragraph.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/paragraph.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/paragraph.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/reflect.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/reflect.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/reflect.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/reflect.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/scroll_indicator.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/scroll_indicator.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/scroll_indicator.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/scroll_indicator.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/selection.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/selection.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/selection.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/selection.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/separator.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/separator.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/separator.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/separator.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/size.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/size.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/size.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/size.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/spinner.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/spinner.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/spinner.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/spinner.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/strikethrough.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/strikethrough.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/strikethrough.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/strikethrough.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/table.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/table.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/table.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/table.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/text.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/text.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/text.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/text.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/underlined.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/underlined.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/underlined.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/underlined.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/underlined_double.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/underlined_double.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/underlined_double.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/underlined_double.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/util.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/util.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/util.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/util.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/vbox.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/vbox.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/dom/vbox.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/dom.dir/src/ftxui/dom/vbox.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/animation.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/animation.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/animation.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/animation.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/button.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/button.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/button.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/button.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/catch_event.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/catch_event.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/catch_event.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/catch_event.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/checkbox.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/checkbox.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/checkbox.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/checkbox.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/collapsible.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/collapsible.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/collapsible.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/collapsible.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/component.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/component.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/component.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/component.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/component_options.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/component_options.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/component_options.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/component_options.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/container.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/container.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/container.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/container.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/dropdown.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/dropdown.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/dropdown.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/dropdown.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/event.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/event.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/event.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/event.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/hoverable.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/hoverable.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/hoverable.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/hoverable.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/input.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/input.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/input.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/input.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/loop.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/loop.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/loop.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/loop.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/maybe.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/maybe.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/maybe.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/maybe.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/menu.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/menu.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/menu.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/menu.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/modal.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/modal.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/modal.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/modal.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/radiobox.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/radiobox.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/radiobox.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/radiobox.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/renderer.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/renderer.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/renderer.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/renderer.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/resizable_split.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/resizable_split.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/resizable_split.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/resizable_split.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/screen_interactive.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/screen_interactive.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/screen_interactive.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/screen_interactive.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/slider.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/slider.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/slider.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/slider.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/terminal_input_parser.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/terminal_input_parser.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/terminal_input_parser.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/terminal_input_parser.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/util.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/util.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/util.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/util.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/3rdparty/ftxui",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/window.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/window.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/src/ftxui/component/window.cpp",
+  "output": "3rdparty/ftxui/CMakeFiles/component.dir/src/ftxui/component/window.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/utils",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/utils.dir/src/lock.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/src/lock.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/src/lock.cpp",
+  "output": "utils/CMakeFiles/utils.dir/src/lock.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/utils",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/utils.dir/src/psync.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/src/psync.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/src/psync.cpp",
+  "output": "utils/CMakeFiles/utils.dir/src/psync.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/utils",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/utils.dir/src/runner.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/src/runner.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/src/runner.cpp",
+  "output": "utils/CMakeFiles/utils.dir/src/runner.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/utils",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/utils.dir/src/timing.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/src/timing.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/src/timing.cpp",
+  "output": "utils/CMakeFiles/utils.dir/src/timing.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/utils",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/utils.dir/src/waitpid.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/src/waitpid.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/src/waitpid.cpp",
+  "output": "utils/CMakeFiles/utils.dir/src/waitpid.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/protocol",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/protocol.dir/src/device.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/src/device.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/src/device.cpp",
+  "output": "protocol/CMakeFiles/protocol.dir/src/device.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/protocol",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/protocol.dir/src/names.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/src/names.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/src/names.cpp",
+  "output": "protocol/CMakeFiles/protocol.dir/src/names.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/sched",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/sched.dir/src/policy/awf.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/policy/awf.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/policy/awf.cpp",
+  "output": "sched/CMakeFiles/sched.dir/src/policy/awf.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/sched",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/sched.dir/src/policy/cfs.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/policy/cfs.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/policy/cfs.cpp",
+  "output": "sched/CMakeFiles/sched.dir/src/policy/cfs.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/sched",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/sched.dir/src/policy/chpf.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/policy/chpf.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/policy/chpf.cpp",
+  "output": "sched/CMakeFiles/sched.dir/src/policy/chpf.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/sched",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/sched.dir/src/policy/hhpf.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/policy/hhpf.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/policy/hhpf.cpp",
+  "output": "sched/CMakeFiles/sched.dir/src/policy/hhpf.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/sched",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/sched.dir/src/policy/hpf.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/policy/hpf.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/policy/hpf.cpp",
+  "output": "sched/CMakeFiles/sched.dir/src/policy/hpf.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/sched",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/sched.dir/src/policy/kedf.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/policy/kedf.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/policy/kedf.cpp",
+  "output": "sched/CMakeFiles/sched.dir/src/policy/kedf.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/sched",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/sched.dir/src/policy/lax.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/policy/lax.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/policy/lax.cpp",
+  "output": "sched/CMakeFiles/sched.dir/src/policy/lax.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/sched",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/sched.dir/src/policy/mlfq.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/policy/mlfq.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/policy/mlfq.cpp",
+  "output": "sched/CMakeFiles/sched.dir/src/policy/mlfq.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/sched",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/sched.dir/src/policy/policy.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/policy/policy.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/policy/policy.cpp",
+  "output": "sched/CMakeFiles/sched.dir/src/policy/policy.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/sched",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/sched.dir/src/policy/pup.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/policy/pup.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/policy/pup.cpp",
+  "output": "sched/CMakeFiles/sched.dir/src/policy/pup.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/sched",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/sched.dir/src/policy/up.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/policy/up.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/policy/up.cpp",
+  "output": "sched/CMakeFiles/sched.dir/src/policy/up.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/sched",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/sched.dir/src/protocol/event.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/protocol/event.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/protocol/event.cpp",
+  "output": "sched/CMakeFiles/sched.dir/src/protocol/event.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/sched",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/sched.dir/src/protocol/hint.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/protocol/hint.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/protocol/hint.cpp",
+  "output": "sched/CMakeFiles/sched.dir/src/protocol/hint.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/sched",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/sched.dir/src/protocol/operation.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/protocol/operation.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/protocol/operation.cpp",
+  "output": "sched/CMakeFiles/sched.dir/src/protocol/operation.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/sched",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/sched.dir/src/protocol/status.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/protocol/status.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/protocol/status.cpp",
+  "output": "sched/CMakeFiles/sched.dir/src/protocol/status.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/sched",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/sched.dir/src/scheduler/global.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/scheduler/global.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/scheduler/global.cpp",
+  "output": "sched/CMakeFiles/sched.dir/src/scheduler/global.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/sched",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/sched.dir/src/scheduler/local.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/scheduler/local.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/scheduler/local.cpp",
+  "output": "sched/CMakeFiles/sched.dir/src/scheduler/local.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/sched",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/sched.dir/src/scheduler/scheduler.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/scheduler/scheduler.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/src/scheduler/scheduler.cpp",
+  "output": "sched/CMakeFiles/sched.dir/src/scheduler/scheduler.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/preempt",
+  "command": "/usr/bin/g++-13 -Dpreempt_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/preempt.dir/src/hal/hw_command.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/src/hal/hw_command.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/src/hal/hw_command.cpp",
+  "output": "preempt/CMakeFiles/preempt.dir/src/hal/hw_command.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/preempt",
+  "command": "/usr/bin/g++-13 -Dpreempt_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/preempt.dir/src/hal/hw_queue.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/src/hal/hw_queue.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/src/hal/hw_queue.cpp",
+  "output": "preempt/CMakeFiles/preempt.dir/src/hal/hw_queue.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/preempt",
+  "command": "/usr/bin/g++-13 -Dpreempt_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/preempt.dir/src/sched/agent.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/src/sched/agent.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/src/sched/agent.cpp",
+  "output": "preempt/CMakeFiles/preempt.dir/src/sched/agent.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/preempt",
+  "command": "/usr/bin/g++-13 -Dpreempt_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/preempt.dir/src/sched/executor.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/src/sched/executor.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/src/sched/executor.cpp",
+  "output": "preempt/CMakeFiles/preempt.dir/src/sched/executor.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/preempt",
+  "command": "/usr/bin/g++-13 -Dpreempt_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/preempt.dir/src/sched/hint.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/src/sched/hint.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/src/sched/hint.cpp",
+  "output": "preempt/CMakeFiles/preempt.dir/src/sched/hint.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/preempt",
+  "command": "/usr/bin/g++-13 -Dpreempt_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/preempt.dir/src/xqueue/async_xqueue.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/src/xqueue/async_xqueue.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/src/xqueue/async_xqueue.cpp",
+  "output": "preempt/CMakeFiles/preempt.dir/src/xqueue/async_xqueue.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/preempt",
+  "command": "/usr/bin/g++-13 -Dpreempt_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/preempt.dir/src/xqueue/command_buffer.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/src/xqueue/command_buffer.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/src/xqueue/command_buffer.cpp",
+  "output": "preempt/CMakeFiles/preempt.dir/src/xqueue/command_buffer.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/preempt",
+  "command": "/usr/bin/g++-13 -Dpreempt_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/preempt.dir/src/xqueue/launch_worker.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/src/xqueue/launch_worker.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/src/xqueue/launch_worker.cpp",
+  "output": "preempt/CMakeFiles/preempt.dir/src/xqueue/launch_worker.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/preempt",
+  "command": "/usr/bin/g++-13 -Dpreempt_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/preempt.dir/src/xqueue/xcommand.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/src/xqueue/xcommand.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/src/xqueue/xcommand.cpp",
+  "output": "preempt/CMakeFiles/preempt.dir/src/xqueue/xcommand.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/preempt",
+  "command": "/usr/bin/g++-13 -Dpreempt_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/preempt.dir/src/xqueue/xqueue.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/src/xqueue/xqueue.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/src/xqueue/xqueue.cpp",
+  "output": "preempt/CMakeFiles/preempt.dir/src/xqueue/xqueue.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/service",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/common/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/jsoncpp/src/lib_json/../../include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cpp-httplib  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/service_common.dir/common/src/client.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/common/src/client.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/common/src/client.cpp",
+  "output": "service/CMakeFiles/service_common.dir/common/src/client.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/service",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/common/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/jsoncpp/src/lib_json/../../include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cpp-httplib  -O3 -DRELEASE_MODE -std=c++20 -fPIC -Wall -Wextra -Werror -o CMakeFiles/service_common.dir/common/src/convert.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/common/src/convert.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/common/src/convert.cpp",
+  "output": "service/CMakeFiles/service_common.dir/common/src/convert.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/service",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/common -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/cli/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/common/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/jsoncpp/src/lib_json/../../include -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/CLI11/include -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cpp-httplib  -O3 -DRELEASE_MODE -std=c++20 -Wall -Wextra -Werror -o CMakeFiles/xcli.dir/cli/src/cli.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/cli/src/cli.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/cli/src/cli.cpp",
+  "output": "service/CMakeFiles/xcli.dir/cli/src/cli.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/service",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/common -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/cli/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/common/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/jsoncpp/src/lib_json/../../include -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/CLI11/include -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ftxui/include -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cpp-httplib  -O3 -DRELEASE_MODE -std=c++20 -Wall -Wextra -Werror -o CMakeFiles/xcli.dir/cli/src/main.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/cli/src/main.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/cli/src/main.cpp",
+  "output": "service/CMakeFiles/xcli.dir/cli/src/main.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/service",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/common -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/server/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/jsoncpp/src/lib_json/../../include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/common/include -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cpp-httplib  -O3 -DRELEASE_MODE -std=c++20 -Wall -Wextra -Werror -o CMakeFiles/xserver.dir/server/src/main.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/server/src/main.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/server/src/main.cpp",
+  "output": "service/CMakeFiles/xserver.dir/server/src/main.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/service",
+  "command": "/usr/bin/g++-13 -DBOOST_CONTAINER_NO_LIB -DBOOST_CONTAINER_STATIC_LINK -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/common -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/server/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/tools -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/interprocess/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/assert/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/config/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/container/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/intrusive/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/move/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/winapi/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/ipc/3rdparty/boost-ipc/predef/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/jsoncpp/src/lib_json/../../include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/common/include -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cpp-httplib  -O3 -DRELEASE_MODE -std=c++20 -Wall -Wextra -Werror -o CMakeFiles/xserver.dir/server/src/server.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/server/src/server.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/server/src/server.cpp",
+  "output": "service/CMakeFiles/xserver.dir/server/src/server.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/service/tools/x11_monitor",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/tools/x11_monitor/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/common/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/jsoncpp/src/lib_json/../../include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/CLI11/include -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cpp-httplib  -O3 -DRELEASE_MODE -std=c++20 -Wall -Wextra -Werror -o CMakeFiles/x11_monitor.dir/src/main.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/tools/x11_monitor/src/main.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/tools/x11_monitor/src/main.cpp",
+  "output": "service/tools/x11_monitor/CMakeFiles/x11_monitor.dir/src/main.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/service/tools/x11_monitor",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/tools/x11_monitor/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/common/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/jsoncpp/src/lib_json/../../include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/CLI11/include -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cpp-httplib  -O3 -DRELEASE_MODE -std=c++20 -Wall -Wextra -Werror -o CMakeFiles/x11_monitor.dir/src/monitor.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/tools/x11_monitor/src/monitor.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/tools/x11_monitor/src/monitor.cpp",
+  "output": "service/tools/x11_monitor/CMakeFiles/x11_monitor.dir/src/monitor.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/service/tools/x11_launcher",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/tools/x11_launcher/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/common/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/jsoncpp/src/lib_json/../../include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/CLI11/include -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cpp-httplib  -O3 -DRELEASE_MODE -std=c++20 -Wall -Wextra -Werror -o CMakeFiles/x11_launcher.dir/src/launcher.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/tools/x11_launcher/src/launcher.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/tools/x11_launcher/src/launcher.cpp",
+  "output": "service/tools/x11_launcher/CMakeFiles/x11_launcher.dir/src/launcher.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/service/tools/x11_launcher",
+  "command": "/usr/bin/g++-13  -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/tools/x11_launcher/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/common/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/jsoncpp/src/lib_json/../../include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/sched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/CLI11/include -isystem /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cpp-httplib  -O3 -DRELEASE_MODE -std=c++20 -Wall -Wextra -Werror -o CMakeFiles/x11_launcher.dir/src/main.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/tools/x11_launcher/src/main.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/service/tools/x11_launcher/src/main.cpp",
+  "output": "service/tools/x11_launcher/CMakeFiles/x11_launcher.dir/src/main.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/usr/bin/g++-13 -Dhalcuda_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cuxtra/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/halcuda.dir/hal/src/arch/arch.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/arch/arch.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/arch/arch.cpp",
+  "output": "platforms/cuda/CMakeFiles/halcuda.dir/hal/src/arch/arch.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/usr/bin/g++-13 -Dhalcuda_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cuxtra/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/halcuda.dir/hal/src/arch/sm120.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/arch/sm120.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/arch/sm120.cpp",
+  "output": "platforms/cuda/CMakeFiles/halcuda.dir/hal/src/arch/sm120.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/usr/bin/g++-13 -Dhalcuda_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cuxtra/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/halcuda.dir/hal/src/arch/sm35.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/arch/sm35.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/arch/sm35.cpp",
+  "output": "platforms/cuda/CMakeFiles/halcuda.dir/hal/src/arch/sm35.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/usr/bin/g++-13 -Dhalcuda_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cuxtra/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/halcuda.dir/hal/src/arch/sm70.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/arch/sm70.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/arch/sm70.cpp",
+  "output": "platforms/cuda/CMakeFiles/halcuda.dir/hal/src/arch/sm70.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/usr/bin/g++-13 -Dhalcuda_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cuxtra/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/halcuda.dir/hal/src/arch/sm86.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/arch/sm86.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/arch/sm86.cpp",
+  "output": "platforms/cuda/CMakeFiles/halcuda.dir/hal/src/arch/sm86.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/usr/bin/g++-13 -Dhalcuda_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cuxtra/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/halcuda.dir/hal/src/common/cuda_command.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/common/cuda_command.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/common/cuda_command.cpp",
+  "output": "platforms/cuda/CMakeFiles/halcuda.dir/hal/src/common/cuda_command.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/usr/bin/g++-13 -Dhalcuda_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cuxtra/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/halcuda.dir/hal/src/common/event_pool.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/common/event_pool.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/common/event_pool.cpp",
+  "output": "platforms/cuda/CMakeFiles/halcuda.dir/hal/src/common/event_pool.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/usr/bin/g++-13 -Dhalcuda_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cuxtra/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/halcuda.dir/hal/src/common/options.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/common/options.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/common/options.cpp",
+  "output": "platforms/cuda/CMakeFiles/halcuda.dir/hal/src/common/options.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/usr/bin/g++-13 -Dhalcuda_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cuxtra/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/halcuda.dir/hal/src/level1/cuda_queue.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/level1/cuda_queue.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/level1/cuda_queue.cpp",
+  "output": "platforms/cuda/CMakeFiles/halcuda.dir/hal/src/level1/cuda_queue.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/usr/bin/g++-13 -Dhalcuda_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cuxtra/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/halcuda.dir/hal/src/level2/cuda_queue.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/level2/cuda_queue.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/level2/cuda_queue.cpp",
+  "output": "platforms/cuda/CMakeFiles/halcuda.dir/hal/src/level2/cuda_queue.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/usr/bin/g++-13 -Dhalcuda_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cuxtra/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/halcuda.dir/hal/src/level2/instrument.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/level2/instrument.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/level2/instrument.cpp",
+  "output": "platforms/cuda/CMakeFiles/halcuda.dir/hal/src/level2/instrument.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/usr/bin/g++-13 -Dhalcuda_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cuxtra/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/halcuda.dir/hal/src/level2/mm.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/level2/mm.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/level2/mm.cpp",
+  "output": "platforms/cuda/CMakeFiles/halcuda.dir/hal/src/level2/mm.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/usr/bin/g++-13 -Dhalcuda_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cuxtra/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/halcuda.dir/hal/src/level3/cuda_queue.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp",
+  "output": "platforms/cuda/CMakeFiles/halcuda.dir/hal/src/level3/cuda_queue.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/usr/bin/g++-13 -Dhalcuda_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cuxtra/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/halcuda.dir/hal/src/level3/gdb_interrupt.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/level3/gdb_interrupt.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/level3/gdb_interrupt.cpp",
+  "output": "platforms/cuda/CMakeFiles/halcuda.dir/hal/src/level3/gdb_interrupt.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/usr/bin/g++-13 -Dhalcuda_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cuxtra/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/halcuda.dir/hal/src/level3/interrupt.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/level3/interrupt.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/level3/interrupt.cpp",
+  "output": "platforms/cuda/CMakeFiles/halcuda.dir/hal/src/level3/interrupt.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/usr/bin/g++-13 -Dhalcuda_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cuxtra/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/halcuda.dir/hal/src/level3/resumable_sm120.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/level3/resumable_sm120.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/level3/resumable_sm120.cpp",
+  "output": "platforms/cuda/CMakeFiles/halcuda.dir/hal/src/level3/resumable_sm120.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/usr/bin/g++-13 -Dhalcuda_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cuxtra/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/halcuda.dir/hal/src/level3/trap_sm120.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/level3/trap_sm120.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/level3/trap_sm120.cpp",
+  "output": "platforms/cuda/CMakeFiles/halcuda.dir/hal/src/level3/trap_sm120.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/usr/bin/g++-13 -Dhalcuda_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/3rdparty/cuxtra/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -o CMakeFiles/halcuda.dir/hal/src/level3/tsg.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/level3/tsg.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/src/level3/tsg.cpp",
+  "output": "platforms/cuda/CMakeFiles/halcuda.dir/hal/src/level3/tsg.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/usr/bin/g++-13 -Dshimcuda_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/shim/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -fvisibility=hidden -o CMakeFiles/shimcuda.dir/shim/src/intercept.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/shim/src/intercept.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/shim/src/intercept.cpp",
+  "output": "platforms/cuda/CMakeFiles/shimcuda.dir/shim/src/intercept.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/usr/bin/g++-13 -Dshimcuda_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/shim/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -fvisibility=hidden -o CMakeFiles/shimcuda.dir/shim/src/intercept_windows.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/shim/src/intercept_windows.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/shim/src/intercept_windows.cpp",
+  "output": "platforms/cuda/CMakeFiles/shimcuda.dir/shim/src/intercept_windows.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/usr/bin/g++-13 -Dshimcuda_EXPORTS -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/shim/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/utils/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/protocol/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/hal/include -I/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/preempt/include  -O3 -DRELEASE_MODE -std=c++20 -fPIC -fPIC -Wall -Wextra -Werror -fvisibility=hidden -o CMakeFiles/shimcuda.dir/shim/src/shim.cpp.o -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/shim/src/shim.cpp",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/platforms/cuda/shim/src/shim.cpp",
+  "output": "platforms/cuda/CMakeFiles/shimcuda.dir/shim/src/shim.cpp.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/home/wy/cuda-12.9/bin/nvcc -forward-unknown-to-host-compiler -ccbin=/usr/bin/g++-13  --options-file CMakeFiles/sm120_verify_compendium.dir/includes_CUDA.rsp  -Wno-deprecated-gpu-targets -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_120,code=[compute_120,sm_120]\" -x cu -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/test/sm120_l3_verify/sm120_verify_compendium.cu -o CMakeFiles/sm120_verify_compendium.dir/__/__/test/sm120_l3_verify/sm120_verify_compendium.cu.o",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/test/sm120_l3_verify/sm120_verify_compendium.cu",
+  "output": "platforms/cuda/CMakeFiles/sm120_verify_compendium.dir/__/__/test/sm120_l3_verify/sm120_verify_compendium.cu.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/home/wy/cuda-12.9/bin/nvcc -forward-unknown-to-host-compiler -ccbin=/usr/bin/g++-13  --options-file CMakeFiles/sm120_l3_trap_bench.dir/includes_CUDA.rsp  -Wno-deprecated-gpu-targets -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_120,code=[compute_120,sm_120]\" -x cu -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/test/sm120_l3_trap/sm120_l3_trap_bench.cu -o CMakeFiles/sm120_l3_trap_bench.dir/__/__/test/sm120_l3_trap/sm120_l3_trap_bench.cu.o",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/test/sm120_l3_trap/sm120_l3_trap_bench.cu",
+  "output": "platforms/cuda/CMakeFiles/sm120_l3_trap_bench.dir/__/__/test/sm120_l3_trap/sm120_l3_trap_bench.cu.o"
+},
+{
+  "directory": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/platforms/cuda",
+  "command": "/home/wy/cuda-12.9/bin/nvcc -forward-unknown-to-host-compiler -ccbin=/usr/bin/g++-13  --options-file CMakeFiles/sm120_l3_resumable_bench.dir/includes_CUDA.rsp  -Wno-deprecated-gpu-targets -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_120,code=[compute_120,sm_120]\" -x cu -c /mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/test/sm120_l3_resumable/sm120_l3_resumable_bench.cu -o CMakeFiles/sm120_l3_resumable_bench.dir/__/__/test/sm120_l3_resumable/sm120_l3_resumable_bench.cu.o",
+  "file": "/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/test/sm120_l3_resumable/sm120_l3_resumable_bench.cu",
+  "output": "platforms/cuda/CMakeFiles/sm120_l3_resumable_bench.dir/__/__/test/sm120_l3_resumable/sm120_l3_resumable_bench.cu.o"
+}
+]

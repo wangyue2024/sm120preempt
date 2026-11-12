@@ -1,0 +1,70 @@
+#pragma once
+
+#include <map>
+#include <list>
+#include <deque>
+#include <mutex>
+#include <thread>
+#include <chrono>
+#include <memory>
+#include <condition_variable>
+
+#include "xsched/utils/common.h"
+#include "xsched/sched/policy/policy.h"
+#include "xsched/sched/protocol/status.h"
+#include "xsched/sched/scheduler/scheduler.h"
+
+namespace xsched::sched
+{
+
+class LocalScheduler : public Scheduler
+{
+public:
+    LocalScheduler(XPolicyType type);
+    virtual ~LocalScheduler();
+
+    virtual void Run() override;
+    virtual void Stop() override;
+    virtual void RecvEvent(std::shared_ptr<const Event> event) override;
+
+    void SetPolicy(XPolicyType type);
+    XPolicyType GetPolicy() const { return policy_type_; }
+
+    void WaitAllOperations();
+    void WaitOperations(PID pid);
+    OperationId NextOperationId(PID pid);
+
+private:
+    void Worker();
+    void ExecuteOperations();
+    void CreateXQueueStatus(PID pid, const std::string &cmdline, XQueueHandle handle, XDevice dev,
+                            XPreemptLevel level, int64_t threshold, int64_t batch_size,
+                            bool ready, std::chrono::system_clock::time_point ready_time);
+    void UpdateStatus(std::shared_ptr<const Event> event);
+    void Suspend(XQueueHandle handle);
+    void Resume(XQueueHandle handle);
+    void AddTimer(const std::chrono::system_clock::time_point time_point);
+
+    Status status_;
+    std::deque<std::chrono::system_clock::time_point> timers_;
+
+    XPolicyType policy_type_;
+    std::unique_ptr<Policy> policy_ = nullptr;
+    std::unique_ptr<std::thread> thread_ = nullptr;
+
+    std::mutex event_mtx_;
+    std::condition_variable event_cv_;
+    std::unique_ptr<std::list<std::shared_ptr<const Event>>> event_queue_ = nullptr;
+
+    struct OperationInfo
+    {
+        OperationId issued_id = 0;
+        OperationId completed_id = 0;
+    };
+
+    std::mutex op_mtx_;
+    std::condition_variable op_cv_;
+    std::map<PID, OperationInfo> ops_;
+};
+
+} // namespace xsched::sched

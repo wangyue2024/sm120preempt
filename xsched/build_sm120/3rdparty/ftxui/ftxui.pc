@@ -1,0 +1,9 @@
+prefix="/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/output"
+libdir="/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/output/lib"
+includedir="/mnt/data/1file/Desktop/code/code/xsched/level3opencode/xsched/output/include"
+
+Name: ftxui
+Description: 
+Version: 6.1.9
+Cflags: -I${includedir}
+Libs: -L${libdir} -lftxui-component -lftxui-dom -lftxui-screen
