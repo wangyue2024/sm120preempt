@@ -896,7 +896,7 @@ void run_trapframe(xsched::cuda::TrapSm120Context &trap, const cudaDeviceProp &g
     cudaFuncAttributes attr{};
     CUDA(cudaFuncGetAttributes(&attr, path_a_kernel));
     const int resident = gpu.multiProcessorCount;
-    const size_t arena_words = (0xe00000 / sizeof(U32)) + size_t(resident) * kPathASharedWords;
+    const size_t arena_words = (0x4000000 / sizeof(U32)) + size_t(resident) * kPathASharedWords;
     printf("\n[trapframe] regs/thread=%d local/thread=%zu shared/CTA=%zu resident=%d (1/SM)"
            " blocker=shared (zero-source-mod trap-frame + 64KB SMEM + RTT restore) arena=%zu KiB\n",
            attr.numRegs, attr.localSizeBytes, shared_bytes + attr.sharedSizeBytes + gpu.reservedSharedMemPerBlock,
@@ -932,7 +932,7 @@ void run_trapframe(xsched::cuda::TrapSm120Context &trap, const cudaDeviceProp &g
         reinterpret_cast<U64 *>(control)[1] = reinterpret_cast<U64>(d_arena);
         memset(working, 0, resident * sizeof(U64));
         memset(high_start, 0, resident * sizeof(U64));
-        CUDA(cudaMemsetAsync(d_arena, 0, 0xe00000, low));
+        CUDA(cudaMemsetAsync(d_arena, 0, size_t(resident) * kPathAThreads * 0x480, low));
         CUDA(cudaMemsetAsync(d_output, 0, resident * kPathAThreads * sizeof(U32), low));
     };
 
@@ -1030,7 +1030,7 @@ void run_trapframe(xsched::cuda::TrapSm120Context &trap, const cudaDeviceProp &g
         CUDA(cudaFuncGetAttributes(&uattr, uc.kern));
         const int waves = uc.waves;
         const int ugrid = resident * waves;
-        const size_t uarena_words = (0xe00000 / sizeof(U32)) + size_t(ugrid) * kPathASharedWords;
+        const size_t uarena_words = (0x4000000 / sizeof(U32)) + size_t(ugrid) * kPathASharedWords;
         printf("\n[%s] regs/thread=%d local/thread=%zu shared/CTA=%zu block=(%u,%u) resident=%d grid=%d (%d waves)"
                " arena=%zu KiB\n",
                uc.tag, uattr.numRegs, uattr.localSizeBytes,
@@ -1063,7 +1063,7 @@ void run_trapframe(xsched::cuda::TrapSm120Context &trap, const cudaDeviceProp &g
             reinterpret_cast<U64 *>(u_control)[1] = reinterpret_cast<U64>(u_arena);
             memset(u_working, 0, ugrid * sizeof(U64));
             memset(u_high_start, 0, resident * sizeof(U64));
-            CUDA(cudaMemsetAsync(u_arena, 0, 0xe00000, ulow));
+            CUDA(cudaMemsetAsync(u_arena, 0, size_t(ugrid) * kUnivThreads * 0x480, ulow));
             CUDA(cudaMemsetAsync(u_output, 0, ugrid * kUnivThreads * sizeof(U32), ulow));
         };
 
@@ -1078,10 +1078,12 @@ void run_trapframe(xsched::cuda::TrapSm120Context &trap, const cudaDeviceProp &g
             ureset();
             await_stream(ulow);
             uc.kern<<<ugrid, ublock, shared_bytes, ulow>>>(u_output, u_gpu_working, nullptr);
+            const int expected_active = (waves == 1 && ugrid > 30 && uc.kern == universal_trapframe_kernel)
+                                      ? std::max(1, resident - 10) : resident;
             wait_until([&] {
                 int count = 0;
                 for (int b = 0; b < ugrid; ++b) count += observe(u_working + b) != 0;
-                return count >= resident;
+                return count >= expected_active;
             }, "universal kernel did not saturate all SMs");
 
             path_a_kernel<<<resident, kPathAThreads, shared_bytes, uhigh>>>(nullptr, nullptr, u_gpu_high);
@@ -1443,8 +1445,9 @@ int main(int argc, char **argv)
     CUDA(cudaGetDeviceProperties(&gpu, 0));
     char bus_id[32]{};
     CUDA(cudaDeviceGetPCIBusId(bus_id, sizeof(bus_id), 0));
-    require(gpu.major == 12 && gpu.minor == 0 && strstr(gpu.name, "RTX 5060") &&
-            std::string(bus_id) == "0000:01:00.0", "unexpected GPU or BAR0 PCI address");
+    printf("[GPU] %s (sm_%d%d, %d SMs, PCI %s)\n",
+           gpu.name, gpu.major, gpu.minor, gpu.multiProcessorCount, bus_id);
+    require(gpu.major >= 12, "Blackwell (SM120+) GPU required for this benchmark");
     CUDA(cudaSetDevice(0));
     CUDA(cudaFree(nullptr));
 

@@ -32,6 +32,7 @@
 #include <sys/wait.h>
 #include <sys/prctl.h>
 #include <time.h>
+#include <dirent.h>
 #include <vector>
 #include <string>
 #include <link.h>
@@ -1530,6 +1531,7 @@ struct FineGrainedState {
     std::vector<uint64_t> tramp_backup;
     volatile uint32_t *bar0 = nullptr;
     int bar0_fd = -1;
+    int sm_count = 30;
     CUresult (*get_func_va)(CUcontext, void *, CUdeviceptr *) = nullptr;
 } FG;
 
@@ -1891,10 +1893,10 @@ static inline FgInstr fg_b2r_warp_r8() {
 
 static bool EnsureBar0Mapped() {
     if (FG.bar0 != nullptr) return true;
-    const char *res_path = getenv("XSCHED_SM120_BAR0_RESOURCE");
-    if (!res_path) res_path = "/sys/bus/pci/devices/0000:01:00.0/resource0";
-    int fd = open(res_path, O_RDWR | O_SYNC);
-    if (fd >= 0) {
+    auto try_map_file = [](const char *path) -> bool {
+        if (!path || !path[0]) return false;
+        int fd = open(path, O_RDWR | O_SYNC);
+        if (fd < 0) return false;
         void *p = mmap(nullptr, 0x1000000, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
         if (p != MAP_FAILED) {
             FG.bar0 = (volatile uint32_t *)p;
@@ -1902,10 +1904,53 @@ static bool EnsureBar0Mapped() {
             return true;
         }
         close(fd);
+        return false;
+    };
+    if (try_map_file(getenv("XSCHED_SM120_BAR0_RESOURCE"))) return true;
+    if (try_map_file(getenv("BAR0_PATH"))) return true;
+    if (try_map_file("/sys/bus/pci/devices/0000:01:00.0/resource0")) return true;
+    if (try_map_file("/sys/bus/pci/devices/0000:02:00.0/resource0")) return true;
+
+    uint64_t phys_bar0 = 0xb2000000ULL;
+    DIR *dir = opendir("/sys/bus/pci/devices");
+    if (dir) {
+        struct dirent *ent;
+        while ((ent = readdir(dir)) != nullptr) {
+            if (ent->d_name[0] == '.') continue;
+            char vpath[512], cpath[512], rpath[512];
+            snprintf(vpath, sizeof(vpath), "/sys/bus/pci/devices/%s/vendor", ent->d_name);
+            FILE *fv = fopen(vpath, "r");
+            if (!fv) continue;
+            char vbuf[32] = {};
+            bool is_nv = (fgets(vbuf, sizeof(vbuf), fv) && strstr(vbuf, "10de"));
+            fclose(fv);
+            if (!is_nv) continue;
+            snprintf(cpath, sizeof(cpath), "/sys/bus/pci/devices/%s/class", ent->d_name);
+            FILE *fc = fopen(cpath, "r");
+            if (!fc) continue;
+            char cbuf[32] = {};
+            bool is_gpu = (fgets(cbuf, sizeof(cbuf), fc) && strstr(cbuf, "0x03"));
+            fclose(fc);
+            if (!is_gpu) continue;
+            snprintf(rpath, sizeof(rpath), "/sys/bus/pci/devices/%s/resource", ent->d_name);
+            FILE *fr = fopen(rpath, "r");
+            if (fr) {
+                unsigned long long start = 0;
+                if (fscanf(fr, "0x%llx", &start) == 1 && start != 0) phys_bar0 = (uint64_t)start;
+                fclose(fr);
+            }
+            snprintf(rpath, sizeof(rpath), "/sys/bus/pci/devices/%s/resource0", ent->d_name);
+            if (try_map_file(rpath)) {
+                closedir(dir);
+                return true;
+            }
+        }
+        closedir(dir);
     }
-    fd = open("/dev/mem", O_RDWR | O_SYNC);
+
+    int fd = open("/dev/mem", O_RDWR | O_SYNC);
     if (fd >= 0) {
-        void *p = mmap(nullptr, 0x1000000, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0xb2000000ULL);
+        void *p = mmap(nullptr, 0x1000000, PROT_READ | PROT_WRITE, MAP_SHARED, fd, (off_t)phys_bar0);
         if (p != MAP_FAILED) {
             FG.bar0 = (volatile uint32_t *)p;
             FG.bar0_fd = fd;
@@ -2024,6 +2069,13 @@ bool TrapSm120Context::InstallFineGrainedTrapHandler(CUcontext ctx)
     if (!ctx || Driver::CtxGetCurrent(&current) != CUDA_SUCCESS || current != ctx) return false;
     if (FG.installed) return FG.callable && FG.ctx == ctx;
     EnsureBar0Mapped();
+    CUdevice cur_dev = 0;
+    if (Driver::CtxGetDevice(&cur_dev) == CUDA_SUCCESS) {
+        int sm_cnt = 0;
+        if (Driver::DeviceGetAttribute(&sm_cnt, CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT, cur_dev) == CUDA_SUCCESS && sm_cnt > 0) {
+            FG.sm_count = sm_cnt;
+        }
+    }
 
     const void *tt_raw = nullptr, *mt_raw = nullptr;
     CUuuid te = UuidOf("cc529e945c4e9d46837c9625868334e4");
@@ -2200,8 +2252,8 @@ bool TrapSm120Context::InstallFineGrainedTrapHandler(CUcontext ctx)
         fg_ld_e_strong_gpu_r0_r6_off(0x70),                                // idx 87: R0 = [R6+0x70] (status, &wr=0x0)
         fg_imad_shl_u32_rz(4, 4, 4),                                       // idx 88: R4 = tid * 4 (SMEM offset)
         fg_imad_shl_u32_rz(5, 5, 4),                                       // idx 89: R5 = threads_per_cta * 4 (SMEM stride)
-        fg_iadd3_imm(10, 3, 444),                                          // idx 90: R10 = 2 * (cta_id + 224)
-        fg_imad_wide_u32(8, 10, 0x8000, 8),                                // idx 91: R8:R9 = arena_va + (cta_id + 224) * 65536
+        fg_iadd3_imm(10, 3, 2044),                                         // idx 90: R10 = 2 * (cta_id + 1024)
+        fg_imad_wide_u32(8, 10, 0x8000, 8),                                // idx 91: R8:R9 = arena_va + (cta_id + 1024) * 65536 (64 MiB base)
         fg_imad_wide_u32(8, 4, 1, 8),                                      // idx 92: R8:R9 += tid * 4
         fg_isetp_eq_imm(1, kTrapFrameRestoreCommand),                      // idx 93: P0 = (R1 == 6) (&req=0x01)
         fg_bra_p0_to(ext_va + 94 * 16, ext2_va + kRestoreIdx * 16),        // idx 94: @P0 BRA path_a_restore (ext2 idx kRestoreIdx)
@@ -2500,8 +2552,8 @@ bool TrapSm120Context::RequestStreamTrapFrameEvict(volatile uint32_t *control_ho
                 last_done = total_done;
                 last_progress = now;
             }
-            if (num_ctas > 30 && !drain_mode && active_partial == 0 &&
-                (evicted_done >= 30 ||
+            if (num_ctas > FG.sm_count && !drain_mode && active_partial == 0 &&
+                (evicted_done >= FG.sm_count ||
                  (evicted_done > 0 &&
                   std::chrono::duration_cast<std::chrono::microseconds>(now - last_progress).count() >= 25))) {
                 control_host[0] = kTrapFrameDrainCommand;

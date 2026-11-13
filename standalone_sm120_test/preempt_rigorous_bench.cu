@@ -307,6 +307,13 @@ int main() {
     warmup_k<<<1, 1>>>();
     cudaDeviceSynchronize();
 
+    cudaDeviceProp gpu_prop{};
+    cudaGetDeviceProperties(&gpu_prop, 0);
+    const int S1 = gpu_prop.multiProcessorCount; // 30 on RTX 5060, 170 on RTX 5090
+    const int S2 = 2 * S1;
+    const int S8 = 8 * S1;
+    printf("[GPU] %s (sm_%d%d, %d SMs)\n\n", gpu_prop.name, gpu_prop.major, gpu_prop.minor, S1);
+
     CUcontext ctx = nullptr;
     cuCtxGetCurrent(&ctx);
     sm120arena::Info info = sm120arena::probe(ctx, 0);
@@ -328,12 +335,13 @@ int main() {
     cudaGetFuncBySymbol(&f_high, (const void *)high_pri_compute_burst_kernel);
     cudaGetFuncBySymbol(&f_sgemm, (const void *)tiled_sgemm_2d_kernel);
 
-    // Allocate mapped control buffers (support up to 2048 CTAs -> 16 KB per buffer)
+    // Allocate mapped control buffers (support up to 4096 CTAs -> 32 KB per buffer)
+    const size_t pbuf_bytes = 32768;
     volatile uint32_t *pbuf_low = nullptr, *pbuf_high = nullptr;
-    cudaHostAlloc((void **)&pbuf_low, 16384, cudaHostAllocMapped);
-    cudaHostAlloc((void **)&pbuf_high, 16384, cudaHostAllocMapped);
-    memset((void *)pbuf_low, 0, 16384);
-    memset((void *)pbuf_high, 0, 16384);
+    cudaHostAlloc((void **)&pbuf_low, pbuf_bytes, cudaHostAllocMapped);
+    cudaHostAlloc((void **)&pbuf_high, pbuf_bytes, cudaHostAllocMapped);
+    memset((void *)pbuf_low, 0, pbuf_bytes);
+    memset((void *)pbuf_high, 0, pbuf_bytes);
 
     // Allocate device/mapped buffers for workloads
     volatile unsigned long long *cta_progress = nullptr, *t_last_low = nullptr;
@@ -343,14 +351,14 @@ int main() {
     float *d_scratch = nullptr, *d_high_out = nullptr;
     float *d_A = nullptr, *d_B = nullptr, *d_C = nullptr;
 
-    cudaHostAlloc((void **)&cta_progress, 512 * sizeof(unsigned long long), cudaHostAllocMapped);
+    cudaHostAlloc((void **)&cta_progress, (S8 + 64) * sizeof(unsigned long long), cudaHostAllocMapped);
     cudaHostAlloc((void **)&t_last_low, sizeof(unsigned long long), cudaHostAllocMapped);
     cudaHostAlloc((void **)&t_high_start, sizeof(unsigned long long), cudaHostAllocMapped);
     cudaHostAlloc((void **)&t_high_end, sizeof(unsigned long long), cudaHostAllocMapped);
     cudaHostAlloc((void **)&atomic_accum, sizeof(unsigned long long), cudaHostAllocMapped);
-    cudaHostAlloc((void **)&out_checksums, 240 * 768 * sizeof(unsigned int), cudaHostAllocMapped);
-    cudaMalloc(&d_scratch, 240 * 768 * sizeof(float));
-    cudaMalloc(&d_high_out, 60 * 512 * sizeof(float));
+    cudaHostAlloc((void **)&out_checksums, (size_t)S8 * 768 * sizeof(unsigned int), cudaHostAllocMapped);
+    cudaMalloc(&d_scratch, (size_t)S8 * 768 * sizeof(float));
+    cudaMalloc(&d_high_out, (size_t)S2 * 512 * sizeof(float));
 
     const int N_GEMM = 1024;
     cudaMalloc(&d_A, N_GEMM * N_GEMM * sizeof(float));
@@ -493,13 +501,13 @@ int main() {
     cuXtraInvalInstrCache(ctx);
 
     printf("====================================================================================================\n");
-    printf(" [BENCH 1] FULL-CHIP (ALL 30 SMs) HEAVY COMPUTE CONTENTION & REALLOCATION (Mode 2 In-Place Pause)\n");
-    printf("   - Low-Priority Workload : 60 CTAs x 512 threads = 30,720 threads across all 30 SMs (Non-Idempotent)\n");
-    printf("   - High-Priority Burst   : 60 CTAs x 256 threads = 15,360 threads across all 30 SMs (8.05 GFLOP FP32)\n");
+    printf(" [BENCH 1] FULL-CHIP (ALL %d SMs) HEAVY COMPUTE CONTENTION & REALLOCATION (Mode 2 In-Place Pause)\n", S1);
+    printf("   - Low-Priority Workload : %d CTAs x 512 threads = %d threads across all %d SMs (Non-Idempotent)\n", S2, S2 * 512, S1);
+    printf("   - High-Priority Burst   : %d CTAs x 256 threads = %d threads across all %d SMs\n", S2, S2 * 256, S1);
     printf("====================================================================================================\n");
 
-    unsigned int high_loops = 8192; // 60 * 256 * 8192 * 64 FLOPs = 8.053 GFLOPs
-    double high_gflops_work = (double)60 * 256 * (double)high_loops * 64.0 / 1e9;
+    unsigned int high_loops = 8192;
+    double high_gflops_work = (double)S2 * 256 * (double)high_loops * 64.0 / 1e9;
     void *args_high[] = { &d_high_out, &t_high_start, &t_high_end, &high_loops };
     unsigned int warmup_iters = 16;
     void *args_low_warm[] = { &cta_progress, &t_last_low, &atomic_accum, &out_checksums, &d_scratch, &warmup_iters };
@@ -509,13 +517,13 @@ int main() {
     cuLaunchKernel(f_high, 1, 1, 1, 32, 1, 1, 0, stream_high, args_high, nullptr);
     cuCtxSynchronize();
 
-    // 1A: Solo Baseline (High-Priority Burst on Idle GPU across all 30 SMs)
+    // 1A: Solo Baseline (High-Priority Burst on Idle GPU across all SMs)
     double sum_solo_us = 0;
     const int B1_ITERS = 3;
     for (int i = 0; i < B1_ITERS; i++) {
         *t_high_start = ~0ULL; *t_high_end = 0ULL;
         uint64_t ht0 = read_ptimer();
-        cuLaunchKernel(f_high, 60, 1, 1, 256, 1, 1, 0, stream_high_eq, args_high, nullptr);
+        cuLaunchKernel(f_high, S2, 1, 1, 256, 1, 1, 0, stream_high_eq, args_high, nullptr);
         cuStreamSynchronize(stream_high_eq);
         uint64_t ht1 = read_ptimer();
         sum_solo_us += (ht1 - ht0) / 1000.0;
@@ -525,23 +533,23 @@ int main() {
     printf("  [1A. Solo Idle-GPU Baseline]     High-Pri Turnaround = %7.2f us | Throughput = %7.2f GFLOPS (100.0%%)\n",
            avg_solo_us, solo_gflops);
 
-    // 1B-1: Unpreempted Contention (Standard Equal-Priority CUDA Streams across all 30 SMs)
+    // 1B-1: Unpreempted Contention (Standard Equal-Priority CUDA Streams across all SMs)
     unsigned int low_iters_b1 = 49152;
     void *args_low_b1[] = { &cta_progress, &t_last_low, &atomic_accum, &out_checksums, &d_scratch, &low_iters_b1 };
     double sum_contended_us = 0;
     for (int i = 0; i < B1_ITERS; i++) {
-        memset((void *)pbuf_low, 0, 1024);
-        memset((void *)cta_progress, 0, 60 * 8);
+        memset((void *)pbuf_low, 0, pbuf_bytes);
+        memset((void *)cta_progress, 0, S2 * 8);
         *t_last_low = 0; *atomic_accum = 0;
         bind_kernel(f_low, pbuf_low, 1);
         bind_kernel(f_high, pbuf_high, 2);
-        cuLaunchKernel(f_low, 60, 1, 1, 512, 1, 1, 0, stream_low, args_low_b1, nullptr);
-        while (*t_last_low == 0 || cta_progress[59] == 0) usleep(10);
-        usleep(1000); // All 60 CTAs actively saturating all 30 SMs
+        cuLaunchKernel(f_low, S2, 1, 1, 512, 1, 1, 0, stream_low, args_low_b1, nullptr);
+        while (*t_last_low == 0 || cta_progress[S2 - 1] == 0) usleep(10);
+        usleep(1000); // All S2 CTAs actively saturating all SMs
 
         *t_high_start = ~0ULL; *t_high_end = 0ULL;
         uint64_t ht0 = read_ptimer();
-        cuLaunchKernel(f_high, 60, 1, 1, 256, 1, 1, 0, stream_high_eq, args_high, nullptr);
+        cuLaunchKernel(f_high, S2, 1, 1, 256, 1, 1, 0, stream_high_eq, args_high, nullptr);
         cuStreamSynchronize(stream_high_eq);
         uint64_t ht1 = read_ptimer();
         sum_contended_us += (ht1 - ht0) / 1000.0;
@@ -555,18 +563,18 @@ int main() {
     // 1B-2: Unpreempted Contention with CUDA Hardware Priority Stream (-5)
     double sum_hwpri_us = 0;
     for (int i = 0; i < B1_ITERS; i++) {
-        memset((void *)pbuf_low, 0, 1024);
-        memset((void *)cta_progress, 0, 60 * 8);
+        memset((void *)pbuf_low, 0, pbuf_bytes);
+        memset((void *)cta_progress, 0, S2 * 8);
         *t_last_low = 0; *atomic_accum = 0;
         bind_kernel(f_low, pbuf_low, 1);
         bind_kernel(f_high, pbuf_high, 2);
-        cuLaunchKernel(f_low, 60, 1, 1, 512, 1, 1, 0, stream_low, args_low_b1, nullptr);
-        while (*t_last_low == 0 || cta_progress[59] == 0) usleep(10);
+        cuLaunchKernel(f_low, S2, 1, 1, 512, 1, 1, 0, stream_low, args_low_b1, nullptr);
+        while (*t_last_low == 0 || cta_progress[S2 - 1] == 0) usleep(10);
         usleep(1000);
 
         *t_high_start = ~0ULL; *t_high_end = 0ULL;
         uint64_t ht0 = read_ptimer();
-        cuLaunchKernel(f_high, 60, 1, 1, 256, 1, 1, 0, stream_high, args_high, nullptr);
+        cuLaunchKernel(f_high, S2, 1, 1, 256, 1, 1, 0, stream_high, args_high, nullptr);
         cuStreamSynchronize(stream_high);
         uint64_t ht1 = read_ptimer();
         sum_hwpri_us += (ht1 - ht0) / 1000.0;
@@ -582,17 +590,17 @@ int main() {
     int b1_checksum_errs = 0;
     int total_errors = 0;
     unsigned long long last_atomic = 0;
-    unsigned long long expected_atomic_b1 = (unsigned long long)60 * (low_iters_b1 / 256);
+    unsigned long long expected_atomic_b1 = (unsigned long long)S2 * (low_iters_b1 / 256);
 
     for (int i = 0; i < B1_ITERS; i++) {
-        memset((void *)pbuf_low, 0, 1024);
-        memset((void *)cta_progress, 0, 60 * 8);
+        memset((void *)pbuf_low, 0, pbuf_bytes);
+        memset((void *)cta_progress, 0, S2 * 8);
         *t_last_low = 0; *atomic_accum = 0;
         bind_kernel(f_low, pbuf_low, 1);
         bind_kernel(f_high, pbuf_high, 2);
-        cuLaunchKernel(f_low, 60, 1, 1, 512, 1, 1, 0, stream_low, args_low_b1, nullptr);
-        while (*t_last_low == 0 || cta_progress[59] == 0) usleep(10);
-        usleep(1000); // Let stream_low saturate all 30 SMs
+        cuLaunchKernel(f_low, S2, 1, 1, 512, 1, 1, 0, stream_low, args_low_b1, nullptr);
+        while (*t_last_low == 0 || cta_progress[S2 - 1] == 0) usleep(10);
+        usleep(1000); // Let stream_low saturate all SMs
 
         // Preempt stream_low via Mode 2 (Normal-Mode Yielding Trampoline)
         uint64_t tp0 = read_ptimer();
@@ -605,10 +613,10 @@ int main() {
         if (t_stopped <= tp0) total_errors++;
         double yield_us = (double)((int64_t)(t_stopped - tp0)) / 1000.0;
 
-        // Launch High-Priority Burst while stream_low's 30,720 threads yield in Normal-Mode Trampoline on the 30 SMs
+        // Launch High-Priority Burst while stream_low's threads yield in Normal-Mode Trampoline
         *t_high_start = ~0ULL; *t_high_end = 0ULL;
         uint64_t ht0 = read_ptimer();
-        cuLaunchKernel(f_high, 60, 1, 1, 256, 1, 1, 0, stream_high_eq, args_high, nullptr);
+        cuLaunchKernel(f_high, S2, 1, 1, 256, 1, 1, 0, stream_high_eq, args_high, nullptr);
         cuStreamSynchronize(stream_high_eq);
         uint64_t ht1 = read_ptimer();
 
@@ -630,8 +638,8 @@ int main() {
         last_atomic = *atomic_accum;
         if (last_atomic != expected_atomic_b1) total_errors++;
     }
-    // Verify non-idempotent checksums across 30,720 threads
-    for (unsigned int tid = 0; tid < 60 * 512; tid += 64) {
+    // Verify non-idempotent checksums across all threads
+    for (unsigned int tid = 0; tid < (unsigned int)(S2 * 512); tid += 64) {
         if (out_checksums[tid] != compute_ref_checksum(tid, low_iters_b1)) b1_checksum_errs++;
     }
     if (b1_checksum_errs != 0) total_errors += b1_checksum_errs;
@@ -641,17 +649,17 @@ int main() {
            avg_preempted_us, preempted_gflops, 100.0 * preempted_gflops / solo_gflops, avg_contended_us / avg_preempted_us);
     printf("       -> Preemption Latencies : BAR0 MMIO = %.2f us | On-GPU Compute Yield = %.2f us | In-Place Resume = %.2f us\n",
            sum_mmio_us / B1_ITERS, sum_yield_us / B1_ITERS, sum_resume_us / B1_ITERS);
-    printf("       -> Non-Idempotent State : atomic_accum = %llu / %llu | sampled_checksum_errors = %d ( across 30,720 threads! )\n\n",
-           last_atomic, expected_atomic_b1, b1_checksum_errs);
+    printf("       -> Non-Idempotent State : atomic_accum = %llu / %llu | sampled_checksum_errors = %d ( across %d threads! )\n\n",
+           last_atomic, expected_atomic_b1, b1_checksum_errs, S2 * 512);
 
     // -----------------------------------------------------------------------
-    // BENCH 2: 100% SM Hardware Slot Saturation (46,080 / 46,080 Threads)
+    // BENCH 2: 100% SM Hardware Slot Saturation
     //          Proving Mode 3 Hybrid Slot Eviction + In-Place Pause & Mode 1 Multi-Wave Takeover
     // -----------------------------------------------------------------------
     printf("====================================================================================================\n");
-    printf(" [BENCH 2] 100%% SM HARDWARE SLOT SATURATION (46,080 / 46,080 Threads = 100%% Occupancy on 30 SMs)\n");
-    printf("   - Low-Priority Workload : 60 CTAs x 768 threads = 46,080 threads (100.0%% of hardware thread slots!)\n");
-    printf("   - High-Priority Arrival : 30 CTAs x 512 threads = 15,360 threads (arrives AFTER all SM slots are full)\n");
+    printf(" [BENCH 2] 100%% SM HARDWARE SLOT SATURATION (%d / %d Threads = 100%% Occupancy on %d SMs)\n", S2 * 768, S2 * 768, S1);
+    printf("   - Low-Priority Workload : %d CTAs x 768 threads = %d threads (100.0%% of hardware thread slots!)\n", S2, S2 * 768);
+    printf("   - High-Priority Arrival : %d CTAs x 512 threads = %d threads (arrives AFTER all SM slots are full)\n", S1, S1 * 512);
     printf("====================================================================================================\n");
 
     unsigned int low_iters_b2 = 65536;
@@ -659,11 +667,11 @@ int main() {
     unsigned int high_loops_b2 = 4096;
     void *args_high_b2[] = { &d_high_out, &t_high_start, &t_high_end, &high_loops_b2 };
 
-    // 2A: Solo High-Pri Baseline (30 CTAs x 512 threads)
+    // 2A: Solo High-Pri Baseline (S1 CTAs x 512 threads)
     bind_kernel(f_high, pbuf_high, 2);
     *t_high_start = ~0ULL; *t_high_end = 0ULL;
     uint64_t b2_s0 = read_ptimer();
-    cuLaunchKernel(f_high, 30, 1, 1, 512, 1, 1, 0, stream_high, args_high_b2, nullptr);
+    cuLaunchKernel(f_high, S1, 1, 1, 512, 1, 1, 0, stream_high, args_high_b2, nullptr);
     cuStreamSynchronize(stream_high);
     uint64_t b2_s1 = read_ptimer();
     double b2_solo_us = (b2_s1 - b2_s0) / 1000.0;
@@ -671,18 +679,18 @@ int main() {
            b2_solo_us, (double)(*t_high_start - b2_s0) / 1000.0);
 
     // 2B: Unpreempted 100% Slot Saturation (stream_high blocked waiting for SM slots)
-    memset((void *)pbuf_low, 0, 1024);
-    memset((void *)cta_progress, 0, 60 * 8);
+    memset((void *)pbuf_low, 0, pbuf_bytes);
+    memset((void *)cta_progress, 0, S2 * 8);
     *t_last_low = 0; *atomic_accum = 0;
     bind_kernel(f_low, pbuf_low, 1);
     bind_kernel(f_high, pbuf_high, 2);
-    cuLaunchKernel(f_low, 60, 1, 1, 768, 1, 1, 0, stream_low, args_low_b2, nullptr);
-    while (*t_last_low == 0 || cta_progress[29] == 0) usleep(10);
-    usleep(500); // All 30 SMs saturated by 768-thread CTAs!
+    cuLaunchKernel(f_low, S2, 1, 1, 768, 1, 1, 0, stream_low, args_low_b2, nullptr);
+    while (*t_last_low == 0 || cta_progress[S1 - 1] == 0) usleep(10);
+    usleep(500); // All SMs saturated by 768-thread CTAs!
 
     *t_high_start = ~0ULL; *t_high_end = 0ULL;
     uint64_t b2_u0 = read_ptimer();
-    cuLaunchKernel(f_high, 30, 1, 1, 512, 1, 1, 0, stream_high, args_high_b2, nullptr);
+    cuLaunchKernel(f_high, S1, 1, 1, 512, 1, 1, 0, stream_high, args_high_b2, nullptr);
     cuStreamSynchronize(stream_high);
     uint64_t b2_u1 = read_ptimer();
     cuStreamSynchronize(stream_low);
@@ -691,18 +699,18 @@ int main() {
     printf("  [2B. Unpreempted 100%% Full Slots] Turnaround = %8.2f us | Queue-to-SM-Start Delay = %6.2f us (Blocked by 100%% full SM slots!)\n",
            b2_unpreempt_us, b2_unpreempt_qdelay);
 
-    // 2C: Mode 3 Hybrid (Evict CTAs 0..29 via cmd=1 to free 23,040 thread slots + Pause CTAs 30..59 in-place via cmd=2!)
-    memset((void *)pbuf_low, 0, 1024);
-    memset((void *)cta_progress, 0, 60 * 8);
+    // 2C: Mode 3 Hybrid (Evict CTAs 0..S1-1 via cmd=1 + Pause CTAs S1..S2-1 in-place via cmd=2!)
+    memset((void *)pbuf_low, 0, pbuf_bytes);
+    memset((void *)cta_progress, 0, S2 * 8);
     *t_last_low = 0; *atomic_accum = 0;
     bind_kernel(f_low, pbuf_low, 1);
     bind_kernel(f_high, pbuf_high, 2);
-    cuLaunchKernel(f_low, 60, 1, 1, 768, 1, 1, 0, stream_low, args_low_b2, nullptr);
-    while (*t_last_low == 0 || cta_progress[29] == 0) usleep(10);
-    usleep(500); // All 30 SMs saturated
+    cuLaunchKernel(f_low, S2, 1, 1, 768, 1, 1, 0, stream_low, args_low_b2, nullptr);
+    while (*t_last_low == 0 || cta_progress[S1 - 1] == 0) usleep(10);
+    usleep(500); // All SMs saturated
 
-    for (int c = 0; c < 30; c++) pbuf_low[4 + 2 * c] = 1u;  // Evict CTAs 0..29 (free slots across all 30 SMs)
-    for (int c = 30; c < 60; c++) pbuf_low[4 + 2 * c] = 2u; // In-place pause CTAs 30..59 (preserve state!)
+    for (int c = 0; c < S1; c++) pbuf_low[4 + 2 * c] = 1u;  // Evict CTAs 0..S1-1 (free slots across all SMs)
+    for (int c = S1; c < S2; c++) pbuf_low[4 + 2 * c] = 2u; // In-place pause CTAs S1..S2-1 (preserve state!)
     pbuf_low[0] = 3u;
     __sync_synchronize();
 
@@ -710,35 +718,35 @@ int main() {
     uint64_t b2_h0 = read_ptimer();
     pulse_trap_broadcast();
     usleep(20);
-    cuLaunchKernel(f_high, 30, 1, 1, 512, 1, 1, 0, stream_high, args_high_b2, nullptr);
+    cuLaunchKernel(f_high, S1, 1, 1, 512, 1, 1, 0, stream_high, args_high_b2, nullptr);
     cuStreamSynchronize(stream_high);
     uint64_t b2_h1 = read_ptimer();
 
-    // Resume CTAs 30..59 in-place!
+    // Resume CTAs S1..S2-1 in-place!
     pbuf_low[0] = 0u;
     __sync_synchronize();
     pulse_trap_broadcast();
     cuStreamSynchronize(stream_low);
 
     int evicted_flags = 0, preserved_completed = 0;
-    for (int c = 0; c < 60; c++) {
+    for (int c = 0; c < S2; c++) {
         if (pbuf_low[5 + 2 * c] == 1u) evicted_flags++;
-        if (c >= 30 && (cta_progress[c] & (1ULL << 62))) preserved_completed++;
+        if (c >= S1 && (cta_progress[c] & (1ULL << 62))) preserved_completed++;
     }
     double b2_hybrid_us = (b2_h1 - b2_h0) / 1000.0;
     double b2_hybrid_qdelay = (double)(*t_high_start - b2_h0) / 1000.0;
     printf("  [2C. Mode 3 Hybrid Evict+Pause]  Turnaround = %8.2f us | Queue-to-SM-Start Delay = %6.2f us (%.1fx Faster Turnaround!)\n",
            b2_hybrid_us, b2_hybrid_qdelay, b2_unpreempt_us / b2_hybrid_us);
-    printf("       -> Hybrid State Accounting: Evicted CTAs recorded = %d/30 | In-Place Paused CTAs 30..59 resumed & completed = %d/30\n",
-           evicted_flags, preserved_completed);
+    printf("       -> Hybrid State Accounting: Evicted CTAs recorded = %d/%d | In-Place Paused CTAs %d..%d resumed & completed = %d/%d\n",
+           evicted_flags, S1, S1, S2 - 1, preserved_completed, S1);
 
-    // 2D: Multi-Wave Grid (240 CTAs x 512 threads = 4 Waves across 30 SMs) Preemption via Mode 1 + High-Pri Stream
-    memset((void *)pbuf_low, 0, 4096);
-    memset((void *)cta_progress, 0, 240 * 8);
+    // 2D: Multi-Wave Grid (S8 CTAs x 512 threads = 4 Waves across S1 SMs) Preemption via Mode 1 + High-Pri Stream
+    memset((void *)pbuf_low, 0, pbuf_bytes);
+    memset((void *)cta_progress, 0, S8 * 8);
     *t_last_low = 0; *atomic_accum = 0;
     bind_kernel(f_low, pbuf_low, 1);
     bind_kernel(f_high, pbuf_high, 2);
-    cuLaunchKernel(f_low, 240, 1, 1, 512, 1, 1, 0, stream_low, args_low_b2, nullptr);
+    cuLaunchKernel(f_low, S8, 1, 1, 512, 1, 1, 0, stream_low, args_low_b2, nullptr);
     while (*t_last_low == 0) usleep(10);
     usleep(1000);
 
@@ -748,7 +756,7 @@ int main() {
     uint64_t b2_m0 = read_ptimer();
     pulse_trap_broadcast();
     usleep(20);
-    cuLaunchKernel(f_high, 60, 1, 1, 256, 1, 1, 0, stream_high, args_high_b2, nullptr);
+    cuLaunchKernel(f_high, S2, 1, 1, 256, 1, 1, 0, stream_high, args_high_b2, nullptr);
     cuStreamSynchronize(stream_high);
     uint64_t b2_m1 = read_ptimer();
     while (cuStreamQuery(stream_low) == CUDA_ERROR_NOT_READY) {
@@ -758,8 +766,8 @@ int main() {
     cuStreamSynchronize(stream_low);
     double b2_mw_us = (b2_m1 - b2_m0) / 1000.0;
     double b2_mw_qdelay = (double)(*t_high_start - b2_m0) / 1000.0;
-    printf("  [2D. Mode 1 Multi-Wave (240 CTA)] High-Pri Turnaround = %8.2f us | Queue-to-SM-Start Delay = %6.2f us (Wave-0 Evicted -> High-Pri Immediate Takeover!)\n\n",
-           b2_mw_us, b2_mw_qdelay);
+    printf("  [2D. Mode 1 Multi-Wave (%d CTA)] High-Pri Turnaround = %8.2f us | Queue-to-SM-Start Delay = %6.2f us (Wave-0 Evicted -> High-Pri Immediate Takeover!)\n\n",
+           S8, b2_mw_us, b2_mw_qdelay);
 
     // -----------------------------------------------------------------------
     // BENCH 3: Real-World 2D Tiled SGEMM (1024x1024) Overhead Breakdown (O1, O2, O3, O4)
@@ -768,7 +776,7 @@ int main() {
     printf(" [BENCH 3] QUANTITATIVE OVERHEAD BREAKDOWN ON 2D TILED SGEMM (1024x1024, Grid=(6,10), Block=(16,16))\n");
     printf("====================================================================================================\n");
 
-    memset((void *)pbuf_high, 0, 16384);
+    memset((void *)pbuf_high, 0, pbuf_bytes);
     bind_kernel(f_sgemm, pbuf_high, 300);
 
     // O1 Part 2: Measure 2D Tiled SGEMM AFTER hook install + debugger params bound (0 traps fired)
@@ -805,16 +813,16 @@ int main() {
            avg_sgemm_10pulses_us, per_pulse_tax_us, 100.0 * per_pulse_tax_us / avg_sgemm_hooked_us);
 
     // O3: Co-Resident Normal-Mode Trampoline Tax on 2D Tiled SGEMM
-    memset((void *)pbuf_low, 0, 1024);
-    memset((void *)cta_progress, 0, 60 * 8);
+    memset((void *)pbuf_low, 0, pbuf_bytes);
+    memset((void *)cta_progress, 0, S2 * 8);
     *t_last_low = 0; *atomic_accum = 0;
     bind_kernel(f_low, pbuf_low, 1);
     bind_kernel(f_sgemm, pbuf_high, 300);
-    cuLaunchKernel(f_low, 30, 1, 1, 512, 1, 1, 0, stream_low, args_low_b1, nullptr);
+    cuLaunchKernel(f_low, S1, 1, 1, 512, 1, 1, 0, stream_low, args_low_b1, nullptr);
     uint64_t tw0 = read_ptimer();
-    while ((*t_last_low == 0 || cta_progress[29] == 0) && (read_ptimer() - tw0) < 2000000000ULL) usleep(10);
+    while ((*t_last_low == 0 || cta_progress[S1 - 1] == 0) && (read_ptimer() - tw0) < 2000000000ULL) usleep(10);
     usleep(500);
-    // Pause all 30 CTAs (15,360 threads across all 30 SMs) of stream_low in Normal-Mode Trampoline
+    // Pause all S1 CTAs of stream_low in Normal-Mode Trampoline
     pbuf_low[0] = 2u;
     __sync_synchronize();
     pulse_trap_broadcast();
@@ -826,8 +834,8 @@ int main() {
         cuLaunchKernel(f_sgemm, 6, 10, 1, 16, 16, 1, 0, stream_high_eq, args_sgemm, nullptr);
         while (cuStreamQuery(stream_high_eq) == CUDA_ERROR_NOT_READY) {
             if ((read_ptimer() - t0) > 1000000000ULL) {
-                printf("  [O3 DIAG] stream_high_eq blocked at iter %d (cta_prog[0]=%llu, [29]=%llu)! Resuming stream_low...\n",
-                       i, cta_progress[0], cta_progress[29]);
+                printf("  [O3 DIAG] stream_high_eq blocked at iter %d (cta_prog[0]=%llu, [%d]=%llu)! Resuming stream_low...\n",
+                       i, cta_progress[0], S1 - 1, cta_progress[S1 - 1]);
                 pbuf_low[0] = 0u;
                 __sync_synchronize();
                 pulse_trap_broadcast();
@@ -845,8 +853,8 @@ int main() {
     uint64_t tw_low = read_ptimer();
     while (cuStreamQuery(stream_low) == CUDA_ERROR_NOT_READY) {
         if ((read_ptimer() - tw_low) > 1000000000ULL) {
-            printf("  [O3 DIAG] stream_low blocked on resume (cta_prog[0]=%llu, [29]=%llu)! Sending exit...\n",
-                   cta_progress[0], cta_progress[29]);
+            printf("  [O3 DIAG] stream_low blocked on resume (cta_prog[0]=%llu, [%d]=%llu)! Sending exit...\n",
+                   cta_progress[0], S1 - 1, cta_progress[S1 - 1]);
             pbuf_low[0] = 1u;
             __sync_synchronize();
             pulse_trap_broadcast();
@@ -859,26 +867,26 @@ int main() {
 
     double avg_sgemm_coresident_us = sum_sgemm_coresident_us / 5.0;
     double o3_pct = 100.0 * (avg_sgemm_coresident_us - avg_sgemm_hooked_us) / avg_sgemm_hooked_us;
-    printf("  [O3. Co-Resident Trampoline Tax]    Solo SGEMM = %7.2f us | w/ 30 Paused CTAs (All 30 SMs) = %7.2f us | Overhead = %+5.2f%%\n\n",
-           avg_sgemm_hooked_us, avg_sgemm_coresident_us, o3_pct);
+    printf("  [O3. Co-Resident Trampoline Tax]    Solo SGEMM = %7.2f us | w/ %d Paused CTAs (All %d SMs) = %7.2f us | Overhead = %+5.2f%%\n\n",
+           avg_sgemm_hooked_us, S1, S1, avg_sgemm_coresident_us, o3_pct);
 
     // -----------------------------------------------------------------------
-    // O4: 50-Cycle Statistical Latency Distribution under Full 30-SM Load
+    // O4: 50-Cycle Statistical Latency Distribution under Full SM Load
     // -----------------------------------------------------------------------
     printf("====================================================================================================\n");
-    printf(" [BENCH 4] 50-CYCLE STATISTICAL LATENCY DISTRIBUTION UNDER FULL 30-SM LOAD (Min/Avg/P50/P90/P99/Max)\n");
+    printf(" [BENCH 4] 50-CYCLE STATISTICAL LATENCY DISTRIBUTION UNDER FULL %d-SM LOAD (Min/Avg/P50/P90/P99/Max)\n", S1);
     printf("====================================================================================================\n");
 
     unsigned int low_iters_b4 = 131072;
-    unsigned long long expected_atomic_b4 = (unsigned long long)60 * (low_iters_b4 / 256);
+    unsigned long long expected_atomic_b4 = (unsigned long long)S2 * (low_iters_b4 / 256);
     void *args_low_b4[] = { &cta_progress, &t_last_low, &atomic_accum, &out_checksums, &d_scratch, &low_iters_b4 };
-    memset((void *)pbuf_low, 0, 1024);
-    memset((void *)cta_progress, 0, 60 * 8);
+    memset((void *)pbuf_low, 0, pbuf_bytes);
+    memset((void *)cta_progress, 0, S2 * 8);
     *t_last_low = 0; *atomic_accum = 0;
     bind_kernel(f_low, pbuf_low, 1);
 
-    cuLaunchKernel(f_low, 60, 1, 1, 512, 1, 1, 0, stream_low, args_low_b4, nullptr);
-    while (*t_last_low == 0 || cta_progress[59] == 0) usleep(10);
+    cuLaunchKernel(f_low, S2, 1, 1, 512, 1, 1, 0, stream_low, args_low_b4, nullptr);
+    while (*t_last_low == 0 || cta_progress[S2 - 1] == 0) usleep(10);
     usleep(500);
 
     std::vector<double> vec_mmio, vec_yield, vec_resume;
@@ -921,7 +929,7 @@ int main() {
     if (res_b4 != CUDA_SUCCESS) total_errors++;
 
     int b4_checksum_errs = 0;
-    for (unsigned int tid = 0; tid < 60 * 512; tid += 64) {
+    for (unsigned int tid = 0; tid < (unsigned int)(S2 * 512); tid += 64) {
         if (out_checksums[tid] != compute_ref_checksum(tid, low_iters_b4)) b4_checksum_errs++;
     }
     unsigned long long b4_atomic = *atomic_accum;
@@ -929,7 +937,7 @@ int main() {
     total_errors += b4_total_errs;
 
     print_stats("1. Host BAR0 MMIO Pulse Latency", vec_mmio);
-    print_stats("2. On-GPU 30-SM Compute Yield", vec_yield);
+    print_stats("2. On-GPU Full-Chip Compute Yield", vec_yield);
     print_stats("3. In-Place Trampoline Resume", vec_resume);
     printf("  [50-Cycle Integrity Verification]   stream_low completed after 50 Pause/Resume cycles: atomic=%llu/%llu | checksum_errs=%d | timing_errs=%d (total_errors=%d)\n",
            b4_atomic, expected_atomic_b4, b4_checksum_errs, b4_timing_errs, total_errors);

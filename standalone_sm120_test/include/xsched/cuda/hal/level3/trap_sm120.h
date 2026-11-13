@@ -44,8 +44,22 @@ public:
     //   Mode 1: Per-Stream Early-Exit + XSched Per-CTA Restore Flags
     //   Mode 2: Non-Abort Resumable Per-Stream Pause & In-Place Resume (Non-Idempotent Safe)
     //   Mode 3: Sub-Stream Per-CTA Selective Pause & In-Place Resume Inside a Single Kernel
+    //   Mode 4: Signal an opt-in kernel to checkpoint and exit at a CTA-safe boundary.
     bool InstallFineGrainedTrapHandler(CUcontext ctx);
     bool BindKernelPreemptBuffer(CUfunction func, uint64_t preempt_buf_va, int64_t kernel_idx, uint64_t guardian_va = 0);
+    // Bind while no launch of func is in flight. control_va is the existing mapped
+    // command buffer, request_va is a separate, zero-initialized device uint32_t.
+    // After requesting a checkpoint, retire the stream before clearing the two
+    // words and relaunching. The caller owns the checkpoint and stream ordering.
+    bool BindKernelCheckpointRequest(CUfunction func, uint64_t control_va, uint64_t request_va);
+    bool RequestStreamCheckpoint(volatile uint32_t *control_host);
+    // Mode 5 (Path A): Zero-source-modification arbitrary-PC hardware trap-frame + SMEM evict
+    // and atomic RTT restore via Global Arena c[0][0x178].
+    bool BindKernelTrapFrameEvict(CUfunction func, uint64_t control_va, uint64_t dump_stub_va);
+    bool RequestStreamTrapFrameEvict(volatile uint32_t *control_host, int num_ctas = 0);
+    bool PrepareKernelTrapFrameRestore(CUfunction func);
+    bool RequestStreamTrapFrameRestore(volatile uint32_t *control_host, int num_ctas = 0);
+    bool FinishKernelTrapFrameRestore();
     bool TriggerFineGrainedTrapPulse();
     bool EarlyExitStream(volatile uint32_t *preempt_buf_host);
     bool PauseStreamInPlace(volatile uint32_t *preempt_buf_host);
