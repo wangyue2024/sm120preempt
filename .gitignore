@@ -1,0 +1,33 @@
+# Build & install artifacts
+build/
+build_*/
+*/build/
+*/build_*/
+xsched/build*/
+*.o
+*.obj
+*.a
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+
+# Python / PyTorch / Triton caches
+__pycache__/
+*.py[cod]
+.venv/
+venv*/
+.triton/
+
+# Editor / OS / temp artifacts
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.log
+*.tmp
+/tmp/
+sm120_sass_check.bin

@@ -29,12 +29,6 @@ InstrumentContext::InstrumentContext(CUcontext ctx): kCtx(ctx)
     CUdevice dev;
     CUDA_ASSERT(Driver::CtxGetDevice(&dev));
     guardian_ = Guardian::Instance(dev);
-    if (getenv("XSCHED_SM120_TRAP_MIN_CTX") != nullptr) {
-        // Diagnostic: bisect which cuXtra setup turns the sm120 0x83de0317
-        // from "trap delivered to the handler" into "in-flight work cancelled".
-        XINFO("InstrumentContext: minimal mode (no instr mem / preempt buffer)");
-        return;
-    }
     instr_mem_ = std::make_unique<InstrMemAllocator>(kCtx, dev);
     preempt_buf_ = std::make_unique<ResizableBuffer>(dev);
     // clear the preempt buffer
@@ -203,7 +197,6 @@ void InstrumentManager::Deactivate()
 {
     // set global_exit_flag to 1
     CUDA_ASSERT(Driver::MemsetD32Async(preempt_buf_ptr_, 1, 1, op_stream_));
-    if (getenv("XSCHED_SM120_TRAP_CMD_WORD") != nullptr) SetTrapCommand(2);
 }
 
 void InstrumentManager::SetTrapCommand(uint32_t cmd)

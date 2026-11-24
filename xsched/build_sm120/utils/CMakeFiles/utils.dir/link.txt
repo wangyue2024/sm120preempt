@@ -1,2 +1,0 @@
-/usr/bin/ar qc libutils.a CMakeFiles/utils.dir/src/lock.cpp.o CMakeFiles/utils.dir/src/psync.cpp.o CMakeFiles/utils.dir/src/runner.cpp.o CMakeFiles/utils.dir/src/timing.cpp.o CMakeFiles/utils.dir/src/waitpid.cpp.o
-/usr/bin/ranlib libutils.a

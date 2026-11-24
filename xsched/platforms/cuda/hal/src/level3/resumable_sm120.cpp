@@ -143,8 +143,8 @@ bool ResumableSm120Context::EnsureHandles(int ctx_index)
     if (ctx_index >= 0) {
         ctx_slot_ = ctx_index;
     }
-    if (!TrapSm120Context::GetRmHandlesByIndex(ctx_slot_, &handles_)) {
-        if (!TrapSm120Context::GetLatestRmHandles(&handles_)) {
+    if (!Sm120RmHandleStore::GetByIndex(ctx_slot_, &handles_)) {
+        if (!Sm120RmHandleStore::GetLatest(&handles_)) {
             return false;
         }
     }

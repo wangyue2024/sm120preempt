@@ -47,6 +47,8 @@ public:
     CudaKernelCommand(CUfunction func, void **params, void **extra, bool deep_copy);
     virtual ~CudaKernelCommand();
     virtual unsigned int BlockCnt() const = 0;
+    virtual unsigned int ThreadCnt() const = 0;
+    virtual unsigned int DynSmemBytes() const = 0;
 
     // After CUDA 12, kFunc could be a CUkernel. We convert CUkernel to CUfunction
     // by calling cuKernelGetFunction, the actual CUfunction is stored in kFuncHandle.
@@ -83,6 +85,8 @@ public:
         , gdx_(gdx), gdy_(gdy), gdz_(gdz), bdx_(bdx), bdy_(bdy), bdz_(bdz), shm_(shm) {}
     virtual ~CudaKernelLaunchCommand() = default;
     virtual unsigned int BlockCnt() const override { return gdx_ * gdy_ * gdz_; }
+    virtual unsigned int ThreadCnt() const override { return bdx_ * bdy_ * bdz_; }
+    virtual unsigned int DynSmemBytes() const override { return shm_; }
 
 private:
     const unsigned int gdx_, gdy_, gdz_; // grid dimension
@@ -105,6 +109,10 @@ public:
     virtual ~CudaKernelLaunchExCommand();
     virtual unsigned int BlockCnt() const override
     { return cfg_.gridDimX * cfg_.gridDimY * cfg_.gridDimZ; }
+    virtual unsigned int ThreadCnt() const override
+    { return cfg_.blockDimX * cfg_.blockDimY * cfg_.blockDimZ; }
+    virtual unsigned int DynSmemBytes() const override
+    { return cfg_.sharedMemBytes; }
 
 private:
     CUlaunchConfig cfg_;

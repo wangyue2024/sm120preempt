@@ -18,7 +18,7 @@
 #include <vector>
 
 #include "xsched/cuda/hal/level3/resumable_sm120.h"
-#include "xsched/cuda/hal/level3/trap_sm120.h"
+#include "xsched/cuda/hal/level3/sm120_rm_handles.h"
 
 namespace {
 
@@ -235,9 +235,9 @@ int main(int argc, char **argv)
         }
     }
 
-    // Activate TrapSm120Context ioctl hook before cuInit/cuCtxCreate so RM handles
+    // Activate Sm120RmHandleStore ioctl hook before cuInit/cuCtxCreate so RM handles
     // for both low-priority (slot 0) and high-priority (slot 1) contexts are captured.
-    (void)xsched::cuda::TrapSm120Context::Instance();
+    (void)xsched::cuda::Sm120RmHandleStore::GetCount();
 
     if (cuInit(0) != CUDA_SUCCESS) {
         std::fprintf(stderr, "cuInit(0) failed\n");

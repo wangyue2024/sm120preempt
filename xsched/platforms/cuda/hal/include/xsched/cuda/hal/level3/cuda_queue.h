@@ -4,6 +4,7 @@
 #include "xsched/cuda/hal/level3/interrupt.h"
 #include "xsched/cuda/hal/level3/tsg.h"
 #include "xsched/cuda/hal/level3/resumable_sm120.h"
+#include "xsched/cuda/hal/level3/sm120_trap_engine.h"
 
 namespace xsched::cuda
 {
@@ -15,6 +16,7 @@ public:
     virtual ~CudaQueueLv3Trap() = default;
 
     virtual void Launch(std::shared_ptr<preempt::HwCommand> hw_cmd) override;
+    virtual void Deactivate() override;
     virtual void Interrupt() override;
     virtual void Restore(const preempt::CommandLog &log) override;
     virtual void Reactivate(const preempt::CommandLog &log) override;
@@ -24,11 +26,17 @@ public:
     virtual bool          SupportDynamicLevel()  override { return true; }
     virtual XPreemptLevel GetMaxSupportedLevel() override { return kPreemptLevelInterrupt; }
 
+    sm120::Sm120StreamContext *Sm120Stream() const { return sm120_stream_.get(); }
+
 protected:
+    static bool IsSm120Stream(CUstream stream);
+    sm120::Sm120PreemptMode SelectSm120Mode(const std::shared_ptr<preempt::HwCommand> &hw_cmd) const;
+
     std::shared_ptr<InterruptContext> interrupt_context_ = nullptr;
-    // The trap backend kills the running kernel instead of pausing it in
-    // place, so it has to replay that kernel itself: the launch worker's
-    // command log is already empty by the time Resume() runs.
+    const bool is_sm120_ = false;
+    std::shared_ptr<sm120::Sm120TrapEngine> sm120_engine_ = nullptr;
+    std::unique_ptr<sm120::Sm120StreamContext> sm120_stream_ = nullptr;
+    sm120::Sm120PreemptMode last_preempt_mode_ = sm120::Sm120PreemptMode::kTrapFrame;
     std::shared_ptr<preempt::HwCommand> last_kernel_ = nullptr;
     bool relaunched_ = false;   // Reactivate relaunched a kernel this round
 };

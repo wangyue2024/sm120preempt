@@ -6,7 +6,7 @@
 #include <mutex>
 
 #include "xsched/cuda/hal/common/cuda.h"
-#include "xsched/cuda/hal/level3/trap_sm120.h"
+#include "xsched/cuda/hal/level3/sm120_rm_handles.h"
 
 namespace xsched::cuda
 {

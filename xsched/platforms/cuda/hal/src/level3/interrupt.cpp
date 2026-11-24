@@ -7,7 +7,6 @@
 #include "xsched/cuda/hal/level3/interrupt.h"
 #include "xsched/cuda/hal/level2/instrument.h"
 #include "xsched/cuda/hal/common/cuda_assert.h"
-#include "xsched/cuda/hal/level3/trap_sm120.h"
 
 using namespace xsched::cuda;
 
@@ -23,16 +22,6 @@ InterruptContext::InterruptContext(CUcontext ctx)
 
     CUdevice dev;
     CUDA_ASSERT(Driver::CtxGetDevice(&dev));
-    int major = 0, minor = 0;
-    Driver::DeviceGetAttribute(&major, CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MAJOR, dev);
-    Driver::DeviceGetAttribute(&minor, CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MINOR, dev);
-    sm120_trap_ = (major * 10 + minor) == 120;
-    if (sm120_trap_) {
-        if (!TrapSm120Context::Instance().Init(kCtx, kOpStream)) {
-            XWARN("sm120 trap backend is not ready");
-        }
-        return;
-    }
 
     trap_handler_ = TarpHandler::Instance(dev);
     XASSERT(trap_handler_ != nullptr, "no trap handler implementation for this architecture");
@@ -42,7 +31,6 @@ InterruptContext::InterruptContext(CUcontext ctx)
 
 void InterruptContext::InstrumentTrapHandler()
 {
-    if (sm120_trap_) return;
     static std::mutex init_mtx;
     static bool initialized = false;
     std::lock_guard<std::mutex> lock(init_mtx);
@@ -86,11 +74,6 @@ void InterruptContext::InstrumentTrapHandler()
 void InterruptContext::Interrupt()
 {
     XINFO("triggering trap (ctx %p)", kCtx);
-    if (sm120_trap_) {
-        bool ok = TrapSm120Context::Instance().Trigger();
-        XINFO("sm120 trap triggered: %s", ok ? "ok" : "FAILED");
-        return;
-    }
     cuXtraTriggerTrap(kCtx);
     XINFO("trap triggered");
 }

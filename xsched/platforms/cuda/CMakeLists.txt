@@ -9,8 +9,12 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
     if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
         set(CMAKE_CUDA_ARCHITECTURES "120")
     endif()
-    if(NOT DEFINED CMAKE_CUDA_COMPILER AND EXISTS "/home/wy/cuda-12.9/bin/nvcc")
-        set(CMAKE_CUDA_COMPILER "/home/wy/cuda-12.9/bin/nvcc")
+    if(NOT DEFINED CMAKE_CUDA_COMPILER)
+        if(EXISTS "$ENV{HOME}/.local/cuda-12.9/bin/nvcc")
+            set(CMAKE_CUDA_COMPILER "$ENV{HOME}/.local/cuda-12.9/bin/nvcc")
+        elseif(EXISTS "/home/wy/cuda-12.9/bin/nvcc")
+            set(CMAKE_CUDA_COMPILER "/home/wy/cuda-12.9/bin/nvcc")
+        endif()
     endif()
     if(NOT DEFINED CMAKE_CUDA_HOST_COMPILER AND EXISTS "/usr/bin/g++-13")
         set(CMAKE_CUDA_HOST_COMPILER "/usr/bin/g++-13")
@@ -51,8 +55,20 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
         endif()
     endfunction()
 
-    add_sm120_l3_bin(sm120_verify_compendium "test/sm120_l3_verify/sm120_verify_compendium.cu")
-    add_sm120_l3_bin(sm120_l3_trap_bench "test/sm120_l3_trap/sm120_l3_trap_bench.cu")
+    add_sm120_l3_bin(sm120_cave_probe "test/sm120_v2/cave_probe.cu")
+    add_sm120_l3_bin(sm120_v2_e2e_suite "test/sm120_v2/sm120_v2_e2e_suite.cu")
+    add_sm120_l3_bin(sm120_v2_bench "test/sm120_v2/sm120_v2_bench.cu")
     add_sm120_l3_bin(sm120_l3_resumable_bench "test/sm120_l3_resumable/sm120_l3_resumable_bench.cu")
+
+    if(EXISTS "${CMAKE_SOURCE_DIR}/test/sm120_v2/test_sass_disasm.cpp")
+        add_executable(sm120_sass_disasm "${CMAKE_SOURCE_DIR}/test/sm120_v2/test_sass_disasm.cpp")
+        target_include_directories(sm120_sass_disasm PRIVATE
+            ${XSCHED_INCLUDE_DIR}
+            ${CMAKE_CURRENT_LIST_DIR}/hal/include
+        )
+        set_target_properties(sm120_sass_disasm PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+        )
+    endif()
 endif()
 

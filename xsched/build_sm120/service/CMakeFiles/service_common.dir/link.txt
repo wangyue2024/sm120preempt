@@ -1,2 +1,0 @@
-/usr/bin/ar qc libservice_common.a CMakeFiles/service_common.dir/common/src/client.cpp.o CMakeFiles/service_common.dir/common/src/convert.cpp.o
-/usr/bin/ranlib libservice_common.a

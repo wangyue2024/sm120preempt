@@ -10,7 +10,7 @@ namespace xsched::cuda
 class CudaQueueLv2 : public CudaQueueLv1
 {
 public:
-    CudaQueueLv2(CUstream stream);
+    CudaQueueLv2(CUstream stream, bool init_instrument = true);
     virtual ~CudaQueueLv2() = default;
 
     virtual void Launch(std::shared_ptr<preempt::HwCommand> hw_cmd) override;

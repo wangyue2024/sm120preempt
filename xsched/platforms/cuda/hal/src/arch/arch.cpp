@@ -11,6 +11,7 @@
 #include "xsched/cuda/hal/arch/sm86.h"
 #include "xsched/cuda/hal/arch/sm120.h"
 #include "xsched/cuda/hal/level3/gdb_interrupt.h"
+#include "xsched/cuda/hal/level3/sm120_trap_engine.h"
 // NEW_CUDA_ARCH: New CUDA architecture support goes here
 
 using namespace xsched::cuda;
@@ -180,8 +181,11 @@ CUresult xsched::cuda::DirectLaunch(std::shared_ptr<CudaKernelCommand> kernel, C
     case 70:
     case 86:
         return CudaQueueLv3Trap::DirectLaunch(kernel, current_ctx, stream);
-    case 120:
-        return CudaQueueLv3Tsg::DirectLaunch(kernel, stream);
+    case 120: {
+        std::lock_guard<std::mutex> lock(sm120::Sm120TrapEngine::LaunchMutex(current_ctx));
+        sm120::Sm120StreamContext::ClearDebuggerParams(kernel->kFuncHandle);
+        return kernel->LaunchWrapper(stream);
+    }
     // NEW_CUDA_ARCH: New CUDA architecture support goes here
     default:
         return CudaQueueLv1::DirectLaunch(kernel, stream);

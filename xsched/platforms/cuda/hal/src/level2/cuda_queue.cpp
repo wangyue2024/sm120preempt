@@ -5,31 +5,15 @@
 using namespace xsched::cuda;
 using namespace xsched::preempt;
 
-CudaQueueLv2::CudaQueueLv2(CUstream stream): CudaQueueLv1(stream)
+CudaQueueLv2::CudaQueueLv2(CUstream stream, bool init_instrument): CudaQueueLv1(stream)
 {
-    instrument_manager_ = std::make_unique<InstrumentManager>(context_, cudevice_);
+    if (init_instrument) {
+        instrument_manager_ = std::make_unique<InstrumentManager>(context_, cudevice_);
+    }
 }
 
 void CudaQueueLv2::Launch(std::shared_ptr<HwCommand> hw_cmd)
 {
-    // Diagnostic (sm120 trap backend): launch with the debugger-parameter
-    // window populated (preempt buffer pointer) but through the *original*
-    // entry point, i.e. no guardian replacement.  This keeps the trap handler
-    // reachable while still giving the cave a flag to discriminate on.
-    if (getenv("XSCHED_SM120_TRAP_PLAIN_LAUNCH") != nullptr) {
-        auto kernel = std::dynamic_pointer_cast<CudaKernelCommand>(hw_cmd);
-        if (kernel != nullptr) {
-            CUDA_ASSERT(CudaQueueLv2::DirectLaunch(kernel, context_, kStream));
-            return;
-        }
-    }
-    // Experimental: the sm120 trap backend can kill raw kernels (trap +
-    // command-log replay); guardian instrumentation changes the entry point
-    // and is incompatible with an external RM debugger session.
-    if (getenv("XSCHED_SM120_TRAP_NO_INSTR")) {
-        CudaQueueLv1::Launch(hw_cmd);
-        return;
-    }
     auto kernel = std::dynamic_pointer_cast<CudaKernelCommand>(hw_cmd);
     if (kernel != nullptr) return instrument_manager_->Launch(kernel, kStream, level_);
     
@@ -41,10 +25,6 @@ void CudaQueueLv2::Launch(std::shared_ptr<HwCommand> hw_cmd)
 void CudaQueueLv2::Deactivate()
 {
     XASSERT(level_ >= kPreemptLevelDeactivate, "Deactivate() not supported on level-%d", level_);
-    // The sm120 trap backend needs this flag too: the armed trap stub
-    // redirects the trapped warp to the guardian entry, which exits the block
-    // only when the exit flag is set.
-    if (getenv("XSCHED_SM120_TRAP_NO_DEACT") != nullptr) return;
     instrument_manager_->Deactivate();
 }
 
@@ -72,7 +52,6 @@ void CudaQueueLv2::OnPreemptLevelChange(XPreemptLevel level)
 void CudaQueueLv2::OnHwCommandSubmit(std::shared_ptr<preempt::HwCommand> hw_cmd)
 {
     this->CudaQueueLv1::OnHwCommandSubmit(hw_cmd);
-    if (getenv("XSCHED_SM120_TRAP_NO_INSTR")) return;
     if (level_ < kPreemptLevelDeactivate) return;
 
     if (std::dynamic_pointer_cast<CudaGraphCommand>(hw_cmd) != nullptr) {
