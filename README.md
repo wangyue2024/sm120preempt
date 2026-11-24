@@ -74,6 +74,8 @@ sudo env LD_LIBRARY_PATH="$CUDA_LIB" CUDA_MPS_PIPE_DIRECTORY=/tmp/no_mps_wangyue
 
 | 文档 | 内容说明 |
 | :--- | :--- |
+| **[`doc/Blackwell_SM120_Level3_Preemption_Technical_Manual_v2.2.1_ZH.docx`](doc/Blackwell_SM120_Level3_Preemption_Technical_Manual_v2.2.1_ZH.docx)** | **【推荐·35 页排版 Word 完全技术手册（`v2.2.1-sm120`）】** 10 章全景覆盖总体架构、ToolsMemory 11 代码洞、SM120 128-bit SASS 编码与 79 指令、80 槽 Entry Guardian、静态 9-Cave 指令流、GDDR7 控制面与 `u_arena` 承载恢复、BAR0 D10 与安全路由、15 项微架构发现、RTX 5080 & 5060 双卡实测与 Phase 3 规划 |
+| **[`doc/SM120_V2_COMPLETE_TECHNICAL_MANUAL_ZH.md`](doc/SM120_V2_COMPLETE_TECHNICAL_MANUAL_ZH.md)** | **【完整技术手册 Markdown 源文（`v2.2.1-sm120`）】** 与上述 `.docx` 完全同步的 10 章详尽技术手册（适合 GitHub 在线阅读） |
 | [`PROJECT.md`](PROJECT.md) | 研究背景、目录结构、核心 HAL 模块清单与双端开发/安全规范 |
 | [`doc/README.md`](doc/README.md) | 技术文档总览与阅读索引 |
 | [`doc/SM120_V2_ARCHITECTURE_ZH.md`](doc/SM120_V2_ARCHITECTURE_ZH.md) | Blackwell SM120 v2 静态 9-Cave 引擎、Entry Guardian、状态机、内存布局与硬件安全法则详解 |
@@ -81,5 +83,5 @@ sudo env LD_LIBRARY_PATH="$CUDA_LIB" CUDA_MPS_PIPE_DIRECTORY=/tmp/no_mps_wangyue
 | [`doc/SM120_V2_COMPREHENSIVE_EVALUATION_ZH.md`](doc/SM120_V2_COMPREHENSIVE_EVALUATION_ZH.md) | 闭源 CUDA 库、Blackwell 硬件边界、PyTorch/cuDNN/Triton、DNN/LLM 调度 QoS 全方位评测、测试方法论与缺陷全景分析 |
 | [`doc/SM120_V2_STATUS_PROBLEMS_AND_ROADMAP_ZH.md`](doc/SM120_V2_STATUS_PROBLEMS_AND_ROADMAP_ZH.md) | **项目阶段总汇报**：当前状态、已达成成果、10 项现存问题台账（P0/P1/P2）、Phase 1–3 演进与论文规划及 5080 同步手册 |
 | [`doc/SM120_V2_RTX5060_VS_RTX5080_DIFF_ZH.md`](doc/SM120_V2_RTX5060_VS_RTX5080_DIFF_ZH.md) | **RTX 5060 vs RTX 5080 适配与差异对比**：`GB206 (595.x)` vs `GB203 (580.x)` 硬件/驱动/工具链/延迟/显存差异全解 |
-| [`CHANGELOG.md`](CHANGELOG.md) | 版本发布与修复变更日志（`v2.0.0-sm120` → `v2.1.0-sm120` → `v2.2.0-sm120`） |
+| [`CHANGELOG.md`](CHANGELOG.md) | 版本发布与修复变更日志（`v2.0.0-sm120` → `v2.1.0-sm120` → `v2.2.0-sm120` → `v2.2.1-sm120`） |
 | [`xsched/docs/xsched-osdi25.pdf`](xsched/docs/xsched-osdi25.pdf) | XSched OSDI'25 原始论文 |
