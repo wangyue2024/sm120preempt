@@ -12,7 +12,7 @@
 | 角色 | GPU 型号与架构 | SM / SMEM 规格 | 驱动与 CUDA 工具链 | 说明 |
 | :--- | :--- | :--- | :--- | :--- |
 | **主验证与构建机 (`5080`)** | NVIDIA GeForce RTX 5080 (`GB203`, `sm_120`) | 84 SMs / `100 KiB` SMEM/SM | Driver `580.95.05`, CUDA `12.9` (`/home/wangyue/.local/cuda-12.9`), `g++-13` | 无头计算服务器，主构建与 11/11 E2E/Bench 基准验证平台 |
-| **本地交叉验证机 (`5060`)** | NVIDIA GeForce RTX 5060 (`GB206`, `sm_120`) | 30 SMs / `100 KiB` SMEM/SM | Driver `595.99.02`, Ubuntu 26.04 | 桌面独显环境，用于跨驱动版本（`595.x`）代码洞探测与基准交叉验证 |
+| **本地交叉验证机 (`5060`)** | NVIDIA GeForce RTX 5060 (`GB206`, `sm_120`) | 30 SMs / `100 KiB` SMEM/SM | Driver `595.99.02`, CUDA `12.9`, `g++-13`, PyTorch `2.11+cu128`, Ubuntu 26.04 | 桌面独显环境，`v2.2.0` 全方位生产加固（Suite 1–3, 15/15 库特性 + 11/11 PyTorch）实机验证平台 |
 
 ---
 

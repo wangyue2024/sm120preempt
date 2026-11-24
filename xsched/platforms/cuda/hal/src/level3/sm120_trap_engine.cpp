@@ -555,6 +555,51 @@ Sm120TrapEngine::Sm120TrapEngine(CUcontext ctx, CUdevice dev)
 Sm120TrapEngine::~Sm120TrapEngine()
 {
     RestoreOriginal();
+    if (helper_mod_ != nullptr) {
+        CUcontext cur = nullptr;
+        if (Driver::CtxGetCurrent(&cur) == CUDA_SUCCESS && cur == ctx_) {
+            Driver::ModuleUnload(helper_mod_);
+        }
+        helper_mod_ = nullptr;
+        cond_clear_fn_ = nullptr;
+    }
+}
+
+bool Sm120TrapEngine::LoadHelperModule()
+{
+    if (cond_clear_fn_ != nullptr) return true;
+    static constexpr const char *kCondClearPtx =
+        ".version 8.0\n"
+        ".target sm_80\n"
+        ".address_size 64\n"
+        ".visible .entry sm120_cond_clear_hdr(.param .u64 p_ctrl) {\n"
+        "    .reg .u64 %rd<2>;\n"
+        "    .reg .u32 %r<2>;\n"
+        "    .reg .pred %p<2>;\n"
+        "    ld.param.u64 %rd1, [p_ctrl];\n"
+        "    ld.global.cg.u32 %r1, [%rd1];\n"
+        "    setp.eq.u32 %p0, %r1, 6;\n"
+        "    setp.eq.u32 %p1, %r1, 2;\n"
+        "    or.pred %p0, %p0, %p1;\n"
+        "    @!%p0 bra DONE;\n"
+        "    mov.u64 %rd0, 0;\n"
+        "    st.global.cg.u64 [%rd1 + 0], %rd0;\n"
+        "    st.global.cg.u64 [%rd1 + 8], %rd0;\n"
+        "    st.global.cg.u64 [%rd1 + 16], %rd0;\n"
+        "    st.global.cg.u64 [%rd1 + 24], %rd0;\n"
+        "DONE:\n"
+        "    ret;\n"
+        "}\n";
+    if (Driver::ModuleLoadData(&helper_mod_, kCondClearPtx) != CUDA_SUCCESS || !helper_mod_) {
+        XWARN("sm120_trap_engine: failed to load cond_clear_hdr PTX helper");
+        return false;
+    }
+    if (Driver::ModuleGetFunction(&cond_clear_fn_, helper_mod_, "sm120_cond_clear_hdr") != CUDA_SUCCESS ||
+        !cond_clear_fn_) {
+        XWARN("sm120_trap_engine: failed to resolve sm120_cond_clear_hdr");
+        return false;
+    }
+    return true;
 }
 
 bool Sm120TrapEngine::Init()
@@ -562,6 +607,7 @@ bool Sm120TrapEngine::Init()
     std::lock_guard<std::mutex> lock(mu_);
     if (ready_) return true;
     if (!arena_.Discover(true)) return false;
+    LoadHelperModule();
     if (!EmitStaticHandler()) {
         arena_.RestoreAll();
         return false;
@@ -1117,7 +1163,7 @@ bool Sm120TrapEngine::EmitStaticHandler()
 }
 
 // ==========================================================================
-// Sm120StreamContext
+// Sm120StreamContext (VRAM-Resident Control Plane + High-Priority CE DMA)
 // ==========================================================================
 
 namespace
@@ -1126,54 +1172,72 @@ namespace
 constexpr size_t kLayoutStageSlots = 256;
 constexpr size_t kLayoutStageBytes = kLayoutStageSlots * 64;
 
-struct PostRestoreClearArgs
+struct ScopedCudaCtx
 {
-    std::weak_ptr<void> state;
-    uint64_t expected_epoch = 0;
-    void (*clear_fn)(const std::shared_ptr<void> &, uint64_t) = nullptr;
+    bool pushed = false;
+    explicit ScopedCudaCtx(CUcontext target)
+    {
+        if (target == nullptr) return;
+        CUcontext cur = nullptr;
+        if (Driver::CtxGetCurrent(&cur) != CUDA_SUCCESS || cur != target) {
+            if (Driver::CtxPushCurrent_v2(target) == CUDA_SUCCESS) {
+                pushed = true;
+            }
+        }
+    }
+    ~ScopedCudaCtx()
+    {
+        if (pushed) {
+            CUcontext popped = nullptr;
+            (void)Driver::CtxPopCurrent_v2(&popped);
+        }
+    }
 };
-
-void CUDA_CB PostRestoreClearHostCb(void *ud)
-{
-    auto *args = static_cast<PostRestoreClearArgs *>(ud);
-    if (!args) return;
-    auto st = args->state.lock();
-    const uint64_t expected = args->expected_epoch;
-    auto fn = args->clear_fn;
-    delete args;
-    if (st && fn) fn(st, expected);
-}
 
 } // namespace
 
 Sm120StreamContext::Sm120StreamContext(CUcontext ctx, CUdevice dev,
                                        std::shared_ptr<Sm120TrapEngine> engine)
-    : ctx_(ctx), dev_(dev), engine_(std::move(engine)),
-      clear_state_(std::make_shared<PostRestoreClearState>())
+    : ctx_(ctx), dev_(dev), engine_(std::move(engine))
 {
+    ScopedCudaCtx guard(ctx_);
     guardian_reg_ = Sm120GuardianRegistry::Instance(ctx_);
+
+    int lp = 0, hp = 0;
+    if (Driver::CtxGetStreamPriorityRange(&lp, &hp) == CUDA_SUCCESS) {
+        if (Driver::StreamCreateWithPriority(&ctrl_op_stream_, CU_STREAM_NON_BLOCKING, hp) != CUDA_SUCCESS) {
+            Driver::StreamCreate(&ctrl_op_stream_, CU_STREAM_NON_BLOCKING);
+        }
+    } else {
+        Driver::StreamCreate(&ctrl_op_stream_, CU_STREAM_NON_BLOCKING);
+    }
+
+    void *hdr_pin = nullptr;
+    if (Driver::MemHostAlloc(&hdr_pin, 128, CU_MEMHOSTALLOC_PORTABLE) == CUDA_SUCCESS && hdr_pin) {
+        memset(hdr_pin, 0, 128);
+        ctrl_host_ = reinterpret_cast<Sm120ControlHeader *>(hdr_pin);
+    }
+
     void *stage = nullptr;
-    if (Driver::MemHostAlloc(&stage, kLayoutStageBytes, CU_MEMHOSTALLOC_DEVICEMAP) == CUDA_SUCCESS && stage) {
+    if (Driver::MemHostAlloc(&stage, kLayoutStageBytes, CU_MEMHOSTALLOC_PORTABLE) == CUDA_SUCCESS && stage) {
         memset(stage, 0, kLayoutStageBytes);
         layout_stage_ = reinterpret_cast<uint8_t *>(stage);
     }
-    if (Driver::MemAlloc_v2(&layout_stage_dev_, kLayoutStageBytes + 64u) == CUDA_SUCCESS &&
-        layout_stage_dev_ != 0) {
-        Driver::MemsetD8_v2(layout_stage_dev_, 0, kLayoutStageBytes + 64u);
-    }
+
     EnsureControlCapacity(65536);
 }
 
 Sm120StreamContext::~Sm120StreamContext()
 {
-    if (clear_state_) {
-        std::lock_guard<std::mutex> lock(clear_state_->mu);
-        ++clear_state_->epoch;
-        clear_state_->ctrl_host = nullptr;
-    }
     CUcontext cur = nullptr;
-    if (Driver::CtxGetCurrent(&cur) == CUDA_ERROR_DEINITIALIZED || cur != ctx_) {
+    if (Driver::CtxGetCurrent(&cur) == CUDA_ERROR_DEINITIALIZED) {
         return;
+    }
+    ScopedCudaCtx guard(ctx_);
+    if (ctrl_op_stream_ != nullptr) {
+        (void)Driver::StreamSynchronize(ctrl_op_stream_);
+        Driver::StreamDestroy_v2(ctrl_op_stream_);
+        ctrl_op_stream_ = nullptr;
     }
     for (CUdeviceptr old_arena : retired_arenas_) {
         if (old_arena != 0) Driver::MemFree_v2(old_arena);
@@ -1184,71 +1248,94 @@ Sm120StreamContext::~Sm120StreamContext()
         arena_dev_ = 0;
         arena_bytes_ = 0;
     }
-    for (void *old_ctrl : retired_ctrls_) {
-        if (old_ctrl != nullptr) Driver::MemFreeHost(old_ctrl);
+    for (CUdeviceptr old_ctrl : retired_ctrls_) {
+        if (old_ctrl != 0) Driver::MemFree_v2(old_ctrl);
     }
     retired_ctrls_.clear();
+    if (ctrl_dev_ != 0) {
+        Driver::MemFree_v2(ctrl_dev_);
+        ctrl_dev_ = 0;
+    }
     if (ctrl_host_ != nullptr) {
         Driver::MemFreeHost(ctrl_host_);
         ctrl_host_ = nullptr;
-        ctrl_dev_ = 0;
     }
     if (layout_stage_ != nullptr) {
         Driver::MemFreeHost(layout_stage_);
         layout_stage_ = nullptr;
     }
-    if (layout_stage_dev_ != 0) {
-        Driver::MemFree_v2(layout_stage_dev_);
-        layout_stage_dev_ = 0;
+}
+
+bool Sm120StreamContext::ReadHeaderLocked(Sm120ControlHeader *out) const
+{
+    if (!out || ctrl_dev_ == 0 || ctrl_host_ == nullptr || ctrl_op_stream_ == nullptr) return false;
+    ScopedCudaCtx guard(ctx_);
+    if (Driver::MemcpyDtoHAsync_v2(ctrl_host_, ctrl_dev_, sizeof(Sm120ControlHeader), ctrl_op_stream_) != CUDA_SUCCESS) {
+        return false;
     }
+    if (Driver::StreamSynchronize(ctrl_op_stream_) != CUDA_SUCCESS) return false;
+    memcpy(out, ctrl_host_, sizeof(Sm120ControlHeader));
+    return true;
+}
+
+bool Sm120StreamContext::WriteHeaderSliceLocked(size_t offset, const void *src, size_t bytes)
+{
+    if (!src || ctrl_dev_ == 0 || ctrl_host_ == nullptr || ctrl_op_stream_ == nullptr) return false;
+    if (offset + bytes > sizeof(Sm120ControlHeader)) return false;
+    ScopedCudaCtx guard(ctx_);
+    uint8_t *dst_pin = reinterpret_cast<uint8_t *>(ctrl_host_) + offset;
+    memcpy(dst_pin, src, bytes);
+    if (Driver::MemcpyHtoDAsync_v2(ctrl_dev_ + offset, dst_pin, bytes, ctrl_op_stream_) != CUDA_SUCCESS) {
+        return false;
+    }
+    return Driver::StreamSynchronize(ctrl_op_stream_) == CUDA_SUCCESS;
 }
 
 bool Sm120StreamContext::EnsureControlCapacity(uint32_t num_ctas)
 {
     const uint32_t needed_ctas = std::max(num_ctas, 65536u);
-    if (ctrl_host_ != nullptr && needed_ctas <= ctrl_cta_cap_) return true;
+    if (ctrl_dev_ != 0 && needed_ctas <= ctrl_cta_cap_) return true;
 
+    ScopedCudaCtx guard(ctx_);
     // If growing u_control after kernels have already been queued on last_stream_,
     // wait for the stream so no in-flight kernel references the retired ctrl_dev_.
-    if (ctrl_host_ != nullptr && last_stream_ != nullptr) {
-        CUcontext cur = nullptr;
-        if (Driver::CtxGetCurrent(&cur) == CUDA_SUCCESS && cur == ctx_) {
-            (void)Driver::StreamSynchronize(last_stream_);
-        }
+    if (ctrl_dev_ != 0 && last_stream_ != nullptr) {
+        (void)Driver::StreamSynchronize(last_stream_);
     }
 
     const size_t new_bytes = AlignUpSize(sizeof(Sm120ControlHeader) +
                                          static_cast<size_t>(needed_ctas) * sizeof(Sm120CtaEntry),
                                          4096ULL);
-    void *new_host = nullptr;
-    CUresult r = Driver::MemHostAlloc(&new_host, new_bytes, CU_MEMHOSTALLOC_DEVICEMAP);
-    if (r != CUDA_SUCCESS || !new_host) return false;
-    memset(new_host, 0, new_bytes);
-
-    CUdeviceptr new_dev = reinterpret_cast<CUdeviceptr>(new_host);
-    (void)Driver::MemHostGetDevicePointer_v2(&new_dev, new_host, 0);
-
-    auto *new_hdr = reinterpret_cast<Sm120ControlHeader *>(new_host);
-    if (ctrl_host_ != nullptr) {
-        memcpy(new_hdr, ctrl_host_, sizeof(Sm120ControlHeader));
-        const size_t old_entries = static_cast<size_t>(ctrl_cta_cap_) * sizeof(Sm120CtaEntry);
-        if (old_entries > 0) {
-            memcpy(reinterpret_cast<uint8_t *>(new_hdr) + sizeof(Sm120ControlHeader),
-                   reinterpret_cast<uint8_t *>(ctrl_host_) + sizeof(Sm120ControlHeader),
-                   old_entries);
+    CUdeviceptr new_dev = 0;
+    if (Driver::MemAlloc_v2(&new_dev, new_bytes) != CUDA_SUCCESS || new_dev == 0) {
+        return false;
+    }
+    if (ctrl_op_stream_ != nullptr) {
+        Driver::MemsetD8Async(new_dev, 0, new_bytes, ctrl_op_stream_);
+        if (ctrl_dev_ != 0) {
+            const size_t copy_bytes = sizeof(Sm120ControlHeader) +
+                                      static_cast<size_t>(ctrl_cta_cap_) * sizeof(Sm120CtaEntry);
+            Driver::MemcpyDtoDAsync_v2(new_dev, ctrl_dev_, copy_bytes, ctrl_op_stream_);
+            retired_ctrls_.push_back(ctrl_dev_);
         }
-        retired_ctrls_.push_back(ctrl_host_);
+        Driver::MemsetD32Async(new_dev + offsetof(Sm120ControlHeader, max_ctas),
+                               needed_ctas, 1, ctrl_op_stream_);
+        Driver::StreamSynchronize(ctrl_op_stream_);
+    } else {
+        Driver::MemsetD8_v2(new_dev, 0, new_bytes);
+        if (ctrl_dev_ != 0) {
+            const size_t copy_bytes = sizeof(Sm120ControlHeader) +
+                                      static_cast<size_t>(ctrl_cta_cap_) * sizeof(Sm120CtaEntry);
+            Driver::MemcpyDtoD_v2(new_dev, ctrl_dev_, copy_bytes);
+            retired_ctrls_.push_back(ctrl_dev_);
+        }
+        Driver::MemsetD32_v2(new_dev + offsetof(Sm120ControlHeader, max_ctas), needed_ctas, 1);
     }
 
-    new_hdr->max_ctas = needed_ctas;
-    ctrl_host_ = new_hdr;
-    ctrl_dev_  = new_dev;
+    ctrl_dev_ = new_dev;
     ctrl_bytes_ = new_bytes;
     ctrl_cta_cap_ = needed_ctas;
-    if (clear_state_) {
-        std::lock_guard<std::mutex> lock(clear_state_->mu);
-        clear_state_->ctrl_host = ctrl_host_;
-    }
+    if (ctrl_host_ != nullptr) ctrl_host_->max_ctas = needed_ctas;
     return true;
 }
 
@@ -1321,16 +1408,14 @@ bool Sm120StreamContext::PrepareLaunch(CUfunction func,
             max_blocks_sm <= 0) {
             max_blocks_sm = std::max(engine_->MaxThreadsPerSm() / static_cast<int>(threads_per_cta), 1);
         }
+        const uint32_t slack = std::max(64u, static_cast<uint32_t>(engine_->SmCount() * 2));
         const uint32_t max_resident =
-            static_cast<uint32_t>(engine_->SmCount() * max_blocks_sm) + 16u;
+            static_cast<uint32_t>(engine_->SmCount() * max_blocks_sm) + slack;
         const uint32_t max_slots = std::min(num_ctas, max_resident);
 
         if (!EnsureArenaPool(static_cast<size_t>(slot_stride) * max_slots)) return false;
 
-        const bool is_restore =
-            (ctrl_host_ != nullptr) &&
-            (__atomic_load_n(&ctrl_host_->cmd, __ATOMIC_ACQUIRE) == kCmdMode5Restore) &&
-            (saved_arena_dev_ != 0);
+        const bool is_restore = is_restore_cmd_active_ && (saved_arena_dev_ != 0);
         const uint64_t effective_arena = static_cast<uint64_t>(is_restore ? saved_arena_dev_ : arena_dev_);
         if (kernel_idx != 0) {
             kernel_arena_map_[kernel_idx] = static_cast<CUdeviceptr>(effective_arena);
@@ -1361,21 +1446,17 @@ bool Sm120StreamContext::PrepareLaunch(CUfunction func,
         };
         static_assert(sizeof(Layout36) == 36, "Layout36 size mismatch");
 
-        if (stream != nullptr && layout_stage_ != nullptr && layout_stage_dev_ != 0) {
-            // Queue layout update FIFO on stream via Device VRAM staging:
-            // Pinned-Host -> Device (HtoDAsync) -> Pinned-Host ctrl_host_ (DtoHAsync).
-            // Direct HtoDAsync to host-mapped ctrl_dev_ is Host->Host and synchronously blocks CPU!
+        if (stream != nullptr && layout_stage_ != nullptr) {
+            // Destination ctrl_dev_ is in GPU GDDR7 VRAM: single strictly-async HtoD DMA on stream!
             const size_t slot_off = (layout_stage_cursor_ % kLayoutStageSlots) * 64u;
             ++layout_stage_cursor_;
             void *host_slot = layout_stage_ + slot_off;
-            const CUdeviceptr dev_slot = layout_stage_dev_ + slot_off;
             memcpy(host_slot, &layout, sizeof(layout));
-            Driver::MemcpyHtoDAsync_v2(dev_slot, host_slot, sizeof(layout), stream);
-            Driver::MemcpyDtoHAsync_v2(
-                reinterpret_cast<uint8_t *>(ctrl_host_) + offsetof(Sm120ControlHeader, arena_va),
-                dev_slot, sizeof(layout), stream);
+            Driver::MemcpyHtoDAsync_v2(
+                ctrl_dev_ + offsetof(Sm120ControlHeader, arena_va),
+                host_slot, sizeof(layout), stream);
         } else {
-            memcpy(&ctrl_host_->arena_va, &layout, sizeof(layout));
+            WriteHeaderSliceLocked(offsetof(Sm120ControlHeader, arena_va), &layout, sizeof(layout));
         }
     }
 
@@ -1397,65 +1478,62 @@ bool Sm120StreamContext::PrepareLaunch(CUfunction func,
 bool Sm120StreamContext::PreemptStream(Sm120PreemptMode mode)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    if (!engine_->IsReady() || !ctrl_host_) return false;
+    if (!engine_->IsReady() || ctrl_dev_ == 0) return false;
+    ScopedCudaCtx guard(ctx_);
+
+    Sm120ControlHeader hdr{};
+    if (!ReadHeaderLocked(&hdr)) return false;
 
     // If a prior Mode 5 restore is in flight, wait until all State B CTAs self-trapped & restored,
     // and all warps (including collaterally-trapped warps on the same SM) have drained Cave 1.
-    const bool was_mode5_restore = (__atomic_load_n(&ctrl_host_->cmd, __ATOMIC_ACQUIRE) == kCmdMode5Restore);
+    const bool was_mode5_restore = (hdr.cmd == kCmdMode5Restore);
     if (was_mode5_restore) {
         const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(2);
-        while (__atomic_load_n(&ctrl_host_->restored_slots, __ATOMIC_ACQUIRE) <
-                   __atomic_load_n(&ctrl_host_->evicted_slots, __ATOMIC_ACQUIRE) ||
-               __atomic_load_n(&ctrl_host_->trap_inflight, __ATOMIC_ACQUIRE) != 0u) {
+        while (true) {
+            const uint32_t target_restored =
+                (hdr.max_slots > 0) ? std::min(hdr.evicted_slots, hdr.max_slots) : hdr.evicted_slots;
+            if (hdr.restored_slots >= target_restored && hdr.trap_inflight == 0u) break;
             if (std::chrono::steady_clock::now() >= deadline) {
-                XWARN("sm120_trap_engine: timed out waiting for prior restore (%u/%u, inflight=%u)",
-                      ctrl_host_->restored_slots, ctrl_host_->evicted_slots, ctrl_host_->trap_inflight);
+                XWARN("sm120_trap_engine: timed out waiting for prior restore (%u/%u, max=%u, inflight=%u)",
+                      hdr.restored_slots, hdr.evicted_slots, hdr.max_slots, hdr.trap_inflight);
                 break;
             }
-            std::this_thread::yield();
+            std::this_thread::sleep_for(std::chrono::microseconds(25));
+            if (!ReadHeaderLocked(&hdr)) break;
         }
     }
 
-    // Invalidate any pending PostRestoreClearHostCb from an earlier restore wave so that
-    // when this preemption drains the stream early, the stale callback does not wipe
-    // our newly recorded eviction counters [0x00..0x1f].
-    if (clear_state_) {
-        std::lock_guard<std::mutex> clk(clear_state_->mu);
-        ++clear_state_->epoch;
-    }
+    is_restore_cmd_active_ = false;
 
     // Capture currently active arena VA as fallback; PrepareRestore will resolve the exact
     // arena recorded for active_kernel_idx in kernel_arena_map_.
-    saved_arena_dev_ = static_cast<CUdeviceptr>(
-        __atomic_load_n(&ctrl_host_->arena_va, __ATOMIC_ACQUIRE));
+    saved_arena_dev_ = static_cast<CUdeviceptr>(hdr.arena_va);
 
-    // Reset per-round mutable run state [0x00..0x18] before firing the 1-shot pulse.
-    // Note: is_restore_wave (+0x1c) is preserved across multi-round preempts until post-restore clear.
-    __atomic_store_n(&ctrl_host_->evicted_slots, 0u, __ATOMIC_RELEASE);
-    __atomic_store_n(&ctrl_host_->active_kernel_idx, 0ULL, __ATOMIC_RELEASE);
-    __atomic_store_n(&ctrl_host_->restored_slots, 0u, __ATOMIC_RELEASE);
-    __atomic_store_n(&ctrl_host_->drained_cnt, 0u, __ATOMIC_RELEASE);
-    __atomic_store_n(&ctrl_host_->mode1_exit_cnt, 0u, __ATOMIC_RELEASE);
-    __atomic_store_n(&ctrl_host_->overflow_err, 0u, __ATOMIC_RELEASE);
-
+    // Reset per-round mutable run state [0x04..0x1b] and overflow_err, preserving is_restore_wave (+0x1c),
+    // then publish new_cmd at +0x00 via high-priority Copy Engine DMA (~12 us even under 100% SM load).
     const uint32_t new_cmd = (mode == Sm120PreemptMode::kEarlyExit)
                            ? kCmdMode1Evict : kCmdMode5Evict;
-    __atomic_store_n(&ctrl_host_->cmd, new_cmd, __ATOMIC_SEQ_CST);
-    __atomic_thread_fence(__ATOMIC_SEQ_CST);
+    uint32_t zeros6[6] = {};
+    memcpy(reinterpret_cast<uint8_t *>(ctrl_host_) + 4, zeros6, sizeof(zeros6));
+    ctrl_host_->cmd = new_cmd;
+    ctrl_host_->overflow_err = 0u;
+    Driver::MemcpyHtoDAsync_v2(ctrl_dev_ + offsetof(Sm120ControlHeader, overflow_err),
+                               &ctrl_host_->overflow_err, sizeof(uint32_t), ctrl_op_stream_);
+    Driver::MemcpyHtoDAsync_v2(ctrl_dev_ + 4, reinterpret_cast<uint8_t *>(ctrl_host_) + 4,
+                               sizeof(zeros6), ctrl_op_stream_);
+    Driver::MemcpyHtoDAsync_v2(ctrl_dev_, ctrl_host_, sizeof(uint32_t), ctrl_op_stream_);
+    Driver::StreamSynchronize(ctrl_op_stream_);
 
     if (was_mode5_restore) {
-        // Any warp that entered Cave 1 right around the cmd store will re-read cmd == new_cmd
-        // and self-dispatch into Cave 0 Evict; wait for trap_inflight to hit 0 and give
-        // pure-L1 .text.traphandler epilogues (~50 instrs, zero PCIe) margin to finish RTT.
         std::this_thread::sleep_for(std::chrono::microseconds(30));
         const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(500);
-        while (__atomic_load_n(&ctrl_host_->trap_inflight, __ATOMIC_ACQUIRE) != 0u) {
+        while (ReadHeaderLocked(&hdr) && hdr.trap_inflight != 0u) {
             if (std::chrono::steady_clock::now() >= deadline) {
                 XWARN("sm120_trap_engine: timed out waiting for trap_inflight drain (%u)",
-                      ctrl_host_->trap_inflight);
+                      hdr.trap_inflight);
                 break;
             }
-            std::this_thread::yield();
+            std::this_thread::sleep_for(std::chrono::microseconds(25));
         }
         std::this_thread::sleep_for(std::chrono::microseconds(30));
     }
@@ -1465,50 +1543,48 @@ bool Sm120StreamContext::PreemptStream(Sm120PreemptMode mode)
         return false;
     }
 
-    // Progress-aware bounded confirmation: on an idle GPU the single pulse above drains the
-    // stream immediately (0 retries, 0 extra latency). On a display/shared GPU (where another
-    // context briefly owns GR during the 1 us pulse) or during back-to-back Restore->Evict
-    // under heavy PCIe atomic contention (where 1 SM may still be finishing RTT), issue a
-    // strictly bounded recovery pulse only when eviction counters stall while the stream is
-    // still active.
-    CUcontext cur = nullptr;
-    if (last_stream_ != nullptr &&
-        Driver::CtxGetCurrent(&cur) == CUDA_SUCCESS && cur == ctx_) {
-        auto read_progress = [this]() -> uint32_t {
-            return __atomic_load_n(&ctrl_host_->evicted_slots, __ATOMIC_ACQUIRE) +
-                   __atomic_load_n(&ctrl_host_->drained_cnt, __ATOMIC_ACQUIRE) +
-                   __atomic_load_n(&ctrl_host_->mode1_exit_cnt, __ATOMIC_ACQUIRE);
-        };
-        uint32_t last_prog = read_progress();
+    // Progress-aware bounded confirmation: on the normal fast path StreamQuery returns
+    // CUDA_SUCCESS in < 1 ms with ZERO extra DMA overhead; only sample counters via CE DMA
+    // every 2 ms if the stream stays active (display/shared GPU recovery protection).
+    if (last_stream_ != nullptr) {
+        uint32_t last_prog = 0;
         auto last_prog_tp = std::chrono::steady_clock::now();
+        auto last_sample_tp = last_prog_tp;
         constexpr int kMaxRecoveryPulses = 8;
         int retries = 0;
         while (Driver::StreamQuery(last_stream_) == CUDA_ERROR_NOT_READY) {
-            const uint32_t prog = read_progress();
             const auto now = std::chrono::steady_clock::now();
-            if (prog != last_prog) {
-                last_prog = prog;
-                last_prog_tp = now;
-            } else {
-                const int64_t stall_us =
-                    std::chrono::duration_cast<std::chrono::microseconds>(now - last_prog_tp).count();
-                const int64_t threshold_us = std::min<int64_t>(15000LL << std::min(retries, 2), 60000LL);
-                if (stall_us >= threshold_us) {
-                    if (retries >= kMaxRecoveryPulses) {
-                        XWARN("sm120_trap_engine: stream still busy after %d recovery pulses "
-                              "(ev=%u dr=%u m1=%u)",
-                              retries, ctrl_host_->evicted_slots,
-                              ctrl_host_->drained_cnt, ctrl_host_->mode1_exit_cnt);
-                        break;
+            const int64_t since_sample_us =
+                std::chrono::duration_cast<std::chrono::microseconds>(now - last_sample_tp).count();
+            if (since_sample_us >= 2000LL) {
+                last_sample_tp = now;
+                if (ReadHeaderLocked(&hdr)) {
+                    const uint32_t prog = hdr.evicted_slots + hdr.drained_cnt + hdr.mode1_exit_cnt;
+                    if (prog != last_prog) {
+                        last_prog = prog;
+                        last_prog_tp = now;
+                    } else {
+                        const int64_t stall_us =
+                            std::chrono::duration_cast<std::chrono::microseconds>(now - last_prog_tp).count();
+                        const int64_t threshold_us = std::min<int64_t>(15000LL << std::min(retries, 2), 60000LL);
+                        if (stall_us >= threshold_us) {
+                            if (retries >= kMaxRecoveryPulses) {
+                                XWARN("sm120_trap_engine: stream still busy after %d recovery pulses "
+                                      "(ev=%u dr=%u m1=%u cmd=%u active=%llu max_ctas=%u inflight=%u ctrl=%#llx)",
+                                      retries, hdr.evicted_slots, hdr.drained_cnt, hdr.mode1_exit_cnt,
+                                      hdr.cmd, (unsigned long long)hdr.active_kernel_idx, hdr.max_ctas,
+                                      hdr.trap_inflight, (unsigned long long)ctrl_dev_);
+                                break;
+                            }
+                            ++retries;
+                            XDEBG("sm120_trap_engine: recovery pulse #%d after %lld us stall "
+                                  "(ev=%u dr=%u m1=%u)",
+                                  retries, static_cast<long long>(stall_us),
+                                  hdr.evicted_slots, hdr.drained_cnt, hdr.mode1_exit_cnt);
+                            engine_->FireEvictPulse();
+                            last_prog_tp = std::chrono::steady_clock::now();
+                        }
                     }
-                    ++retries;
-                    XDEBG("sm120_trap_engine: recovery pulse #%d after %lld us stall "
-                          "(ev=%u dr=%u m1=%u)",
-                          retries, static_cast<long long>(stall_us),
-                          ctrl_host_->evicted_slots, ctrl_host_->drained_cnt,
-                          ctrl_host_->mode1_exit_cnt);
-                    engine_->FireEvictPulse();
-                    last_prog_tp = std::chrono::steady_clock::now();
                 }
             }
             std::this_thread::yield();
@@ -1520,9 +1596,13 @@ bool Sm120StreamContext::PreemptStream(Sm120PreemptMode mode)
 uint64_t Sm120StreamContext::PrepareRestore(Sm120PreemptMode mode)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    if (!ctrl_host_) return 0;
+    if (ctrl_dev_ == 0) return 0;
+    ScopedCudaCtx guard(ctx_);
 
-    uint64_t idx = __atomic_load_n(&ctrl_host_->active_kernel_idx, __ATOMIC_ACQUIRE);
+    Sm120ControlHeader hdr{};
+    (void)ReadHeaderLocked(&hdr);
+
+    uint64_t idx = hdr.active_kernel_idx;
     if (idx == 0) idx = last_kernel_idx_;
 
     // Resolve exact arena VA used when the evicted kernel was originally launched so
@@ -1534,17 +1614,22 @@ uint64_t Sm120StreamContext::PrepareRestore(Sm120PreemptMode mode)
         }
     }
 
-    if (clear_state_) {
-        std::lock_guard<std::mutex> clk(clear_state_->mu);
-        last_restore_epoch_ = ++clear_state_->epoch;
-    }
-
     const uint32_t restore_cmd = (mode == Sm120PreemptMode::kEarlyExit)
                                ? kCmdMode1Replay : kCmdMode5Restore;
-    __atomic_store_n(&ctrl_host_->restored_slots, 0u, __ATOMIC_RELEASE);
-    __atomic_store_n(&ctrl_host_->is_restore_wave, 1u, __ATOMIC_RELEASE);
-    __atomic_store_n(&ctrl_host_->cmd, restore_cmd, __ATOMIC_SEQ_CST);
-    __atomic_thread_fence(__ATOMIC_SEQ_CST);
+    is_restore_cmd_active_ = (mode == Sm120PreemptMode::kTrapFrame);
+
+    // Update restored_slots=0 (+0x10), is_restore_wave=1 (+0x1c), then cmd=restore_cmd (+0x00)
+    // atomically in GPU VRAM via high-priority Copy Engine stream.
+    ctrl_host_->restored_slots = 0u;
+    ctrl_host_->is_restore_wave = 1u;
+    ctrl_host_->cmd = restore_cmd;
+    Driver::MemcpyHtoDAsync_v2(ctrl_dev_ + offsetof(Sm120ControlHeader, restored_slots),
+                               &ctrl_host_->restored_slots, sizeof(uint32_t), ctrl_op_stream_);
+    Driver::MemcpyHtoDAsync_v2(ctrl_dev_ + offsetof(Sm120ControlHeader, is_restore_wave),
+                               &ctrl_host_->is_restore_wave, sizeof(uint32_t), ctrl_op_stream_);
+    Driver::MemcpyHtoDAsync_v2(ctrl_dev_ + offsetof(Sm120ControlHeader, cmd),
+                               &ctrl_host_->cmd, sizeof(uint32_t), ctrl_op_stream_);
+    Driver::StreamSynchronize(ctrl_op_stream_);
     return idx;
 }
 
@@ -1552,60 +1637,71 @@ bool Sm120StreamContext::EnqueuePostRestoreClear(CUstream stream)
 {
     std::lock_guard<std::mutex> lock(mu_);
     saved_arena_dev_ = 0;
-    if (ctrl_host_ == nullptr || !clear_state_) return false;
-    auto *args = new PostRestoreClearArgs{
-        clear_state_,
-        last_restore_epoch_,
-        [](const std::shared_ptr<void> &raw, uint64_t expected) {
-            auto st = std::static_pointer_cast<PostRestoreClearState>(raw);
-            std::lock_guard<std::mutex> clk(st->mu);
-            if (st->epoch != expected || st->ctrl_host == nullptr) return;
-            memset(st->ctrl_host, 0, 32);
-            __atomic_thread_fence(__ATOMIC_SEQ_CST);
-        }
-    };
-    if (Driver::LaunchHostFunc(stream, PostRestoreClearHostCb, args) != CUDA_SUCCESS) {
-        delete args;
-        return false;
+    is_restore_cmd_active_ = false;
+    if (ctrl_dev_ == 0) return false;
+    ScopedCudaCtx guard(ctx_);
+
+    CUfunction fn = engine_->CondClearFunc();
+    if (fn != nullptr) {
+        // Launch 1-thread GPU-native conditional clear (~2 us, strictly ordered on stream):
+        // clears ctrl_dev_[0..31] ONLY if cmd == 6 or 2 (no-op if Preempt #2 flipped cmd to 5/1!).
+        CUdeviceptr dev_arg = ctrl_dev_;
+        void *params[] = { &dev_arg };
+        return Driver::LaunchKernel(fn, 1, 1, 1, 1, 1, 1, 0, stream, params, nullptr) == CUDA_SUCCESS;
     }
-    return true;
+    return Driver::MemsetD8Async(ctrl_dev_, 0, 32, stream) == CUDA_SUCCESS;
 }
 
 void Sm120StreamContext::ResetControlSync()
 {
     std::lock_guard<std::mutex> lock(mu_);
     saved_arena_dev_ = 0;
-    if (clear_state_) {
-        std::lock_guard<std::mutex> clk(clear_state_->mu);
-        ++clear_state_->epoch;
-    }
-    if (!ctrl_host_) return;
-    memset(ctrl_host_, 0, 32);
-    ctrl_host_->overflow_err = 0;
-    ctrl_host_->trap_inflight = 0;
+    is_restore_cmd_active_ = false;
+    if (ctrl_dev_ == 0 || ctrl_op_stream_ == nullptr) return;
+    ScopedCudaCtx guard(ctx_);
+
+    Driver::MemsetD8Async(ctrl_dev_, 0, 32, ctrl_op_stream_);
+    Driver::MemsetD8Async(ctrl_dev_ + offsetof(Sm120ControlHeader, overflow_err), 0, 8, ctrl_op_stream_);
     const size_t entries_bytes = static_cast<size_t>(ctrl_cta_cap_) * sizeof(Sm120CtaEntry);
     if (entries_bytes > 0) {
-        memset(reinterpret_cast<uint8_t *>(ctrl_host_) + sizeof(Sm120ControlHeader), 0, entries_bytes);
+        Driver::MemsetD8Async(ctrl_dev_ + sizeof(Sm120ControlHeader), 0, entries_bytes, ctrl_op_stream_);
     }
-    ctrl_host_->max_ctas = ctrl_cta_cap_;
-    __atomic_thread_fence(__ATOMIC_SEQ_CST);
+    Driver::MemsetD32Async(ctrl_dev_ + offsetof(Sm120ControlHeader, max_ctas),
+                           ctrl_cta_cap_, 1, ctrl_op_stream_);
+    Driver::StreamSynchronize(ctrl_op_stream_);
 }
 
 Sm120StreamTelemetry Sm120StreamContext::Telemetry() const
 {
     std::lock_guard<std::mutex> lock(mu_);
     Sm120StreamTelemetry t;
-    if (!ctrl_host_) return t;
-    t.cmd               = __atomic_load_n(&ctrl_host_->cmd, __ATOMIC_ACQUIRE);
-    t.evicted_slots     = __atomic_load_n(&ctrl_host_->evicted_slots, __ATOMIC_ACQUIRE);
-    t.restored_slots    = __atomic_load_n(&ctrl_host_->restored_slots, __ATOMIC_ACQUIRE);
-    t.drained_cnt       = __atomic_load_n(&ctrl_host_->drained_cnt, __ATOMIC_ACQUIRE);
-    t.mode1_exit_cnt    = __atomic_load_n(&ctrl_host_->mode1_exit_cnt, __ATOMIC_ACQUIRE);
-    t.overflow_err      = __atomic_load_n(&ctrl_host_->overflow_err, __ATOMIC_ACQUIRE);
-    t.is_restore_wave   = __atomic_load_n(&ctrl_host_->is_restore_wave, __ATOMIC_ACQUIRE);
-    t.active_kernel_idx = __atomic_load_n(&ctrl_host_->active_kernel_idx, __ATOMIC_ACQUIRE);
+    Sm120ControlHeader hdr{};
+    if (!ReadHeaderLocked(&hdr)) return t;
+    t.cmd               = hdr.cmd;
+    t.evicted_slots     = hdr.evicted_slots;
+    t.restored_slots    = hdr.restored_slots;
+    t.drained_cnt       = hdr.drained_cnt;
+    t.mode1_exit_cnt    = hdr.mode1_exit_cnt;
+    t.overflow_err      = hdr.overflow_err;
+    t.is_restore_wave   = hdr.is_restore_wave;
+    t.active_kernel_idx = hdr.active_kernel_idx;
     t.arena_bytes       = arena_bytes_;
     return t;
+}
+
+bool Sm120StreamContext::ReadCtaEntries(std::vector<Sm120CtaEntry> &out, uint32_t count) const
+{
+    std::lock_guard<std::mutex> lock(mu_);
+    if (ctrl_dev_ == 0 || ctrl_op_stream_ == nullptr || count > ctrl_cta_cap_) return false;
+    out.resize(count);
+    if (count == 0) return true;
+    ScopedCudaCtx guard(ctx_);
+    if (Driver::MemcpyDtoHAsync_v2(out.data(), ctrl_dev_ + sizeof(Sm120ControlHeader),
+                                   static_cast<size_t>(count) * sizeof(Sm120CtaEntry),
+                                   ctrl_op_stream_) != CUDA_SUCCESS) {
+        return false;
+    }
+    return Driver::StreamSynchronize(ctrl_op_stream_) == CUDA_SUCCESS;
 }
 
 } // namespace xsched::cuda::sm120

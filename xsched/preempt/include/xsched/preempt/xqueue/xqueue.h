@@ -34,6 +34,7 @@ public:
 
     virtual void Suspend(int64_t flags) = 0;
     virtual void Resume(int64_t flags) = 0;
+    virtual bool IsSuspended() const { return false; }
 
     /// @brief Set the preempt level of the XQueue. NOT thread-safe, make sure there is
     /// NO other operations on the XQueue when calling this function.
@@ -71,6 +72,8 @@ public:
     static std::shared_ptr<XQueue> Get(XQueueHandle xq_h);
 
     static XResult ForEachWaitAll();
+    static XResult ForEachWaitActive();
+    static bool HasAnySuspended();
     static XResult ForEach(std::function<XResult(std::shared_ptr<XQueue>)> func);
     static XResult AutoCreate(std::function<XResult(HwQueueHandle *)> create_hwq);
     static XResult AutoDestroy(HwQueueHandle hwq_h);

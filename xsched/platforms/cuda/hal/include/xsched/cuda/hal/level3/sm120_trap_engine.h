@@ -108,9 +108,11 @@ public:
     int MaxThreadsPerSm() const { return max_threads_per_sm_; }
     CUcontext Context() const { return ctx_; }
     const Sm120Arena &Arena() const { return arena_; }
+    CUfunction CondClearFunc() const { return cond_clear_fn_; }
 
 private:
     bool EmitStaticHandler();
+    bool LoadHelperModule();
 
     CUcontext ctx_ = nullptr;
     CUdevice  dev_ = 0;
@@ -118,6 +120,8 @@ private:
     int max_threads_per_sm_ = 1536;
     bool ready_ = false;
     Sm120Arena arena_;
+    CUmodule helper_mod_ = nullptr;
+    CUfunction cond_clear_fn_ = nullptr;
     std::mutex mu_;
 };
 
@@ -157,42 +161,39 @@ public:
     void ResetControlSync();
 
     Sm120StreamTelemetry Telemetry() const;
+    bool ReadCtaEntries(std::vector<Sm120CtaEntry> &out, uint32_t count) const;
     CUdeviceptr ControlDevVA() const { return ctrl_dev_; }
     volatile uint32_t *ControlHostPtr() const { return reinterpret_cast<volatile uint32_t *>(ctrl_host_); }
 
 private:
-    struct PostRestoreClearState
-    {
-        std::mutex mu;
-        uint64_t epoch = 0;
-        Sm120ControlHeader *ctrl_host = nullptr;
-    };
-
     bool EnsureControlCapacity(uint32_t num_ctas);
     bool EnsureArenaPool(size_t required_bytes);
+    bool ReadHeaderLocked(Sm120ControlHeader *out) const;
+    bool WriteHeaderSliceLocked(size_t offset, const void *src, size_t bytes);
 
     CUcontext ctx_ = nullptr;
     CUdevice  dev_ = 0;
     std::shared_ptr<Sm120TrapEngine> engine_;
     std::shared_ptr<Sm120GuardianRegistry> guardian_reg_;
 
-    Sm120ControlHeader *ctrl_host_ = nullptr;
+    // VRAM-resident control header + CtaEntry[] (GPU L2-cached, zero PCIe traffic in Guardian/Trap!)
     CUdeviceptr ctrl_dev_ = 0;
     size_t ctrl_bytes_ = 0;
     uint32_t ctrl_cta_cap_ = 0;
+    // Pinned 80B host staging buffer + dedicated high-priority Copy Engine stream for DMA header sync
+    Sm120ControlHeader *ctrl_host_ = nullptr;
+    CUstream ctrl_op_stream_ = nullptr;
 
     CUdeviceptr arena_dev_ = 0;
     size_t arena_bytes_ = 0;
     std::vector<CUdeviceptr> retired_arenas_;
-    std::vector<void *> retired_ctrls_;
+    std::vector<CUdeviceptr> retired_ctrls_;
     uint8_t *layout_stage_ = nullptr;
     size_t layout_stage_cursor_ = 0;
-    CUdeviceptr layout_stage_dev_ = 0;
     CUdeviceptr saved_arena_dev_ = 0;
+    bool is_restore_cmd_active_ = false;
     CUstream last_stream_ = nullptr;
     std::map<uint64_t, CUdeviceptr> kernel_arena_map_;
-    std::shared_ptr<PostRestoreClearState> clear_state_;
-    uint64_t last_restore_epoch_ = 0;
 
     uint64_t last_kernel_idx_ = 0;
     mutable std::mutex mu_;

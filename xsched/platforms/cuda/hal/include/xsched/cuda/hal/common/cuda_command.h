@@ -49,6 +49,8 @@ public:
     virtual unsigned int BlockCnt() const = 0;
     virtual unsigned int ThreadCnt() const = 0;
     virtual unsigned int DynSmemBytes() const = 0;
+    virtual bool IsCooperative() const { return false; }
+    virtual unsigned int ClusterSize() const { return 1; }
 
     // After CUDA 12, kFunc could be a CUkernel. We convert CUkernel to CUfunction
     // by calling cuKernelGetFunction, the actual CUfunction is stored in kFuncHandle.
@@ -61,6 +63,7 @@ public:
     CUdeviceptr entry_point_guardian = 0;
 
 protected:
+    bool EnsureDynamicSmem(unsigned int shm) const;
     bool deep_copy_ = false;
     // If extra is passed, its param ptrs will also be filled into params_ during deep-copy.
     // When launching the kernel, if extra_ is not nullptr, use extra_ instead of params_.
@@ -96,8 +99,13 @@ private:
     {
         void **params = params_;
         if (deep_copy_ && extra_ != nullptr) params = nullptr;
-        return Driver::LaunchKernel(kFunc, gdx_, gdy_, gdz_, bdx_, bdy_, bdz_,
-                                    shm_, stream, params, extra_);
+        CUresult r = Driver::LaunchKernel(kFunc, gdx_, gdy_, gdz_, bdx_, bdy_, bdz_,
+                                          shm_, stream, params, extra_);
+        if (UNLIKELY(r == CUDA_ERROR_INVALID_VALUE && shm_ > 0 && EnsureDynamicSmem(shm_))) {
+            r = Driver::LaunchKernel(kFunc, gdx_, gdy_, gdz_, bdx_, bdy_, bdz_,
+                                     shm_, stream, params, extra_);
+        }
+        return r;
     }
 };
 
@@ -113,10 +121,48 @@ public:
     { return cfg_.blockDimX * cfg_.blockDimY * cfg_.blockDimZ; }
     virtual unsigned int DynSmemBytes() const override
     { return cfg_.sharedMemBytes; }
+    virtual bool IsCooperative() const override;
+    virtual unsigned int ClusterSize() const override;
 
 private:
-    CUlaunchConfig cfg_;
+    CUlaunchConfig cfg_{};
+    bool attrs_deep_copied_ = false;
     virtual CUresult Launch(CUstream stream) override;
+};
+
+class CudaCooperativeKernelLaunchCommand : public CudaKernelCommand
+{
+public:
+    CudaCooperativeKernelLaunchCommand(CUfunction func,
+                                       unsigned int gdx, unsigned int gdy, unsigned int gdz,
+                                       unsigned int bdx, unsigned int bdy, unsigned int bdz,
+                                       unsigned int shm, void **params, bool deep_copy)
+        : CudaKernelCommand(func, params, nullptr, deep_copy)
+        , gdx_(gdx), gdy_(gdy), gdz_(gdz), bdx_(bdx), bdy_(bdy), bdz_(bdz), shm_(shm)
+    {
+        // Cooperative grid.sync() requires whole-grid residency; route safely at Level-1 boundary.
+        ClearProps(preempt::kCommandPropertyDeactivatable);
+    }
+    virtual ~CudaCooperativeKernelLaunchCommand() = default;
+    virtual unsigned int BlockCnt() const override { return gdx_ * gdy_ * gdz_; }
+    virtual unsigned int ThreadCnt() const override { return bdx_ * bdy_ * bdz_; }
+    virtual unsigned int DynSmemBytes() const override { return shm_; }
+    virtual bool IsCooperative() const override { return true; }
+
+private:
+    const unsigned int gdx_, gdy_, gdz_;
+    const unsigned int bdx_, bdy_, bdz_;
+    const unsigned int shm_;
+    virtual CUresult Launch(CUstream stream) override
+    {
+        CUresult r = Driver::LaunchCooperativeKernel(kFunc, gdx_, gdy_, gdz_, bdx_, bdy_, bdz_,
+                                                     shm_, stream, params_);
+        if (UNLIKELY(r == CUDA_ERROR_INVALID_VALUE && shm_ > 0 && EnsureDynamicSmem(shm_))) {
+            r = Driver::LaunchCooperativeKernel(kFunc, gdx_, gdy_, gdz_, bdx_, bdy_, bdz_,
+                                                shm_, stream, params_);
+        }
+        return r;
+    }
 };
 
 // host function

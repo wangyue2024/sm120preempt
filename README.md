@@ -11,10 +11,21 @@
 - **极简双模式设计**：
   - **Mode 1 (`kEarlyExit`)**：面向幂等内核的零显存开销早退与无泄漏 `State C` 拦截。
   - **Mode 5 (`kTrapFrame`)**：面向非幂等内核的全架构硬件状态保存与恢复——覆盖全 3D 网格/线程块、`R0..R253` 全量寄存器级联（`SR_REGALLOC + BRX`）、`UR0..UR63 + UPR + B0..B15`、`0..15` 号命名屏障（`B2R`/`R2B`）、动态 `SR_SMEMSZ` 共享内存、栈溢出及 `__noinline__` 递归局部内存（LMEM）、部分已退出 CTA（`warp_mask` + 动态 Leader 选举）。
-- **静态 9-Cave 引擎**：进程初始化时一次性在 `.text.traphandler` ToolsMemory 中静态部署全部 9 个代码洞（`1,045 / 1,390` 工作槽位，全 `C++20 -Wall -Wextra -Werror` 零警告），零运行期热补丁。
+- **静态 9-Cave 引擎 + 100% GDDR7 显存控制面 (`v2.2.0`)**：进程初始化时一次性在 `.text.traphandler` ToolsMemory 中静态部署全部 9 个代码洞（`1,045 / 1,390` 工作槽位，全 `C++20 -Wall -Wextra -Werror` 零警告），零运行期热补丁；控制头与 `Sm120CtaEntry[65536]` 驻留 GPU GDDR7 显存（配合高优先级 Copy Engine DMA 通道与 1 线程 GPU 原生条件清理 `sm120_cond_clear_hdr`），彻底消除 PCIe Zero-Copy 瓶颈，Entry Guardian 开销低至 **`0.43–0.97 µs`**、Mode 5 抢占延迟低至 **`48–70 µs`**。
+- **自适应内核/模式路由器 + 生产级运行时加固**：静态扫描 SM120 `SYNCS`（`mbarrier`）指令、完整拦截 `cuLaunchCooperativeKernel[_ptsz]`、自动识别多波次 Cluster 与 CUDA Graph 并安全降级至 Level-1 边界；支持 `XMemFree_v2` 延迟释放队列（彻底消除抢占挂起期间 `cudaFree` / `torch.cuda.empty_cache()` 死锁）、无上下文工作线程 `ScopedStreamContext` 回退与 `cuDNN` 动态 SMEM 竞态自愈。
 - **永久 Entry Guardian + `BPT.TRAP 0x1` 0 脉冲自陷恢复**：首次发射前注入 `0x500` B（80 槽位）入口守护序言；Evict 阶段单次 BAR0 `0x00424684` 广播脉冲拦截并换出全部在途 CTA，Restore 阶段由恢复波次自主执行用户态 `BPT.TRAP 0x1` 自陷恢复（0 Host 脉冲）。
 - **紧凑 `slot_id` 池化 `u_arena`**：按物理 SM 并发上限动态池化显存，16,384 CTAs 网格下较朴素按 Grid 分配方案节省 **160.6×**（RTX 5080）/ **436.9×**（RTX 5060）显存。
 - **XSched HAL 闭环 + 独立 Context CILP**：`CudaQueueLv3Trap` 完整对接 `AsyncXQueue` 多内核 FIFO 队列与高优 `DirectLaunch` 零开销绕过；同时独立保留 `ResumableSm120Context`（`0x20801210` / `0xa06c0105` 上下文级 CILP 抢占）。
+
+### 核心实测亮点（`v2.2.0-sm120`, RTX 5060 `GB206`）
+
+| 评估维度 | 关键指标（`v2.2.0` 实测） | 较 `v2.1.0` 提升 / 对比 |
+| :--- | :--- | :--- |
+| **微基准（Entry Guardian / Mode 5 Evict）** | `0.43–0.97 µs` / `48.0 µs`（512 CTAs, 48K SMEM） | **45×–100×** / **22.4×** 加速 |
+| **8 大闭源 CUDA 库 + 7 项 Blackwell 硬件特性** | **15 / 15 PASS**（`cuBLAS/Lt/cuFFT/cuSPARSE/CUB` + `mma/cp.async/mbarrier/Graph/Cluster/Coop`） | `cuBLAS` `0.86 ms` (**77×**), `cuSPARSE` `0.11 ms` (**466×**) |
+| **LLM Serving (`15 ms` QoS, Mode 5)** | `HP P50 = 0.475 ms`, `SUSP P50 = 57 µs`, `SLO ≤ 2 ms = 100%`, `LP_ret = 98.2%` | **67.7×** HP 加速 / **548×** 抢占加速 / `err = 0.00e+00` |
+| **100% SM 饱和 Heavy QoS (`5–50 ms` 全频段)** | `HP P50 = 0.083–0.088 ms`, `SUSP P50 = 66 µs`, `SLO ≤ 2 ms = 100%`, `LP_ret = 98.7%–105%` | 较 Lv1 延迟低 **85×**，`err = 0.00e+00` |
+| **真实未修改 PyTorch 2.11 + cuDNN 9.19 + Triton 3.6.0** | **11 / 11 PASS**（含 ResNet-18 AdamW 训练 `5.5e-9`、4 种 Llama SDPA、Triton、`PT-06` `empty_cache` 零死锁） | `PT-05-QOS`: `HP P50 = 0.552 ms` (**133.6×**), `SLO ≤ 2 ms = 100%`, `LP_ret = 101.9%` |
 
 ---
 
@@ -69,5 +80,5 @@ sudo env LD_LIBRARY_PATH="$CUDA_LIB" CUDA_MPS_PIPE_DIRECTORY=/tmp/no_mps_wangyue
 | [`doc/SM120_V2_COMPREHENSIVE_EVALUATION_ZH.md`](doc/SM120_V2_COMPREHENSIVE_EVALUATION_ZH.md) | 闭源 CUDA 库、Blackwell 硬件边界、PyTorch/cuDNN/Triton、DNN/LLM 调度 QoS 全方位评测、测试方法论与缺陷全景分析 |
 | [`doc/SM120_V2_STATUS_PROBLEMS_AND_ROADMAP_ZH.md`](doc/SM120_V2_STATUS_PROBLEMS_AND_ROADMAP_ZH.md) | **项目阶段总汇报**：当前状态、已达成成果、10 项现存问题台账（P0/P1/P2）、Phase 1–3 演进与论文规划及 5080 同步手册 |
 | [`doc/SM120_V2_RTX5060_VS_RTX5080_DIFF_ZH.md`](doc/SM120_V2_RTX5060_VS_RTX5080_DIFF_ZH.md) | **RTX 5060 vs RTX 5080 适配与差异对比**：`GB206 (595.x)` vs `GB203 (580.x)` 硬件/驱动/工具链/延迟/显存差异全解 |
-| [`CHANGELOG.md`](CHANGELOG.md) | 版本发布与修复变更日志（`v2.0.0-sm120` → `v2.1.0-sm120`） |
+| [`CHANGELOG.md`](CHANGELOG.md) | 版本发布与修复变更日志（`v2.0.0-sm120` → `v2.1.0-sm120` → `v2.2.0-sm120`） |
 | [`xsched/docs/xsched-osdi25.pdf`](xsched/docs/xsched-osdi25.pdf) | XSched OSDI'25 原始论文 |

@@ -100,6 +100,30 @@ XResult XQueueManager::ForEachWaitAll()
     return kXSchedSuccess;
 }
 
+bool XQueueManager::HasAnySuspended()
+{
+    std::lock_guard<std::mutex> lock(mtx_);
+    for (const auto &it : xqs_) {
+        if (it.second->IsSuspended()) return true;
+    }
+    return false;
+}
+
+XResult XQueueManager::ForEachWaitActive()
+{
+    std::list<std::shared_ptr<XQueueWaitAllCommand>> wait_cmds;
+    std::unique_lock<std::mutex> lock(mtx_);
+    for (const auto &it : xqs_) {
+        if (it.second->IsSuspended()) continue;
+        auto wait_cmd = it.second->SubmitWaitAll();
+        if (wait_cmd == nullptr) return kXSchedErrorUnknown;
+        wait_cmds.push_back(wait_cmd);
+    }
+    lock.unlock();
+    for (auto &cmd : wait_cmds) cmd->Wait();
+    return kXSchedSuccess;
+}
+
 XResult XQueueManager::ForEach(std::function<XResult(std::shared_ptr<XQueue>)> func)
 {
     std::lock_guard<std::mutex> lock(mtx_);

@@ -173,6 +173,7 @@ def test_pt01_resnet50_inference(xs, lp_stream, hp_stream, xq):
     x = torch.randn(32, 3, 224, 224, device="cuda", dtype=torch.float16)
     hp_a = torch.randn(256, 512, device="cuda", dtype=torch.float16)
     hp_b = torch.randn(512, 512, device="cuda", dtype=torch.float16)
+    torch.cuda.synchronize()
 
     with torch.no_grad():
         with torch.cuda.stream(hp_stream):
@@ -208,6 +209,7 @@ def test_pt02_resnet50_train(xs, lp_stream, hp_stream, xq):
     y = torch.randint(0, 1000, (32,), device="cuda")
     opt_ref = torch.optim.AdamW(m_ref.parameters(), lr=1e-3)
     opt_pre = torch.optim.AdamW(m_pre.parameters(), lr=1e-3)
+    torch.cuda.synchronize()
 
     # Reference 1 training step on hp_stream (non-idempotent AdamW update!)
     with torch.cuda.stream(hp_stream):
@@ -220,6 +222,7 @@ def test_pt02_resnet50_train(xs, lp_stream, hp_stream, xq):
     # Warmup instrumentation on a throwaway copy first
     m_warm = models.resnet18(weights=None).cuda().train()
     opt_warm = torch.optim.AdamW(m_warm.parameters(), lr=1e-3)
+    torch.cuda.synchronize()
     with torch.cuda.stream(lp_stream):
         opt_warm.zero_grad()
         F.cross_entropy(m_warm(x), y).backward()
@@ -229,6 +232,7 @@ def test_pt02_resnet50_train(xs, lp_stream, hp_stream, xq):
 
     hp_a = torch.randn(256, 512, device="cuda", dtype=torch.float16)
     hp_b = torch.randn(512, 512, device="cuda", dtype=torch.float16)
+    torch.cuda.synchronize()
     def run_lp():
         opt_pre.zero_grad()
         loss = F.cross_entropy(m_pre(x), y)
@@ -260,6 +264,7 @@ def test_pt03_llm_sdpa(xs, lp_stream, hp_stream, xq, backend_name):
     x = torch.randn(4, 512, 1024, device="cuda", dtype=torch.float16)
     hp_a = torch.randn(256, 512, device="cuda", dtype=torch.float16)
     hp_b = torch.randn(512, 512, device="cuda", dtype=torch.float16)
+    torch.cuda.synchronize()
 
     with torch.no_grad():
         with torch.cuda.stream(hp_stream):
@@ -298,12 +303,14 @@ def test_pt04_triton(xs, lp_stream, hp_stream, xq):
     y0 = torch.linspace(0.5, -0.5, N, device="cuda", dtype=torch.float32)
 
     xr, yr = x0.clone(), y0.clone()
+    torch.cuda.synchronize()
     with torch.cuda.stream(hp_stream):
         triton_fused_nonidemp_kernel[(128,)](xr, yr, N, iters=35000, BLOCK_SIZE=256)
     hp_stream.synchronize()
 
     # Warmup on lp_stream
     xw, yw = x0.clone(), y0.clone()
+    torch.cuda.synchronize()
     with torch.cuda.stream(lp_stream):
         triton_fused_nonidemp_kernel[(128,)](xw, yw, N, iters=35000, BLOCK_SIZE=256)
     lp_stream.synchronize()
@@ -311,6 +318,7 @@ def test_pt04_triton(xs, lp_stream, hp_stream, xq):
     xp, yp = x0.clone(), y0.clone()
     hp_a = torch.randn(256, 512, device="cuda", dtype=torch.float16)
     hp_b = torch.randn(512, 512, device="cuda", dtype=torch.float16)
+    torch.cuda.synchronize()
     def run_lp():
         triton_fused_nonidemp_kernel[(128,)](xp, yp, N, iters=35000, BLOCK_SIZE=256)
 
@@ -322,6 +330,64 @@ def test_pt04_triton(xs, lp_stream, hp_stream, xq):
     print(f"[PT-04] Triton 3.6.0 Non-Idemp Kernel (sm_120): preempts={len(susp)}/2 "
           f"avg_susp={sum(susp)/max(1,len(susp)):.3f}ms avg_hp={sum(hp)/max(1,len(hp)):.3f}ms "
           f"err_x={err_x:.3e} err_y={err_y:.3e} -> {'PASS' if passed else 'FAIL'}", flush=True)
+    return passed
+
+
+
+def test_pt06_memfree_deadlock(xs, lp_stream, hp_stream, xq):
+    """DEF-03 regression: cudaFree / torch.cuda.empty_cache / un-warmed HP alloc while LP is suspended."""
+    torch.manual_seed(666)
+    N = 256 * 256
+    x0 = torch.randn(N, device="cuda", dtype=torch.float32)
+    y0 = torch.randn(N, device="cuda", dtype=torch.float32)
+
+    # Reference on HP
+    xr, yr = x0.clone(), y0.clone()
+    torch.cuda.synchronize()
+    with torch.cuda.stream(hp_stream):
+        triton_fused_nonidemp_kernel[(256,)](xr, yr, N, iters=6000, BLOCK_SIZE=256)
+    hp_stream.synchronize()
+
+    # Warmup instrumentation on LP
+    xw, yw = x0.clone(), y0.clone()
+    torch.cuda.synchronize()
+    with torch.cuda.stream(lp_stream):
+        triton_fused_nonidemp_kernel[(256,)](xw, yw, N, iters=100, BLOCK_SIZE=256)
+    lp_stream.synchronize()
+
+    # Run LP kernel and suspend mid-execution
+    xp, yp = x0.clone(), y0.clone()
+    torch.cuda.synchronize()
+    with torch.cuda.stream(lp_stream):
+        triton_fused_nonidemp_kernel[(256,)](xp, yp, N, iters=6000, BLOCK_SIZE=256)
+    time.sleep(0.002)
+
+    t0 = time.perf_counter()
+    xs.suspend(xq)
+    t_susp = (time.perf_counter() - t0) * 1000.0
+
+    # While LP is suspended: trigger real cuMemFree_v2 via empty_cache() + fresh HP tensors!
+    tf0 = time.perf_counter()
+    tmp = torch.empty((1024, 1024), device="cuda", dtype=torch.float32)
+    del tmp
+    torch.cuda.empty_cache()
+    with torch.cuda.stream(hp_stream):
+        a = torch.randn((512, 512), device="cuda", dtype=torch.float16)
+        b = torch.randn((512, 512), device="cuda", dtype=torch.float16)
+        c = a @ b
+        hp_sum = float(c.float().sum().item())
+        del a, b, c
+    torch.cuda.empty_cache()
+    t_free = (time.perf_counter() - tf0) * 1000.0
+
+    xs.resume(xq)
+    lp_stream.synchronize()
+
+    err = max((xp - xr).abs().max().item(), (yp - yr).abs().max().item())
+    passed = (err == 0.0 and math.isfinite(hp_sum))
+    print(f"[PT-06] Mid-Suspend cudaFree/empty_cache Deadlock Guard (DEF-03): "
+          f"susp={t_susp:.3f}ms hp_alloc_free={t_free:.3f}ms max_err={err:.3e} -> "
+          f"{'PASS' if passed else 'FAIL'}", flush=True)
     return passed
 
 
@@ -346,6 +412,7 @@ def test_pt05_qos(mode: str):
     hp_w1 = torch.randn(1024, 1024, device="cuda", dtype=torch.float16)
     hp_w2 = torch.randn(1024, 1024, device="cuda", dtype=torch.float16)
     hp_x = torch.randn(32, 1024, device="cuda", dtype=torch.float16)
+    torch.cuda.synchronize()
 
     with torch.no_grad():
         # Warmup & standalone baseline
@@ -454,6 +521,8 @@ def main():
             test_pt03_llm_sdpa(xs, lp_stream, hp_stream, xq, "cudnn")
         if case in ("all", "pt04"):
             test_pt04_triton(xs, lp_stream, hp_stream, xq)
+        if case in ("all", "pt06"):
+            test_pt06_memfree_deadlock(xs, lp_stream, hp_stream, xq)
     finally:
         xs.destroy(hwq, xq)
 

@@ -2,6 +2,42 @@
 
 All notable changes to the Blackwell (`sm_120`) Level-3 transparent preemption and scheduling system are documented in this file.
 
+## [v2.2.0-sm120] - 2026-11-24
+
+### Performance Breakthroughs (10× – 548× Speedup on RTX 5060 `GB206`)
+- **DEF-01 & DEF-08 — 100% GDDR7 VRAM Control Plane + High-Priority Copy Engine DMA (`sm120_trap_engine.h/.cpp`)**:
+  - Migrated `Sm120ControlHeader` + `Sm120CtaEntry[65536]` (`ctrl_dev_`) from PCIe Zero-Copy pinned host RAM into GPU GDDR7 VRAM, eliminating PCIe Gen5 round-trip latency (~1.6–2.0 µs/atomic) in the Entry Guardian and Trap Handler hot paths.
+  - Added dedicated high-priority `ctrl_op_stream_` using pure Copy Engine `Driver::MemcpyHtoDAsync_v2` / `MemcpyDtoHAsync_v2` (never blocked by 100% SM saturation, unlike compute-engine `cuMemsetD32Async`).
+  - Added GPU-native 1-thread PTX helper `sm120_cond_clear_hdr` (~2 µs, strictly ordered on `kStream`) replacing host callback `cuLaunchHostFunc` (`PostRestoreClearHostCb`).
+  - **Verified Before/After Impact (`v2.1.0` → `v2.2.0`, RTX 5060)**:
+    - Entry Guardian Delta: `43.25 µs` → **`0.43–0.97 µs` (45×–100× faster)**
+    - Mode 1 Evict P50 (`512 CTAs, 48K SMEM`): `901.2 µs` → **`38.0 µs` (23.7× faster)**
+    - Mode 5 Evict P50 (`512 CTAs, 48K SMEM`): `1,076.2 µs` → **`48.0 µs` (22.4× faster)**
+    - `cuBLAS` / `cuSPARSE` Suspend: `66.1 ms` / `50.8 ms` → **`0.856 ms` / `0.109 ms` (77× / 466× faster)**
+    - LLM Serving (`15 ms` QoS): `HP P50 32.16 ms → 0.475 ms (67.7×)`, `SUSP P50 31.32 ms → 0.057 ms (548×)`, `SLO ≤ 2 ms: 0% → 100%`, `LP_ret: 19.3% → 98.2%`
+    - 100% SM Saturated Heavy QoS (`15 ms`): `HP P50 0.083 ms` (85× lower than Lv1 `7.091 ms`), `SUSP P50 0.066 ms`, `SLO ≤ 2 ms: 100%`, `LP_ret: 100.7%`
+    - Real PyTorch `PT-05-QOS` (`m5`): `HP P50 73.76 ms → 0.552 ms (133.6×)`, `SUSP P50 73.45 ms → 0.454 ms (161.8×)`, `SLO ≤ 2 ms: 0% → 100%`, `LP_ret: 0.7% → 101.9%`
+
+### Production Hardening & Universal Compatibility (`DEF-02` .. `DEF-07` + Race Fix)
+- **DEF-02 & Phase 2 Adaptive Kernel/Mode Router (`sm120_guardian.h/.cpp`, `cuda_queue.h/.cpp`, `xcommand.h`)**:
+  - Static SM120 SASS scanner (`BinaryHasHwMbarrier`) detects `SYNCS` hardware `mbarrier` opcodes (`op9 = 0x1a7 / 0x1b2`) during one-time instrumentation.
+  - `CudaQueueLv3Trap::OnHwCommandSubmit` adaptively routes `SYNCS/mbarrier`, Cooperative kernels, multi-wave CTA Clusters (`ClusterSize > 1 && BlockCnt > sm_count`), and CUDA Graphs cleanly to Level-1 boundary (`killable = false`, `ClearProps(kCommandPropertyDeactivatable)`), bringing Suite 1 to **15 / 15 PASS**.
+- **DEF-03 — Memory-Safe Deferred Free Queue (`xqueue.h/.cpp`, `async_xqueue.h`, `shim.cpp`)**:
+  - `XMemFree_v2` detects any suspended `XQueue` via `XQueueManager::HasAnySuspended()` and defers freeing into `g_deferred_frees` instead of blocking on `WaitAllActive()` (eliminating mid-suspend `cudaFree` / `torch.cuda.empty_cache()` deadlock while guaranteeing suspended LP kernels' buffers stay live until resume). Verified in `test_def03_def06.cu` and PyTorch `PT-06`.
+- **DEF-04 — Intercept `cuLaunchCooperativeKernel[_ptsz]` (`cuda_command.h`, `shim.h/.cpp`, `intercept.cpp`)**:
+  - Added `CudaCooperativeKernelLaunchCommand` and `XLaunchCooperativeKernel[_ptsz]` interception so cooperative kernels enter XQueue tracking and cleanly route to Level-1 boundary (`HW-07`).
+- **DEF-05 — PyTorch ResNet-18 Training `cuDNN` Async SMEM Race & `LaunchEx` Deep Copy (`cuda_command.h/.cpp`)**:
+  - Fixed `CUDA_ERROR_INVALID_VALUE (1)` in `PT-02` caused by `cuDNN` updating `CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES` on the main thread before async `LaunchWorker` launched an earlier larger-SMEM BatchNorm kernel (`EnsureDynamicSmem` zero-hot-path retry).
+  - Fixed `CudaKernelLaunchExCommand` attribute deep copy when `param_cnt_ == 0` and max-extent `buffer_size` copy for `params_`. Verified `PT-02` PASS (`max_weight_err = 5.472e-09`, `avg_susp = 0.023 ms`).
+- **DEF-06 — Context-Free Worker Thread Automatic `StreamGetCtx` Fallback (`shim.h/.cpp`)**:
+  - Added RAII `ScopedStreamContext` so threads with `cuCtxGetCurrent() == nullptr` seamlessly resolve and bind the stream's CUDA context. Verified in `test_def03_def06.cu`.
+- **DEF-07 — `max_slots` Occupancy Slack & Restore-Wait Cap (`sm120_trap_engine.cpp`)**:
+  - Raised `max_slots` slack to `std::max(64u, sm_count * 2)` and capped prior-restore wait target to `std::min(evicted_slots, max_slots)`.
+- **Upstream `CudaQueueLv3Trap` Concurrency Fix (`cuda_queue.h/.cpp`)**:
+  - Guarded `last_kernel_` with `last_kernel_mtx_`, removed unsynchronized `OnHwCommandSubmit` write, and prevented trailing `CudaEventRecordCommand`/memory commands from clobbering `last_kernel_`. Eliminated `PT-05-QOS` `launch_worker.cpp:98` crash.
+- **Test Harness Hygiene (`test_pytorch_llm_dnn.py`, `test_def03_def06.cu`, `run_all_eval.sh`)**:
+  - Added `test_def03_def06.cu` and PyTorch `PT-06`; added missing `torch.cuda.synchronize()` after default-stream tensor creation before non-blocking stream consumption in `test_pytorch_llm_dnn.py`, achieving **11 / 11 PyTorch PASS** (`0.000e+00` bit-exact across ResNet-50, 4 Llama SDPA backends, Triton 3.6.0, and `PT-06`).
+
 ## [v2.1.0-sm120] - 2026-11-24
 
 ### Added

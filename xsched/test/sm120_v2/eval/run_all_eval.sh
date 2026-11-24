@@ -40,14 +40,19 @@ echo "[1/4] Building evaluation binaries into $OUT_DIR ..."
     -L"$XSCHED_PREFIX/lib" -lpreempt -lhalcuda -lcudart
 "$NVCC" -ccbin "$CXX" -arch=sm_120 -O2 \
     "$SCRIPT_DIR/bystander_pure.cu" -o "$OUT_DIR/bystander_pure"
+"$NVCC" -ccbin "$CXX" -arch=sm_120 -O2 -I"$XSCHED_PREFIX/include" \
+    "$SCRIPT_DIR/test_def03_def06.cu" -o "$OUT_DIR/test_def03_def06" \
+    -L"$XSCHED_PREFIX/lib" -lpreempt -lhalcuda -lcuda -lcudart -lpthread
 
 export LD_LIBRARY_PATH="$XSCHED_PREFIX/lib:$CUDA_LIB:/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH:-}"
 
-echo "[2/4] Running Suite 1: 8 Closed-Source CUDA Libraries + 7 Blackwell HW Features (NP=2) ..."
+echo "[2/4] Running Suite 1: 8 Closed-Source CUDA Libraries + 7 Blackwell HW Features + DEF-03/06 (NP=2) ..."
 for c in LIB-01 LIB-02 LIB-03 LIB-04 LIB-05 LIB-06 LIB-07 LIB-08 HW-01 HW-02 HW-03 HW-04 HW-05 HW-06 HW-07; do
     echo ">>> $c <<<"
     TEST_NP=2 timeout 30 "$OUT_DIR/test_libs_and_features" "$c" 2>&1 | grep -E "^\[|preempts=|WARN|ERRO" || true
 done
+echo ">>> DEF-03 & DEF-06 <<<"
+timeout 30 "$OUT_DIR/test_def03_def06" 2>&1 | grep -E "^\[|WARN|ERRO" || true
 
 echo "[3/4] Running Suite 2: LLM Serving + Non-Idempotent DNN Training + Frequency Sweep ..."
 for m in native lv1 m1 m5; do
@@ -75,7 +80,7 @@ wait "$PID_P" || true
 
 if [[ -n "${PY_BIN:-}" && -x "${PY_BIN:-}" ]]; then
     echo "[Bonus] Running Suite 3: Real PyTorch + cuDNN + FlashAttention + Triton ..."
-    for c in pt01 pt02 pt03_math pt03_flash pt03_efficient pt03_cudnn pt04 qos:native qos:lv1 qos:m5; do
+    for c in pt01 pt02 pt03_math pt03_flash pt03_efficient pt03_cudnn pt04 pt06 qos:native qos:lv1 qos:m5; do
         timeout 45 "$PY_BIN" "$SCRIPT_DIR/test_pytorch_llm_dnn.py" "$c" 2>&1 | grep -E "^\[PT-|WARN|ERRO" || true
     done
 fi

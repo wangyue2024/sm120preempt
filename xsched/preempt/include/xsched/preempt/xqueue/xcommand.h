@@ -86,6 +86,7 @@ public:
     /// @param props The combination of xsched::preempt::XCommandProperty.
     /// Multiple properties can be set by OR-ing them together.
     void SetProps(XCommandProperties props) {props_ |= props;}
+    void ClearProps(XCommandProperties props) {props_ &= ~props;}
 
     /// @brief Get command properties.
     /// @param props_mask The mask of the properties to be get.

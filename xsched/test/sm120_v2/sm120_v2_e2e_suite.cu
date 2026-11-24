@@ -682,16 +682,22 @@ bool RunCase1Mode1MultiWave(CUcontext ctx, CUstream lp_stream, CUstream hp_strea
         CHK_CU(cuLaunchKernel(fn, num_ctas, 1, 1, tpc, 1, 1, smem, lp_stream, args, nullptr));
     }
 
-    if (!PollHostFlag(started.host, 40, 3000)) return false;
+    int sm_cnt_c1 = 30;
+    cuDeviceGetAttribute(&sm_cnt_c1, CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT, dev);
+    const uint32_t target_c1 = std::min<uint32_t>(40u, static_cast<uint32_t>(std::max(1, sm_cnt_c1 - 2)));
+    if (!PollHostFlag(started.host, target_c1, 3000)) {
+        allow.Set(1);
+        cuStreamSynchronize(lp_stream);
+        return false;
+    }
     if (!sctx.PreemptStream(Sm120PreemptMode::kEarlyExit)) return false;
     CHK_CU(cuStreamSynchronize(lp_stream));
 
     const auto tev = sctx.Telemetry();
     std::vector<uint32_t> h_entry_mid(num_ctas);
     CHK_RT(cudaMemcpy(h_entry_mid.data(), d_entry_cnt, num_ctas * sizeof(uint32_t), cudaMemcpyDeviceToHost));
-    const auto *entries = reinterpret_cast<const Sm120CtaEntry *>(
-        const_cast<const uint8_t *>(reinterpret_cast<const volatile uint8_t *>(sctx.ControlHostPtr())) +
-        sizeof(Sm120ControlHeader));
+    std::vector<Sm120CtaEntry> entries;
+    if (!sctx.ReadCtaEntries(entries, num_ctas)) return false;
     uint32_t state_c_leaks = 0, replay_marked = 0;
     for (uint32_t b = 0; b < num_ctas; ++b) {
         if (entries[b].state == kCtaStateReplay) ++replay_marked;
@@ -796,8 +802,11 @@ bool RunCase3Mode5MultiWaveZeroLeak(CUcontext ctx, CUstream lp_stream, CUstream 
         CHK_CU(cuLaunchKernel(fn, num_ctas, 1, 1, tpc, 1, 1, smem, lp_stream, args, nullptr));
     }
 
+    int sm_cnt_c3 = 30;
+    cuDeviceGetAttribute(&sm_cnt_c3, CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT, dev);
+    const uint32_t target_c3 = std::min<uint32_t>(60u, static_cast<uint32_t>(std::max(1, sm_cnt_c3 - 2)));
     if (!PollHostFlag(fast_done.host, fast_ctas, 3000) ||
-        !PollHostFlag(started.host, 60, 3000)) {
+        !PollHostFlag(started.host, target_c3, 3000)) {
         allow.Set(1);
         cuStreamSynchronize(lp_stream);
         return false;
@@ -812,9 +821,8 @@ bool RunCase3Mode5MultiWaveZeroLeak(CUcontext ctx, CUstream lp_stream, CUstream 
     CHK_RT(cudaMemcpy(h_pre_mid.data(), d_pre, num_ctas * sizeof(uint32_t), cudaMemcpyDeviceToHost));
     CHK_RT(cudaMemcpy(h_post_mid.data(), d_post, num_ctas * sizeof(uint32_t), cudaMemcpyDeviceToHost));
 
-    const auto *entries = reinterpret_cast<const Sm120CtaEntry *>(
-        const_cast<const uint8_t *>(reinterpret_cast<const volatile uint8_t *>(sctx.ControlHostPtr())) +
-        sizeof(Sm120ControlHeader));
+    std::vector<Sm120CtaEntry> entries;
+    if (!sctx.ReadCtaEntries(entries, num_ctas)) return false;
     uint32_t st_a = 0, st_b = 0, st_c = 0, leaks = 0;
     for (uint32_t b = 0; b < num_ctas; ++b) {
         if (entries[b].state == kCtaStateDone) ++st_a;

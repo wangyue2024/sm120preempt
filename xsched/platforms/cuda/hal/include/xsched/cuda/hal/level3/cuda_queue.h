@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mutex>
+
 #include "xsched/cuda/hal/level2/cuda_queue.h"
 #include "xsched/cuda/hal/level3/interrupt.h"
 #include "xsched/cuda/hal/level3/tsg.h"
@@ -37,6 +39,8 @@ protected:
     std::shared_ptr<sm120::Sm120TrapEngine> sm120_engine_ = nullptr;
     std::unique_ptr<sm120::Sm120StreamContext> sm120_stream_ = nullptr;
     sm120::Sm120PreemptMode last_preempt_mode_ = sm120::Sm120PreemptMode::kTrapFrame;
+    int sm_count_ = 0;
+    mutable std::mutex last_kernel_mtx_;
     std::shared_ptr<preempt::HwCommand> last_kernel_ = nullptr;
     bool relaunched_ = false;   // Reactivate relaunched a kernel this round
 };

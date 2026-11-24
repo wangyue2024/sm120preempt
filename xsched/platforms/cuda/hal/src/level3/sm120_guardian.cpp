@@ -50,6 +50,22 @@ bool BinaryHasDeviceCalls(const uint8_t *bin, size_t bytes)
     return false;
 }
 
+bool BinaryHasHwMbarrier(const uint8_t *bin, size_t bytes)
+{
+    if (!bin || bytes < 16) return false;
+    const size_t n_ins = bytes / 16;
+    for (size_t i = 0; i < n_ins; ++i) {
+        uint64_t w0 = 0;
+        memcpy(&w0, bin + i * 16, sizeof(w0));
+        const uint32_t op9 = static_cast<uint32_t>(w0 & 0x1ffU);
+        // SM120 hardware-managed SMEM mbarrier instructions (SYNCS.ARRIVE/PHASECHK/EXCH.64).
+        if (op9 == 0x1a7U || op9 == 0x1b2U) {
+            return true;
+        }
+    }
+    return false;
+}
+
 std::vector<sass::Ins> BuildEntryGuardian()
 {
     using namespace sass;
@@ -289,6 +305,25 @@ const Sm120KernelRecord *Sm120GuardianRegistry::EnsureInstrumented(CUfunction fu
     const uint32_t raw_bars = static_cast<uint32_t>(cuXtraGetBarrierCnt(func));
     const uint32_t clamped_bars = std::max(raw_bars, 1u);
     const int clamped_regs = std::max(raw_regs, 16);
+
+    const bool has_mbar = BinaryHasHwMbarrier(static_cast<const uint8_t *>(orig_bin), orig_bin_sz);
+    if (has_mbar) {
+        Sm120KernelRecord rec;
+        rec.func              = func;
+        rec.ep_orig           = ep_orig;
+        rec.ep_inst           = ep_orig;
+        rec.kdesc_dev         = 0;
+        rec.desc.flags        = 4u;
+        rec.raw_num_regs      = raw_regs;
+        rec.clamped_regs      = raw_regs;
+        rec.static_smem_bytes = static_smem;
+        rec.has_hw_mbarrier   = true;
+        auto [ins_it, inserted] = records_.emplace(func, rec);
+        (void)inserted;
+        XINFO("sm120_guardian: detected SM120 SYNCS/mbarrier in func=%p (regs=%d static_smem=%d) -> safe level-1 boundary",
+              static_cast<void *>(func), raw_regs, static_smem);
+        return &ins_it->second;
+    }
 
     const bool has_calls = BinaryHasDeviceCalls(static_cast<const uint8_t *>(orig_bin), orig_bin_sz);
     const uint32_t lmem_static = AlignUp16(static_cast<uint32_t>(std::max(local_bytes, 0)));

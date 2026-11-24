@@ -1,6 +1,6 @@
 # Blackwell (`sm_120`) Level-3 硬件 Trap 抢占与恢复架构详解（v2）
 
-**基线版本**：v2（静态 9-Cave 引擎 + 永久 Entry Guardian + 用户态 `BPT.TRAP 0x1` 0 脉冲自陷恢复）  
+**基线版本**：`v2.2.0-sm120`（静态 9-Cave 引擎 + **100% GDDR7 显存控制面 & 高优 Copy Engine DMA** + 永久 Entry Guardian + 用户态 `BPT.TRAP 0x1` 0 脉冲自陷恢复 + 自适应内核/模式路由器）  
 **适用架构**：NVIDIA Blackwell (`sm_120`) — 已在 `RTX 5080`（`GB203`, 84 SMs, Driver `580.95.05`, CUDA 12.9）与 `RTX 5060`（`GB206`, 30 SMs, Driver `595.99.02`）实机验证  
 
 ---
@@ -100,19 +100,42 @@ flowchart TD
 - 单个紧凑槽位精确对齐布局：`[0x00..0x3f]` 16 个命名屏障 → Per-Warp 区（每 Warp `0x160` B：112B 硬件 Trap Frame + `B2R.WARP` + `UR0..63/UPR/B0..15`）→ Per-Thread GPR 区（按 `reg_ceil` 裁剪至 `min(align16(regs+16), 256)`）→ 动态 SMEM 区（按 `align4096(static + dyn)` 对齐匹配 Blackwell 硬件分配粒度）→ 动态 LMEM 区（按 `lmem_cap`）。
 - 初始 `ctrl_cta_cap_` 为 **65,536 CTAs**（扩容前自动同步 `last_stream_`），并以 `kernel_arena_map_[kernel_idx]` 精确记录每个排队内核对应的 `arena_va`，杜绝多内核背靠背扩容时的 `arena` 错配。
 
-### 5.2 256 槽位 Device VRAM 异步双跳中转与 Epoch 保护恢复清理
+### 5.2 100% GDDR7 显存控制面、高优 Copy Engine DMA 与 GPU 原生条件清理（`v2.2.0` 核心突破）
 
-- **Layout 双跳中转（`layout_stage_dev_` 16 KiB）**：CUDA 驱动对 `CU_MEMHOSTALLOC_DEVICEMAP` 固定主机内存执行 `cuMemcpyHtoDAsync_v2` 会退化为同步 Host-to-Host 阻塞拷贝。v2 为每个 `Sm120StreamContext` 分配 **256×64B = 16 KiB** 环形中转槽位，保证深度异步内核队列（如 CUB / PyTorch）绝不回绕覆盖在途布局更新。
-- **Epoch 保护的 `EnqueuePostRestoreClear`（`Driver::LaunchHostFunc`）**：恢复内核末尾通过 `LaunchHostFunc` 挂载受 `PostRestoreClearState`（独立微锁 + 单调 `epoch`）保护的清零回调。若恢复波次中途遭遇二次抢占，`PreemptStream` 在释放微锁前递增 `epoch` 立即作废过期回调，杜绝二次抢占计数被旧回调清零，且该微锁绝不跨 `StreamQuery` 持有（零死锁）。
-- **空闲队列安全恢复**：`CudaQueueLv3Trap::Reactivate()` 仅在 `evicted_slots > 0 || drained_cnt > 0 || mode1_exit_cnt > 0` 时进入恢复模式，否则调用 `ResetControlSync()` 清零控制头，避免空闲挂起/恢复污染 `cmd = 6`。
+- **VRAM 驻留控制面（彻底消除 `DEF-01` PCIe Zero-Copy 瓶颈）**：
+  - `Sm120ControlHeader` 与 `Sm120CtaEntry[65536]`（`ctrl_dev_`）全部常驻 **GPU GDDR7 显存**（享受 L2 Cache 与 384+ GB/s 显存带宽），Entry Guardian 与 Trap Handler 热路径上的原子读写与状态查询彻底告别 PCIe Gen5 跨总线往返（`~1.6–2.0 µs/op`），使 Entry Guardian 零抢占延迟由 `43.25 µs` 骤降至 **`0.43–0.97 µs`（45×–100× 加速）**，Mode 5 抢占延迟降至 **`48–70 µs`**。
+- **高优先级 Copy Engine DMA 通道（`ctrl_op_stream_`）**：
+  - 主机侧读写控制头（`ReadHeaderLocked` / `PreemptStream` / `PrepareRestore`）统一经最高优先级非阻塞流 `ctrl_op_stream_` 走纯硬件 **Copy Engine**（`Driver::MemcpyHtoDAsync_v2` / `MemcpyDtoHAsync_v2`），**严禁在抢占/恢复关键路径使用 Compute Engine 的 `cuMemsetD32Async`**。即便在 100% SM 饱和负载下，硬件 Copy Engine DMA 仍保持 `~12.6 µs` 恒定低延迟，绝不被在途计算内核阻塞。
+- **256 槽位流内异步布局更新（`layout_stage_`）**：
+  - `PrepareLaunch` 从固定主机环形缓冲 `layout_stage_`（`256 × 64 B = 16 KiB`）发起单次非阻塞 `MemcpyHtoDAsync_v2` 将 `Layout36` 严格按流序写入 VRAM `ctrl_dev_`，彻底取代 v2.1.0 的双跳中转并杜绝深队列回绕覆盖。
+- **GPU 原生 1 线程条件清理（`sm120_cond_clear_hdr`）**：
+  - 进程初始化时由 `Sm120TrapEngine::LoadHelperModule()` 加载 1 线程 PTX 辅助核 `sm120_cond_clear_hdr`（取代旧版 `cuLaunchHostFunc` 宿主机回调）。恢复波次末尾严格按流序入队该核（`~2 µs`），仅当 `cmd == 6`（`kCmdMode5Restore`）或 `cmd == 2`（`kCmdMode1Replay`）时原子清零 `ctrl_dev_[0..31]`；若在恢复中途发生二次抢占将 `cmd` 翻为 `5/1`，则自动 NO-OP，完全免除跨线程回调锁竞争。
+- **空闲队列安全恢复与 `max_slots` 安全裕量（`DEF-07`）**：
+  - `CudaQueueLv3Trap::Reactivate()` 仅在 `evicted_slots > 0 || drained_cnt > 0 || mode1_exit_cnt > 0` 时进入恢复模式，否则调用 `ResetControlSync()` 清零控制头。
+  - `max_slots` 安全裕量提升至 `std::max(64u, sm_count * 2)`，并在 `PreemptStream` 等待前序恢复完成时将目标封顶为 `std::min(evicted_slots, max_slots)`，杜绝高频 `5 ms` 短核抢占溢出超时。
 
 ### 5.3 BAR0 硬件安全法则（D10）与重入保护 / 并发同步
 
 1. **PTIMER 刷新脉冲（严守 D10）**：`Sm120Arena::FireEvictPulse()` 写入 `0x00424684 = 0x80001c01u` 后，**绝不读取 `0x00424684` 或 PGRAPH PRI 寄存器**，而是读取非 PRI 的 `NV_PTIMER_TIME_0 (0x00009400)` 刷新首个 Posted Write 并提供干净的 `~1 µs` 脉冲宽度，再写入 `0x00001c01u` 撤销 `STOP_TRIGGER`。
 2. **多轮 Restore → Evict 同步（`trap_inflight` + `c1_noop_recheck_idx`）**：
-   - Cave 1 入口原子递增 `ctrl_host_->trap_inflight`，所有退出路径（正常恢复、死 Warp 退出、伴随入陷 NO-OP）在返回前原子递减；
+   - Cave 1 入口原子递增 `ctrl_dev_->trap_inflight`，所有退出路径（正常恢复、死 Warp 退出、伴随入陷 NO-OP）在返回前原子递减；
    - 伴随同 SM `BPT.TRAP 0x1` 入陷的非 State B Warp 在 `c1_noop_recheck_idx` 重新检查 `cmd`，若 Host 已切换为 `cmd = 5/1` 则直接派发进 Cave 0 Evict；
-   - `PreemptStream` 在上一轮为 `kCmdMode5Restore` 时等待 `restored_slots >= evicted_slots && trap_inflight == 0`，切换 `cmd` 后再确认 `trap_inflight == 0` 才发射 BAR0 脉冲。
+   - `PreemptStream` 在上一轮为 `kCmdMode5Restore` 时等待 `restored_slots >= min(evicted_slots, max_slots) && trap_inflight == 0`，切换 `cmd` 后再确认 `trap_inflight == 0` 才发射 BAR0 脉冲。
 3. **`TRAP_RETURN_PC == exit_stub_va` 重入防护 + 进度感知有界确认**：
    - Cave 1 的公共分发器 `c1_dispatch_guard_idx` 在派发任何非零 `cmd` 之前，首先比对 `local[0xffffa8] == exit_stub_va`，确保已重定向至 `EXIT` 的 Warp 永远走 NO-OP RTT，杜绝重入 `bar_sync_trap()` 或重复计数的可能；
-   - `PreemptStream` 发射 1-shot 脉冲后监听流完成状态；空闲 GPU 常规场景下 **0 次重试（严格单脉冲）**；仅当极端并发 PCIe 原子风暴或共享桌面上下文导致进度计数连续停滞 `>= 15 ms` 时，才触发严格有界（`<= 8` 次）且重入安全的恢复脉冲。
+   - `PreemptStream` 发射 1-shot 脉冲后监听流完成状态；空闲 GPU 常规场景下 **0 次重试（严格单脉冲）**；仅当极端共享桌面上下文导致进度计数连续停滞 `>= 15 ms` 时，才触发严格有界（`<= 8` 次）且重入安全的恢复脉冲。
+
+### 5.4 自适应内核/模式路由器与生产级 Shim/HAL 加固（`v2.2.0`）
+
+为确保任意闭源库与真实深度学习框架零故障运行，系统在 `Sm120GuardianRegistry`、`CudaQueueLv3Trap` 与 CUDA Shim 中建立了完整的生产防线：
+
+1. **静态 SM120 `SYNCS`（`mbarrier`）指令扫描与自适应路由（`DEF-02` + `DEF-04`）**：
+   - `Sm120GuardianRegistry::BinaryHasHwMbarrier()` 在首次插桩时对内核 128-bit SM120 SASS 执行 `op9 = w0 & 0x1ff` 静态扫描，精确识别 `0x1a7`（`SYNCS.ARRIVE/PHASECHK/CCTL`）与 `0x1b2`（`SYNCS.EXCH.64`）。
+   - `CudaQueueLv3Trap::OnHwCommandSubmit()` 综合内核画像自动路由：含硬件 `SYNCS/mbarrier`、合作内核（`cuLaunchCooperativeKernel[_ptsz]` 经 `CudaCooperativeKernelLaunchCommand` 完整拦截）、跨波次 CTA Cluster（`ClusterSize > 1 && BlockCnt > sm_count`）以及 `CudaGraphCommand` 自动设置 `killable = false` 并清除 `kCommandPropertyDeactivatable`，**安全无缝降级至 Level-1 边界同步**；其余所有幂等/非幂等内核分别路由至 Mode 1 / Mode 5。
+2. **内存安全 `XMemFree_v2` 延迟释放队列（`DEF-03`）**：
+   - `XMemFree_v2()` 通过 `XQueueManager::HasAnySuspended()` 检测当前是否存在已挂起队列；若存在，则将待释放 `CUdeviceptr` 压入 `g_deferred_frees` 立即返回（零死锁，且保证被挂起 LP 内核正在使用的显存不被提前回收），并在后续无挂起状态的 `XMemFree_v2` / `XStreamSynchronize` / `XCtxSynchronize` 安全点统一排空释放。
+3. **`cuDNN` 异步动态 SMEM 竞态自愈与 `LaunchEx` 深拷贝（`DEF-05`）**：
+   - `CudaKernelCommand::EnsureDynamicSmem()` 在异步 `LaunchWorker` 遭遇主线程 `cuDNN` 提前调低 `CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES` 引发的 `CUDA_ERROR_INVALID_VALUE` 时，自动提升动态 SMEM 上限并零开销重试，同时修复 `CudaKernelLaunchExCommand` 在 `param_cnt_ == 0` 时的属性深拷贝与变长参数缓冲区边界拷贝。
+4. **无上下文工作线程自动绑定与 `last_kernel_` 并发互斥（`DEF-06` + 竞态修复）**：
+   - `ScopedStreamContext` 在 `cuCtxGetCurrent() == nullptr` 时自动通过 `Driver::StreamGetCtx(stream, &sctx)` 解析并绑定目标流上下文；
+   - `CudaQueueLv3Trap::last_kernel_` 统一受 `last_kernel_mtx_` 保护，且仅由 `LaunchWorker` 针对 `CudaKernelCommand`/`CudaGraphCommand` 更新，彻底消除多线程高频 QoS 下的 `shared_ptr` 竞态崩溃。

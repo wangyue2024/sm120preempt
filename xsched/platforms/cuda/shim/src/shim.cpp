@@ -1,4 +1,5 @@
 #include <list>
+#include <vector>
 #include <mutex>
 #include <atomic>
 #include <functional>
@@ -121,6 +122,7 @@ int64_t GetCaptureCounter()
 template <typename CmdT, typename... Args>
 CUresult XLaunchKernelImpl(CUstream stream, Args&&... args)
 {
+    ScopedStreamContext scoped_ctx(stream);
     auto xq = HwQueueManager::GetXQueue(GetHwQueueHandle(stream));
     auto kernel = std::make_shared<CmdT>(std::forward<Args>(args)..., xq != nullptr);
     if (xq == nullptr) return DirectLaunch(kernel, stream);
@@ -172,6 +174,32 @@ CUresult XLaunchKernelEx(const CUlaunchConfig *config, CUfunction f, void **para
     return XLaunchKernelImpl<CudaKernelLaunchExCommand>(cfg.hStream, &cfg, f, params, extra);
 }
 
+CUresult XLaunchCooperativeKernel(CUfunction f,
+                                  unsigned int gdx, unsigned int gdy, unsigned int gdz,
+                                  unsigned int bdx, unsigned int bdy, unsigned int bdz,
+                                  unsigned int shmem, CUstream stream, void **params)
+{
+    XDEBG("XLaunchCooperativeKernel(func: %p, stream: %p, grid: [%u, %u, %u], block: [%u, %u, %u], "
+          "shm: %u, params: %p)", f, stream, gdx, gdy, gdz, bdx, bdy, bdz, shmem, params);
+    CHECK_STREAM(stream, Driver::LaunchCooperativeKernel(
+        f, gdx, gdy, gdz, bdx, bdy, bdz, shmem, stream, params));
+    return XLaunchKernelImpl<CudaCooperativeKernelLaunchCommand>(
+        stream, f, gdx, gdy, gdz, bdx, bdy, bdz, shmem, params);
+}
+
+CUresult XLaunchCooperativeKernel_ptsz(CUfunction f,
+                                       unsigned int gdx, unsigned int gdy, unsigned int gdz,
+                                       unsigned int bdx, unsigned int bdy, unsigned int bdz,
+                                       unsigned int shmem, CUstream stream, void **params)
+{
+    XDEBG("XLaunchCooperativeKernel_ptsz(func: %p, stream: %p, grid: [%u, %u, %u], block: [%u, %u, %u], "
+          "shm: %u, params: %p)", f, stream, gdx, gdy, gdz, bdx, bdy, bdz, shmem, params);
+    CHECK_STREAM_PTSZ(stream, Driver::LaunchCooperativeKernel_ptsz(
+        f, gdx, gdy, gdz, bdx, bdy, bdz, shmem, stream, params));
+    return XLaunchKernelImpl<CudaCooperativeKernelLaunchCommand>(
+        stream, f, gdx, gdy, gdz, bdx, bdy, bdz, shmem, params);
+}
+
 CUresult XLaunchKernelEx_ptsz(const CUlaunchConfig *config, CUfunction f, void **params, void **extra)
 {
     if (config == nullptr) {
@@ -193,6 +221,7 @@ static inline CUresult XLaunchHostFuncImpl(CUstream stream, CUhostFn fn, void *d
     // stream is the first arg, different from other XLaunch* functions.
     auto xq = HwQueueManager::GetXQueue(GetHwQueueHandle(stream));
     if (xq == nullptr) return Driver::LaunchHostFunc(stream, fn, data);
+    ScopedStreamContext scoped_ctx(stream);
     auto hw_cmd = std::make_shared<CudaHostFuncCommand>(fn, data);
     xq->Submit(hw_cmd);
     return CUDA_SUCCESS;
@@ -243,11 +272,47 @@ CUresult XStreamEndCapture_ptsz(CUstream stream, CUgraph *graph)
     return XStreamEndCaptureImpl(stream, graph);
 }
 
+static std::mutex g_deferred_free_mtx;
+static std::vector<CUdeviceptr> g_deferred_frees;
+static std::atomic<size_t> g_deferred_free_cnt {0};
+
+static void DrainDeferredFreesIfSafe()
+{
+    if (g_deferred_free_cnt.load(std::memory_order_acquire) == 0) return;
+    if (XQueueManager::HasAnySuspended()) return;
+    XQueueManager::ForEachWaitActive();
+    if (XQueueManager::HasAnySuspended()) return;
+    std::vector<CUdeviceptr> to_free;
+    {
+        std::lock_guard<std::mutex> lock(g_deferred_free_mtx);
+        if (XQueueManager::HasAnySuspended()) return;
+        to_free.swap(g_deferred_frees);
+        g_deferred_free_cnt.store(0, std::memory_order_release);
+    }
+    for (CUdeviceptr ptr : to_free) {
+        Driver::MemFree_v2(ptr);
+    }
+}
+
 CUresult XMemFree_v2(CUdeviceptr dptr)
 {
-    /// TODO: Optimize this.
-    /// In CUDA semantics, cuMemFree only waits for commands who use this memory.
-    XQueueManager::ForEachWaitAll();
+    if (dptr == 0) return CUDA_SUCCESS;
+    // Avoid self-deadlock when any XQueue is suspended (DEF-03): defer freeing
+    // until all queues are active so suspended LP kernels remain memory-safe.
+    if (XQueueManager::HasAnySuspended()) {
+        std::lock_guard<std::mutex> lock(g_deferred_free_mtx);
+        g_deferred_frees.push_back(dptr);
+        g_deferred_free_cnt.store(g_deferred_frees.size(), std::memory_order_release);
+        return CUDA_SUCCESS;
+    }
+    XQueueManager::ForEachWaitActive();
+    if (XQueueManager::HasAnySuspended()) {
+        std::lock_guard<std::mutex> lock(g_deferred_free_mtx);
+        g_deferred_frees.push_back(dptr);
+        g_deferred_free_cnt.store(g_deferred_frees.size(), std::memory_order_release);
+        return CUDA_SUCCESS;
+    }
+    DrainDeferredFreesIfSafe();
     return Driver::MemFree_v2(dptr);
 }
 
@@ -278,6 +343,7 @@ CUresult XEventRecord(CUevent event, CUstream stream)
     XDEBG("XEventRecord(event: %p, stream: %p)", event, stream);
     CONVERT_STREAM(stream);
     if (event == nullptr) return Driver::EventRecord(event, stream);
+    ScopedStreamContext scoped_ctx(stream);
     auto xevent = std::make_shared<CudaEventRecordCommand>(event);
     return XEventRecordImpl(xevent, event, stream);
 }
@@ -287,6 +353,7 @@ CUresult XEventRecord_ptsz(CUevent event, CUstream stream)
     XDEBG("XEventRecord_ptsz(event: %p, stream: %p)", event, stream);
     CONVERT_STREAM_PTSZ(stream);
     if (event == nullptr) return Driver::EventRecord(event, stream);
+    ScopedStreamContext scoped_ctx(stream);
     auto xevent = std::make_shared<CudaEventRecordCommand>(event);
     return XEventRecordImpl(xevent, event, stream);
 }
@@ -296,6 +363,7 @@ CUresult XEventRecordWithFlags(CUevent event, CUstream stream, unsigned int flag
     XDEBG("XEventRecordWithFlags(event: %p, stream: %p, flags: %u)", event, stream, flags);
     CONVERT_STREAM(stream);
     if (event == nullptr) return Driver::EventRecordWithFlags(event, stream, flags);
+    ScopedStreamContext scoped_ctx(stream);
     auto xevent = std::make_shared<CudaEventRecordWithFlagsCommand>(event, flags);
     return XEventRecordImpl(xevent, event, stream);
 }
@@ -305,6 +373,7 @@ CUresult XEventRecordWithFlags_ptsz(CUevent event, CUstream stream, unsigned int
     XDEBG("XEventRecordWithFlags_ptsz(event: %p, stream: %p, flags: %u)", event, stream, flags);
     CONVERT_STREAM_PTSZ(stream);
     if (event == nullptr) return Driver::EventRecordWithFlags(event, stream, flags);
+    ScopedStreamContext scoped_ctx(stream);
     auto xevent = std::make_shared<CudaEventRecordWithFlagsCommand>(event, flags);
     return XEventRecordImpl(xevent, event, stream);
 }
@@ -413,8 +482,13 @@ CUresult XEventDestroy_v2(CUevent event)
 static inline CUresult XStreamSynchronizeImpl(CUstream stream)
 {
     auto xq = HwQueueManager::GetXQueue(GetHwQueueHandle(stream));
-    if (xq == nullptr) return Driver::StreamSynchronize(stream);
+    if (xq == nullptr) {
+        CUresult r = Driver::StreamSynchronize(stream);
+        DrainDeferredFreesIfSafe();
+        return r;
+    }
     xq->WaitAll();
+    DrainDeferredFreesIfSafe();
     return CUDA_SUCCESS;
 }
 
@@ -466,7 +540,9 @@ CUresult XCtxSynchronize()
 {
     XDEBG("XCtxSynchronize()");
     XQueueManager::ForEachWaitAll();
-    return Driver::CtxSynchronize();
+    CUresult r = Driver::CtxSynchronize();
+    DrainDeferredFreesIfSafe();
+    return r;
 }
 
 static std::mutex g_single_stream_mutex;

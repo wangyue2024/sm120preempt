@@ -27,7 +27,7 @@ struct alignas(16) Sm120KernelDesc
     uint32_t lmem_static_bytes;// +0x0c: Align16(CU_FUNC_ATTRIBUTE_LOCAL_SIZE_BYTES)
     uint32_t lmem_cap_bytes;   // +0x10: Max per-thread LMEM snapshot capacity (0 = disabled)
     uint32_t bar_cnt;          // +0x14: Clamped >= 1
-    uint32_t flags;            // +0x18: bit0=has_lmem, bit1=has_device_calls
+    uint32_t flags;            // +0x18: bit0=has_lmem, bit1=has_device_calls, bit2=has_hw_mbarrier
     uint32_t magic;            // +0x1c: kKernelDescMagic
 };
 static_assert(sizeof(Sm120KernelDesc) == 32, "Sm120KernelDesc ABI mismatch");
@@ -42,6 +42,7 @@ struct Sm120KernelRecord
     int           raw_num_regs = 0;
     int           clamped_regs = 0;
     int           static_smem_bytes = 0;
+    bool          has_hw_mbarrier = false;
 };
 
 /// @brief Permanently instruments each managed CUfunction once on first launch with

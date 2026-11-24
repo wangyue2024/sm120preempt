@@ -76,13 +76,17 @@ CudaKernelCommand::CudaKernelCommand(CUfunction func, void **params, void **extr
     if (params != nullptr) {
         // Allocate a continuous buffer for all of the params
         // buffer size = last param offset + last param size
-        size_t last_offset, last_size;
-        cuXtraGetParamInfo(kFuncHandle, param_cnt_ - 1, &last_offset, &last_size, nullptr);
-        size_t buffer_size = last_offset + last_size;
+        size_t buffer_size = 0;
+        for (size_t i = 0; i < param_cnt_; ++i) {
+            size_t offset = 0, size = 0;
+            cuXtraGetParamInfo(kFuncHandle, i, &offset, &size, nullptr);
+            if (offset + size > buffer_size) buffer_size = offset + size;
+        }
+        if (buffer_size == 0) buffer_size = 1;
         param_data_ = (char *)malloc(buffer_size);
 
         for (size_t i = 0; i < param_cnt_; ++i) {
-            size_t offset, size;
+            size_t offset = 0, size = 0;
             cuXtraGetParamInfo(kFuncHandle, i, &offset, &size, nullptr);
             params_[i] = (void*)&param_data_[offset];
             memcpy(params_[i], params[i], size);
@@ -128,6 +132,18 @@ CudaKernelCommand::~CudaKernelCommand()
     if (extra_) free(extra_);
 }
 
+bool CudaKernelCommand::EnsureDynamicSmem(unsigned int shm) const
+{
+    int max_dyn = 0;
+    if (Driver::FuncGetAttribute(&max_dyn, CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES, kFuncHandle) != CUDA_SUCCESS) {
+        return false;
+    }
+    if (static_cast<int>(shm) <= max_dyn) return false;
+    return Driver::FuncSetAttribute(
+               kFuncHandle, CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES,
+               static_cast<int>(shm)) == CUDA_SUCCESS;
+}
+
 CudaKernelLaunchExCommand::CudaKernelLaunchExCommand(const CUlaunchConfig *cfg, CUfunction func,
                                                      void **params, void **extra, bool deep_copy)
     : CudaKernelCommand(func, params, extra, deep_copy)
@@ -138,15 +154,44 @@ CudaKernelLaunchExCommand::CudaKernelLaunchExCommand(const CUlaunchConfig *cfg, 
     }
 
     memcpy(&cfg_, cfg, sizeof(CUlaunchConfig));
-    if (cfg->attrs == nullptr || !deep_copy_) return;
-    cfg_.attrs = (CUlaunchAttribute *)malloc(cfg->numAttrs * sizeof(CUlaunchAttribute));
-    memcpy(cfg_.attrs, cfg->attrs, cfg->numAttrs * sizeof(CUlaunchAttribute));
+    if (cfg->attrs != nullptr && cfg->numAttrs > 0 && deep_copy) {
+        cfg_.attrs = (CUlaunchAttribute *)malloc(cfg->numAttrs * sizeof(CUlaunchAttribute));
+        memcpy(cfg_.attrs, cfg->attrs, cfg->numAttrs * sizeof(CUlaunchAttribute));
+        attrs_deep_copied_ = true;
+    }
+    if (IsCooperative()) {
+        ClearProps(preempt::kCommandPropertyDeactivatable);
+    }
 }
 
 CudaKernelLaunchExCommand::~CudaKernelLaunchExCommand()
 {
-    if (cfg_.attrs == nullptr || !deep_copy_) return;
+    if (cfg_.attrs == nullptr || !attrs_deep_copied_) return;
     free(cfg_.attrs);
+}
+
+bool CudaKernelLaunchExCommand::IsCooperative() const
+{
+    if (cfg_.attrs == nullptr) return false;
+    for (unsigned int i = 0; i < cfg_.numAttrs; ++i) {
+        if (cfg_.attrs[i].id == CU_LAUNCH_ATTRIBUTE_COOPERATIVE && cfg_.attrs[i].value.cooperative != 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+unsigned int CudaKernelLaunchExCommand::ClusterSize() const
+{
+    if (cfg_.attrs == nullptr) return 1;
+    for (unsigned int i = 0; i < cfg_.numAttrs; ++i) {
+        if (cfg_.attrs[i].id == CU_LAUNCH_ATTRIBUTE_CLUSTER_DIMENSION) {
+            const auto &cd = cfg_.attrs[i].value.clusterDim;
+            const unsigned int sz = cd.x * cd.y * cd.z;
+            return sz > 0 ? sz : 1;
+        }
+    }
+    return 1;
 }
 
 CUresult CudaKernelLaunchExCommand::Launch(CUstream stream)
@@ -154,7 +199,12 @@ CUresult CudaKernelLaunchExCommand::Launch(CUstream stream)
     cfg_.hStream = stream;
     void **params = params_;
     if (deep_copy_ && extra_ != nullptr) params = nullptr;
-    return Driver::LaunchKernelEx(&cfg_, kFunc, params, extra_);
+    CUresult r = Driver::LaunchKernelEx(&cfg_, kFunc, params, extra_);
+    if (UNLIKELY(r == CUDA_ERROR_INVALID_VALUE && cfg_.sharedMemBytes > 0 &&
+                 EnsureDynamicSmem(cfg_.sharedMemBytes))) {
+        r = Driver::LaunchKernelEx(&cfg_, kFunc, params, extra_);
+    }
+    return r;
 }
 
 CudaEventRecordCommand::CudaEventRecordCommand(CUevent event)

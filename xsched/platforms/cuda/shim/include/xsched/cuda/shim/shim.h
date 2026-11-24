@@ -10,6 +10,30 @@
 namespace xsched::cuda
 {
 
+class ScopedStreamContext
+{
+public:
+    explicit ScopedStreamContext(CUstream stream)
+    {
+        if (stream == nullptr || stream == CU_STREAM_LEGACY || stream == CU_STREAM_PER_THREAD) return;
+        CUcontext cur = nullptr;
+        if (Driver::CtxGetCurrent(&cur) == CUDA_SUCCESS && cur != nullptr) return;
+        CUcontext sctx = nullptr;
+        if (Driver::StreamGetCtx(stream, &sctx) == CUDA_SUCCESS && sctx != nullptr) {
+            if (Driver::CtxPushCurrent_v2(sctx) == CUDA_SUCCESS) pushed_ = true;
+        }
+    }
+    ~ScopedStreamContext()
+    {
+        if (pushed_) {
+            CUcontext popped = nullptr;
+            Driver::CtxPopCurrent_v2(&popped);
+        }
+    }
+private:
+    bool pushed_ = false;
+};
+
 CUstream GetPTDS();
 void WaitBlockingXQueues();
 
@@ -66,6 +90,7 @@ inline CUresult X##name##Impl(FOR_EACH_PAIR_COMMA(DECLARE_PARAM, __VA_ARGS__), C
 { \
     auto xq = xsched::preempt::HwQueueManager::GetXQueue(GetHwQueueHandle(stream)); \
     if (xq == nullptr) return Driver::name(FOR_EACH_PAIR_COMMA(DECLARE_ARG, __VA_ARGS__), stream); \
+    ScopedStreamContext scoped_ctx(stream); \
     auto hw_cmd = std::make_shared<cmd>(FOR_EACH_PAIR_COMMA(DECLARE_ARG, __VA_ARGS__)); \
     xq->Submit(hw_cmd); \
     return CUDA_SUCCESS; \
@@ -109,6 +134,8 @@ CUresult XLaunchKernel(CUfunction f, unsigned int gdx, unsigned int gdy, unsigne
 CUresult XLaunchKernel_ptsz(CUfunction f, unsigned int gdx, unsigned int gdy, unsigned int gdz, unsigned int bdx, unsigned int bdy, unsigned int bdz, unsigned int shmem, CUstream stream, void **params, void **extra);
 CUresult XLaunchKernelEx(const CUlaunchConfig *config, CUfunction f, void **params, void **extra);
 CUresult XLaunchKernelEx_ptsz(const CUlaunchConfig *config, CUfunction f, void **params, void **extra);
+CUresult XLaunchCooperativeKernel(CUfunction f, unsigned int gdx, unsigned int gdy, unsigned int gdz, unsigned int bdx, unsigned int bdy, unsigned int bdz, unsigned int shmem, CUstream stream, void **params);
+CUresult XLaunchCooperativeKernel_ptsz(CUfunction f, unsigned int gdx, unsigned int gdy, unsigned int gdz, unsigned int bdx, unsigned int bdy, unsigned int bdz, unsigned int shmem, CUstream stream, void **params);
 CUresult XLaunchHostFunc(CUstream stream, CUhostFn fn, void *data);
 CUresult XLaunchHostFunc_ptsz(CUstream stream, CUhostFn fn, void *data);
 
