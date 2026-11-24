@@ -1,68 +1,76 @@
-# Project: XSched Blackwell (RTX 5060 / SM120) Level 3 Trap & Resumable Preemption
+# PROJECT.md — Blackwell (`sm_120`) XSched Level-3 v2 工程说明
 
-## Architecture
-- **Target Hardware & Driver**: NVIDIA GeForce RTX 5060 (`GB206`, Compute Capability `12.0` / `sm_120`, 30 SMs, 64 MB BAR0) on Ubuntu 26.04.1 LTS (`Linux 7.0.0-38-generic`, SecureBoot disabled) running NVIDIA Open GPU Kernel Modules & GSP Firmware `595.99.02`.
-- **XSched Preemption Hierarchy (`xsched/preempt` & `xsched/platforms/cuda/hal`)**:
-  - **Level 1 (`kPreemptLevelBlock`)**: User-space `LaunchWorker` pause/resume with progressive command launching (`threshold_`, `batch_size_`).
-  - **Level 2 (`kPreemptLevelDeactivate`)**: Dynamic SASS binary instrumentation (`GuardianSM120`: `check_preempt` at kernel entry + `restore_exec` for selective CTA replay) using `cuxtra` export tables and SM120 constant memory Bank 0 (`c[0x0][0x170..0x188]` for `DebuggerParams`, `c[0x0][0x374..0x378]` for `gridDim`).
-  - **Level 3 (`kPreemptLevelInterrupt`) on Blackwell (`SM120`)**:
-    1. **SM120 Trap-Based Preemption (`CudaQueueLv3Trap` / `trap_sm120.cpp`)**:
-       - Uses `CU_ETID_ToolsTrapHandler` slot 20 (`GetInfoBlackwell`) to locate `.text.do_pause` (`slot20_pc`) and the live `.text.traphandler` (`live_base = slot20_pc - 0x4400`), patching `live_base + 0x390` (`reason == 1` handler) with SM120 `CALL.ABS.NOINC` (`0x...7943`) to the pre-existing utility vaspace code cave at `slot20_pc + 0xA00` (avoiding `cuXtraInstrMemBlockAlloc` which triggers context cancellation under `NV83DE`).
-       - Inside the cave, warps inspect `c[0x0][0x170..0x188]` (`preempt_buffer`, `kernel_idx`, `killable`), set `global_exit_flag = 1` / `preempt_idx = kernel_idx` / `block_restore_flag = 1`, and exit hardware trap mode cleanly via `IADD R12, R12, 0x10; RET.ABS.NODEC R12 0x20` (with return PC `(R12, R13)` redirected to a normal-mode `EXIT` stub or returning to the kernel exit path) so the SM trap state machine completes cleanly without context corruption (`cudaSuccess`), followed by in-process `CudaQueueLv2::Reactivate(log)` CTA-granular replay.
-       - Hardware trap is triggered in hundreds of microseconds via direct RM `NV83DE` (`GT200_DEBUGGER`) control calls (`0x83de0317` `SUSPEND_CONTEXT` / `0x83de0322` `SET_SINGLE_SM_STOP_TRIGGER` with `0x83de0329` `SET_DROP_DEFERRED_RC` and `0x83de0318` `RESUME_CONTEXT` / `0x83de0310` `CLEAR_ALL_SM_ERROR_STATES`).
-    2. **SM120 Non-Abort Zero-Lost-Work Resumable Preemption (`resumable_sm120.cpp`)**:
-       - Preempts in-flight GPU kernels in hundreds of microseconds and resumes them in place without aborting the process, destroying the context, or losing intra-CTA work, using:
-         - Direct RM `NV83DE` (`GT200_DEBUGGER`) in-place SM warp suspend/stop (`0x83de0317` / `0x83de0322`) and resume/run (`0x83de0318` / `0x83de0323`) without `cuda-gdb` spawn overhead, and/or
-         - Hardware Compute Instruction-Level / CTA Preemption (`NV2080_CTRL_CMD_GR_SET_CTXSW_PREEMPTION_MODE` = `0x20801210` with `COMPUTE_CILP = 2` / `COMPUTE_CTA = 1` + `NVA06C_CTRL_CMD_PREEMPT` = `0xa06c0105` / BAR0 `NV_RUNLIST_PREEMPT`).
+## 1. 项目定位与研究范围
 
-## Feature Inventory
-Every feature from the Survey phase and `ORIGINAL_REQUEST.md` appears here with its assigned milestone.
-| # | Feature | Description | Milestone | Source |
-|---|---------|-------------|-----------|--------|
-| F1 | XSched Paper L3 Model & Critical Verification of `compendium` | Analyze OSDI'25 paper L1/L2/L3 architecture and empirically verify/debunk `compendium` claims on RTX 5060: prove `pGpu+0x911` is `IS_GSP_CLIENT(pGpu)==1` (not a `0` debug gate), demonstrate `0x20800122` working with fixed 56-byte `NV2080_CTRL_GPU_REG_OP` (`regOffset` at `+12`), prove `0x419e84` fails due to `gpuValidateRegOffset_IMPL` (non-root) and Blackwell PRI relocation (`0xbadf1100`), and prove why `trap_sm120.cpp` caused context cancellation (`cuXtraInstrMemBlockAlloc` + raw `EXIT` inside trap mode + broken SM86 `JMP`). | M1 | ORIGINAL_REQUEST §R1, Survey 1/2/3 |
-| F2 | SM120 Level 2 Baseline Integration & Build Verification | Integrate verified `origin/release/sm120-level2` (`GuardianSM120`, `c[0x0][0x170..0x188]`, `extract_sass.py`) into `level3opencode/xsched`, fix `TarpHandlerSM120` SM86 `JMP` bug, and verify Level 2 preemption on live RTX 5060. | M1 | ORIGINAL_REQUEST §R1/R2, Survey 1 |
-| F3 | Sub-Millisecond (~100–500 µs) Non-Abort Level 3 Trap Preemption on RTX 5060 | Implement and verify hardware trap preemption on SM120 (`live_base + 0x390` → `slot20_pc + 0xA00` cave) triggered via direct RM `NV83DE` (`0x83de0317` / `0x83de0322`) that cleanly exits trap mode via `RET.ABS.NODEC` without destroying the CUDA context or aborting the process, supporting multi-round preemption and CTA-granular replay (`CudaQueueLv2::Reactivate`). | M2 | ORIGINAL_REQUEST §R2, Survey 1/2/3 |
-| F4 | Superior Non-Abort Zero-Lost-Work Resumable Preemption on RTX 5060 | Develop and verify non-abort, state-preserving Level 3 preemption on SM120 (direct RM `NV83DE` SM suspend/resume `0x83de0317`/`0x83de0318`/`0x83de0322`/`0x83de0323` and/or `0x20801210` `GR_SET_CTXSW_PREEMPTION_MODE` CILP/CTA + `0xa06c0105` / `NV_RUNLIST_PREEMPT`) achieving sub-millisecond preemption and exact resumption with zero lost work. | M3 | ORIGINAL_REQUEST §R2, Survey 2/3 |
-| F5 | End-to-End Hardware Verification, Latency Benchmarking, & System Health Check | Pass 100% of E2E tests (Tiers 1–4) + Tier 5 adversarial coverage hardening on live RTX 5060 with objective preemption evidence and microsecond-level latency metrics, while ensuring dual-boot, system files, and GPU driver remain 100% healthy. | M4 | ORIGINAL_REQUEST §R2/R3 & Acceptance Criteria |
+- **项目目标**：基于 XSched 框架开展面向 **NVIDIA Blackwell (`sm_120`)** 架构的用户端透明 GPU 空间抢占与调度学术研究，重点攻克**不依赖内核幂等性假设、零内核源码修改**的硬件 Trap 级细粒度抢占与原位状态恢复（Mode 5 `kTrapFrame`），并与幂等早退（Mode 1 `kEarlyExit`）及上下文级 CILP（`ResumableSm120Context`）形成完整 Level-3 抢占体系。
+- **编译与代码标准**：`C++20`，`-fPIC -Wall -Wextra -Werror` 全目标零警告构建；CUDA 设备端测试目标采用 `CUDA 12.9` + `sm_120` 编译。
 
-## Milestones
-| # | Name | Scope | Dependencies | Status |
-|---|------|-------|-------------|--------|
-| M1 | `M1_critical_verify_and_l2_base` | Integrate `origin/release/sm120-level2` & L3 scaffolding into `level3opencode/xsched`, build and execute live RTX 5060 empirical verification probes debunking false `compendium` claims and proving true root causes of SM120 trap failure, and write comprehensive analysis report `xsched/docs/sm120_level3_analysis_and_verification.md`. | none | IN_PROGRESS (`teamwork_worker_r2_1` `1f03756c`) |
-| M2 | `M2_sm120_trap_preempt` | Implement and verify sub-millisecond (~100–500 µs) non-abort Level 3 trap preemption on RTX 5060 (`sm120.cpp` + `trap_sm120.cpp` + `xsched/test/sm120_l3_trap/`) using `.text.traphandler` cave (`slot20_pc + 0xA00`), clean `RET.ABS.NODEC` trap-mode exit, direct RM `NV83DE` trigger, and in-process CTA-granular `Reactivate` replay without context destruction. | M1 | IN_PROGRESS (`teamwork_worker_r2_1` `1f03756c`) |
-| M3 | `M3_resumable_preempt` | Implement and verify superior non-abort, zero-lost-work resumable preemption on RTX 5060 (`resumable_sm120.cpp` + `xsched/test/sm120_l3_resumable/`) using direct RM `NV83DE` in-place SM suspend/resume (`0x83de0317`/`0x83de0318`/`0x83de0322`/`0x83de0323`) and/or `0x20801210` CILP/CTA + `0xa06c0105` preemption. | M1 | IN_PROGRESS (`teamwork_worker_r2_1` `1f03756c`) |
-| M4 | `M4_final_e2e_and_hardening` | Execute Final Milestone Phase 1 (pass 100% of E2E test suite Tiers 1–4 from `TEST_READY.md`) and Phase 2 (Tier 5 white-box adversarial coverage hardening), and verify system/dual-boot/GPU driver integrity. | M2, M3, E2E Track | IN_PROGRESS (`teamwork_worker_r2_1` `1f03756c` Phase 1 E2E verification) |
+---
 
-## Interface Contracts
+## 2. 硬件与软件基线环境
 
-### `M1` ↔ `M2` & `M3` (XSched CUDA HAL Level 2/3 Base)
-- `xsched::cuda::GuardianSM120` (`platforms/cuda/hal/include/xsched/cuda/hal/arch/sm120.h`, `src/arch/sm120.cpp`):
-  - Provides SM120 Level 2 `GetGuardianInstructions` and `GetResumeInstructions` using `c[0x0][0x170..0x188]` (`DebuggerParams`) and `c[0x0][0x374..0x378]` (`gridDim`).
-- `xsched::cuda::TarpHandlerSM120` (`platforms/cuda/hal/include/xsched/cuda/hal/arch/sm120.h`, `src/arch/sm120.cpp`):
-  - Resolves `CU_ETID_ToolsTrapHandler` slot 20 (`slot20_pc`) and live `.text.traphandler` (`live_base = slot20_pc - 0x4400`).
-- `xsched::cuda::CudaQueueLv3Trap` & `xsched::cuda::CudaQueueLv3Resumable` (`platforms/cuda/hal/include/xsched/cuda/hal/level3/`):
-  - Inherit from `CudaQueueLv2` (`HwQueue`), implementing `Deactivate()`, `Interrupt()`, `Restore(log)`, and `Reactivate(log)`.
-  - Mode selection in `platforms/cuda/hal/src/level3/cuda_queue.cpp` via `XSCHED_SM120_L3_MODE`:
-    - `"trap"` (default for `CudaQueueLv3Trap` on SM120): Sub-millisecond non-abort trap preemption (`M2`).
-    - `"resumable"`: Zero-lost-work non-abort resumable preemption (`M3`).
-    - `"tsg"`: Legacy TSG timeslice preemption.
+| 角色 | GPU 型号与架构 | SM / SMEM 规格 | 驱动与 CUDA 工具链 | 说明 |
+| :--- | :--- | :--- | :--- | :--- |
+| **主验证与构建机 (`5080`)** | NVIDIA GeForce RTX 5080 (`GB203`, `sm_120`) | 84 SMs / `100 KiB` SMEM/SM | Driver `580.95.05`, CUDA `12.9` (`/home/wangyue/.local/cuda-12.9`), `g++-13` | 无头计算服务器，主构建与 11/11 E2E/Bench 基准验证平台 |
+| **本地交叉验证机 (`5060`)** | NVIDIA GeForce RTX 5060 (`GB206`, `sm_120`) | 30 SMs / `100 KiB` SMEM/SM | Driver `595.99.02`, Ubuntu 26.04 | 桌面独显环境，用于跨驱动版本（`595.x`）代码洞探测与基准交叉验证 |
 
-### `E2E Testing Track` ↔ `M1`, `M2`, `M3`, `M4`
-- Verification binaries & CLI contracts located in `/run/media/wy/40D41982D4197AFC/1file/Desktop/code/code/xsched/level3opencode/xsched/build_sm120/bin/` (or invoked via E2E runner `xsched/test/sm120_l3_e2e/run_e2e.sh`):
-  1. `sm120_verify_compendium`: Runs empirical root-cause checks (`pGpu+0x911` `IS_GSP_CLIENT`, `0x20800122` 56-byte `RegOp` on `0x9400` PTIMER vs `0x419e84` `0xbadf1100`, trap handler layout at `slot20_pc - 0x4400`); exits `0` on pass and prints structured `VERIFY_PASS` metrics.
-  2. `sm120_l3_trap_bench`: Runs in-process SM120 Level 3 trap preemption (`CudaQueueLv3Trap` / direct RM `NV83DE` + `.text.traphandler` cave + clean `RET.ABS.NODEC` exit + CTA replay) across configurable kernel durations, iterations, and streams; verifies zero context destruction (`cudaSuccess`), result correctness (`mismatch == 0`), and reports preemption latency in microseconds (`P50_US`, `P99_US`, `MIN_US`, `MAX_US`).
-  3. `sm120_l3_resumable_bench`: Runs SM120 non-abort zero-lost-work resumable preemption (`M3`) on long-running / stateful / non-idempotent kernels while launching high-priority kernels during the preempted window; verifies exact completion without re-execution or process abort (`cudaSuccess`, `mismatch == 0`), and reports suspend/resume/turnaround latency in microseconds.
+---
 
-## Code Layout
-- `/run/media/wy/40D41982D4197AFC/1file/Desktop/code/code/xsched/level3opencode/xsched/`
-  - `docs/sm120_level3_analysis_and_verification.md` — Paper Level 3 analysis & critical empirical verification of `compendium` (owned by `M1`)
-  - `platforms/cuda/hal/include/xsched/cuda/hal/arch/sm120.h` — SM120 Guardian & TrapHandler declarations (initialized in `M1`, updated in `M2`)
-  - `platforms/cuda/hal/src/arch/sm120.cpp` — SM120 Guardian & TrapHandler implementation (L2 base in `M1`, L3 trap handler in `M2`)
-  - `platforms/cuda/hal/include/xsched/cuda/hal/level3/` — Level 3 headers (initialized in `M1`)
-  - `platforms/cuda/hal/src/level3/trap_sm120.cpp` — SM120 sub-millisecond non-abort trap preemption implementation (owned exclusively by `M2`)
-  - `platforms/cuda/hal/src/level3/resumable_sm120.cpp` — SM120 non-abort zero-lost-work resumable preemption implementation (owned exclusively by `M3`)
-  - `platforms/cuda/hal/src/level3/cuda_queue.cpp` — Level 3 queue dispatch (initialized in `M1`, finalized in `M2`/`M3`)
-  - `test/sm120_l3_verify/` — Empirical root-cause verification probes (`sm120_verify_compendium`, owned by `M1`)
-  - `test/sm120_l3_trap/` — SM120 Level 3 trap preemption tests & latency benchmarks (`sm120_l3_trap_bench`, owned by `M2`)
-  - `test/sm120_l3_resumable/` — SM120 non-abort resumable preemption tests & latency benchmarks (`sm120_l3_resumable_bench`, owned by `M3`)
-  - `test/sm120_l3_e2e/` — Opaque-box 4-tier E2E test suite & runner (`run_e2e.sh`, owned exclusively by `E2E Testing Orchestrator`)
+## 3. 精简仓库目录结构
+
+```text
+.
+├── README.md                                  # 项目总览与构建/回归快速入口
+├── PROJECT.md                                 # 工程定位、模块清单与运维安全规范
+├── CHANGELOG.md                               # 版本变更与修复日志
+├── doc/
+│   ├── README.md                              # 文档索引
+│   ├── SM120_V2_ARCHITECTURE_ZH.md            # v2 静态 9-Cave 引擎与状态机架构详解
+│   ├── SM120_V2_VERIFICATION_AND_BENCHMARK_ZH.md # 实机验证、基准数据与微架构发现
+│   ├── SM120_V2_COMPREHENSIVE_EVALUATION_ZH.md # 闭源库/DNN/LLM/PyTorch 全方位评测与缺陷剖析
+│   ├── SM120_V2_STATUS_PROBLEMS_AND_ROADMAP_ZH.md # 阶段状态汇报、10 项问题台账与 Phase 1-3 未来规划
+│   └── SM120_V2_RTX5060_VS_RTX5080_DIFF_ZH.md # RTX 5060 vs RTX 5080 跨芯片/跨驱动差异对比
+└── xsched/
+    ├── CMakeLists.txt                         # XSched 顶层构建配置 (C++20)
+    ├── 3rdparty/cuxtra/                       # 底层 CUDA ToolsMemory 与 EntryPoint 操纵库
+    ├── docs/                                  # XSched OSDI'25 论文与原始说明文档
+    ├── include/, preempt/, protocol/, sched/, service/, utils/, tools/
+    ├── platforms/cuda/
+    │   ├── CMakeLists.txt                     # CUDA HAL + 5 项 SM120 v2 测试/基准目标
+    │   └── hal/
+    │       ├── include/xsched/cuda/hal/level3/
+    │       │   ├── sm120_sass.h               # 79 条 SM120 128-bit SASS 编码器
+    │       │   ├── sm120_arena.h              # .text.traphandler 探测与 BAR0 0x00424684 触发
+    │       │   ├── sm120_guardian.h           # 首次发射永久 0x500 B Entry Guardian
+    │       │   ├── sm120_trap_engine.h        # Context 级静态 9-Cave 引擎 + Per-Stream 上下文
+    │       │   ├── sm120_rm_handles.h         # 底层 RM ioctl 句柄捕获与管理
+    │       │   ├── resumable_sm120.h          # Context 级 CILP 独立可恢复抢占模块
+    │       │   └── cuda_queue.h               # CudaQueueLv3Trap / CudaQueueLv3Resumable
+    │       └── src/level3/
+    │           ├── sm120_arena.cpp
+    │           ├── sm120_guardian.cpp
+    │           ├── sm120_trap_engine.cpp
+    │           ├── sm120_rm_handles.cpp
+    │           ├── resumable_sm120.cpp
+    │           ├── cuda_queue.cpp
+    │           └── interrupt.cpp
+    └── test/
+        ├── sm120_v2/
+        │   ├── test_sass_disasm.cpp           # sm120_sass_disasm: 79 条指令 nvdisasm 校验
+        │   ├── cave_probe.cu                  # sm120_cave_probe: 代码洞与 9-Cave 初始化探测
+        │   ├── sm120_v2_e2e_suite.cu          # sm120_v2_e2e_suite: 11 项端到端正确性与压测套件
+        │   └── sm120_v2_bench.cu              # sm120_v2_bench: Guardian/Evict/Restore/显存基准
+        └── sm120_l3_resumable/
+            └── sm120_l3_resumable_bench.cu    # sm120_l3_resumable_bench: CILP 独立基准
+```
+
+---
+
+## 4. 关键工程与硬件安全规范
+
+1. **共享 GPU 安全红线**：`0x00424684` (`NV_PGRAPH_PRI_GPCS_TPCS_SM_SFE_DBGR_CONTROL0`) 为全芯片广播硬件中断寄存器。在共享服务器运行前**必须**执行 `nvidia-smi --query-compute-apps=pid,process_name,used_memory --format=csv,noheader`，严禁在他人 GPU 计算任务运行时触发 BAR0 脉冲。
+2. **严禁盲扫 BAR0 与置位期读 `0x424684`（D9 / D10 硬件红线）**：
+   - 仅允许访问已证实安全的 `0x00424684`（Trap 广播）与 `0x00009400`（`NV_PTIMER_TIME_0` 非 PRI 刷新读）。
+   - 在 `0x00424684` 置位 `0x80001c01` 期间严禁读取 `0x00424684` 或其他 PGRAPH PRI 寄存器，须使用非 PRI 的 `NV_PTIMER_TIME_0` 刷新首个 Posted Write 后再写 `0x00001c01`。
+3. **非入侵与零造假准则**：所有基准与端到端测试均动态链接 `libhalcuda.so` 与 `libpreempt.so`，在未修改的真实 GPU 内核上触发真实硬件 Trap 与 `BPT.TRAP 0x1` 状态恢复；所有延迟与正确性指标均来自真实设备执行结果。
+4. **反回退架构守则**：严禁回退至 v1 阶段的 Mode 2/3/4、`cmd=7`、运行时 `func_pc` 热补丁或 2,000 次盲目 BAR0 轮询；仅在极少数极端并发/共享上下文进度停滞窗口（`>= 15 ms`）触发严格有界（`<= 8` 次）且受 `exit_stub_va` 重入保护的恢复确认脉冲。
