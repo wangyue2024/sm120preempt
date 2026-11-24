@@ -2,6 +2,22 @@
 
 All notable changes to the Blackwell (`sm_120`) Level-3 transparent preemption and scheduling system are documented in this file.
 
+## [v2.2.1-sm120] - 2026-11-24
+
+### Dual-GPU Closed-Loop Verification (`RTX 5080 GB203` + `RTX 5060 GB206`)
+- **RTX 5080 (`GB203`, 84 SMs, 16 GiB, Driver `580.95.05`, CUDA `12.9`, PyTorch `2.11+cu128` / cuDNN `9.19` / Triton `3.6.0`) Full Verification**:
+  - Zero-warning `C++20 -Wall -Wextra -Werror` build, `79/79` SASS disasm, `11 Caves / 1,703 slots`, **`11 / 11 E2E ALL_PASS`**, **`P50 = 420 µs` CILP** (`ZERO_LOST_WORK`).
+  - **`sm120_v2_bench` VRAM Speedups (`v2.0.0` → `v2.2.1`, RTX 5080)**: Entry Guardian `30.78 µs → 0.99 µs` (**31.1×**); Mode 1 `512 CTAs` Evict `971.6 → 110.1 µs` (**8.8×**); Mode 5 `84 CTAs 0K/32K` Evict **`50.9 / 55.4 µs`** (**6.5×–6.7×**), Restore **`30.5 / 41.4 µs`** (**20.1×–25.0×**); Mode 5 `512 CTAs 48K` Evict **`119.9 µs`** (**10.5×**), Restore **`292.0 µs`** (**6.4×**); compact `u_arena` **`139.7×`** (`29.31 MiB` vs `4,096 MiB`).
+  - **Suite 1 (`15 / 15 PASS`) + `DEF-03/06` (`PASS`)**: `cuBLAS` `80–137 µs`, `cuFFT` `140 µs`, `cuSPARSE` `113 µs`, `CUB` `55 µs`, `mma.sync` `34 µs`, `cp.async` `114 µs`, **single-wave Blackwell CTA Cluster (`blocks=60 <= sm=84`) dynamically routed to Mode 5 (`111 µs`, `0/7,680`)**, `DEF-03` `34 µs`.
+  - **Suite 2**: LLM Serving `HP P50 = 0.270 ms`, `SUSP P50 = 32 µs`, `LP_ret = 102.4%`; 100% SM Saturated Heavy QoS `HP P50 = 0.060 ms` (**102.6×** lower than Lv1 `6.155 ms`), `SUSP P50 = 45 µs` (**136.5×** faster than Lv1), `SLO ≤ 2 ms = 100%`, `LP_ret = 103.4%` (`+27.3 pp` over Mode 1 `76.1%`); Cross-Context BAR0 Bystander **`0.011 ms → 0.011 ms` (`0.000 ms` overhead even at P99/Max `0.012 ms`)**.
+  - **Suite 3 (`11 / 11 PyTorch PASS`)**: ResNet-50 `70 µs`, ResNet-18 AdamW training `31 µs` (`7.45e-9`), 4× Llama SDPA `23–991 µs` (`0.000e+00`), Triton 3.6.0 `126 µs` (`0.000e+00`), `PT-06` `empty_cache` `30 µs` (`0.000e+00`), `PT-05-QOS` `HP P50 = 0.290 ms` (`SLO ≤ 2 ms = 100%`, `SUSP P50 = 224 µs`, `LP_ret = 105.3%`).
+
+### Additional 84-SM Edge-Case Fixes Discovered on RTX 5080
+- **SMEM Hardware Quantum Fix (`sm120_trap_engine.cpp`)**: Compute `smem_area = AlignUp(total_user_smem + 0x400, 4096)` (when `total_user_smem > 0`) to account for the `0x400 B` driver-reserved region before Blackwell's 4 KiB SMEM allocation quantum (prevents 3 KiB tail-slot overrun on kernels like `CUB Onesweep` with `static_smem = 36,352 B -> SR_SMEMSZ = 40,960 B`).
+- **Stream-Ordered `is_restore_wave` Clear (`sm120_trap_engine.cpp`)**: `sm120_cond_clear_hdr` now unconditionally clears `is_restore_wave` (`+0x1c`) upon completion of the restored kernel while keeping `ctrl_dev_[0..27]` conditional on `cmd == 6 || cmd == 2`.
+- **Entry Guardian Drain `active_kernel_idx` Tracking (`sm120_guardian.cpp`)**: Replaced 3-instruction `active != 0` check with 1-instruction `lop3_or3_p0(10, 11, kRegZero)` (zero slot shift, `bar_idx` stays at exact slot 39 / `0x270`) and recorded `active_kernel_idx = my_idx` on Entry Guardian State C drains (`st_e_64(4, 0x08, 8, kP0)`).
+- **Dynamic SM-Count Delay Scaling (`test_libs_and_features.cu`, `test_pytorch_llm_dnn.py`)**: Automatically scales mid-execution preemption trigger delays by `30 / max(30, sm_count)` across 30-SM RTX 5060 and 84-SM RTX 5080.
+
 ## [v2.2.0-sm120] - 2026-11-24
 
 ### Performance Breakthroughs (10× – 548× Speedup on RTX 5060 `GB206`)

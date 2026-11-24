@@ -577,6 +577,8 @@ bool Sm120TrapEngine::LoadHelperModule()
         "    .reg .u32 %r<2>;\n"
         "    .reg .pred %p<2>;\n"
         "    ld.param.u64 %rd1, [p_ctrl];\n"
+        "    mov.u32 %r0, 0;\n"
+        "    st.global.cg.u32 [%rd1 + 28], %r0;\n"
         "    ld.global.cg.u32 %r1, [%rd1];\n"
         "    setp.eq.u32 %p0, %r1, 6;\n"
         "    setp.eq.u32 %p1, %r1, 2;\n"
@@ -586,7 +588,7 @@ bool Sm120TrapEngine::LoadHelperModule()
         "    st.global.cg.u64 [%rd1 + 0], %rd0;\n"
         "    st.global.cg.u64 [%rd1 + 8], %rd0;\n"
         "    st.global.cg.u64 [%rd1 + 16], %rd0;\n"
-        "    st.global.cg.u64 [%rd1 + 24], %rd0;\n"
+        "    st.global.cg.u32 [%rd1 + 24], %r0;\n"
         "DONE:\n"
         "    ret;\n"
         "}\n";
@@ -1393,8 +1395,12 @@ bool Sm120StreamContext::PrepareLaunch(CUfunction func,
 
         const uint32_t smem_area_off =
             AlignUp(thread_area_off + threads_per_cta * thread_frame_stride, 128u);
+        const uint32_t total_user_smem =
+            static_cast<uint32_t>(rec->static_smem_bytes) + dyn_smem_bytes;
+        // Hardware allocates SMEM in 4096B quanta AFTER adding the 0x400B driver-reserved region,
+        // so SR_SMEMSZ can reach AlignUp(total_user_smem + 0x400, 4096) (e.g., 36352B -> 40960B).
         const uint32_t smem_area =
-            AlignUp(static_cast<uint32_t>(rec->static_smem_bytes) + dyn_smem_bytes, 4096u);
+            (total_user_smem > 0u) ? AlignUp(total_user_smem + 0x400u, 4096u) : 0u;
 
         const uint32_t lmem_area_off = smem_area_off + smem_area;
         const uint32_t lmem_cap = rec->desc.lmem_cap_bytes;

@@ -17,15 +17,16 @@
 - **紧凑 `slot_id` 池化 `u_arena`**：按物理 SM 并发上限动态池化显存，16,384 CTAs 网格下较朴素按 Grid 分配方案节省 **160.6×**（RTX 5080）/ **436.9×**（RTX 5060）显存。
 - **XSched HAL 闭环 + 独立 Context CILP**：`CudaQueueLv3Trap` 完整对接 `AsyncXQueue` 多内核 FIFO 队列与高优 `DirectLaunch` 零开销绕过；同时独立保留 `ResumableSm120Context`（`0x20801210` / `0xa06c0105` 上下文级 CILP 抢占）。
 
-### 核心实测亮点（`v2.2.0-sm120`, RTX 5060 `GB206`）
+### 核心实测亮点（`v2.2.1-sm120`，RTX 5080 `GB203` + RTX 5060 `GB206` 双卡闭环实测）
 
-| 评估维度 | 关键指标（`v2.2.0` 实测） | 较 `v2.1.0` 提升 / 对比 |
+| 评估维度 | RTX 5080 (`GB203`, 84 SMs, `580.95.05`) | RTX 5060 (`GB206`, 30 SMs, `595.99.02`) |
 | :--- | :--- | :--- |
-| **微基准（Entry Guardian / Mode 5 Evict）** | `0.43–0.97 µs` / `48.0 µs`（512 CTAs, 48K SMEM） | **45×–100×** / **22.4×** 加速 |
-| **8 大闭源 CUDA 库 + 7 项 Blackwell 硬件特性** | **15 / 15 PASS**（`cuBLAS/Lt/cuFFT/cuSPARSE/CUB` + `mma/cp.async/mbarrier/Graph/Cluster/Coop`） | `cuBLAS` `0.86 ms` (**77×**), `cuSPARSE` `0.11 ms` (**466×**) |
-| **LLM Serving (`15 ms` QoS, Mode 5)** | `HP P50 = 0.475 ms`, `SUSP P50 = 57 µs`, `SLO ≤ 2 ms = 100%`, `LP_ret = 98.2%` | **67.7×** HP 加速 / **548×** 抢占加速 / `err = 0.00e+00` |
-| **100% SM 饱和 Heavy QoS (`5–50 ms` 全频段)** | `HP P50 = 0.083–0.088 ms`, `SUSP P50 = 66 µs`, `SLO ≤ 2 ms = 100%`, `LP_ret = 98.7%–105%` | 较 Lv1 延迟低 **85×**，`err = 0.00e+00` |
-| **真实未修改 PyTorch 2.11 + cuDNN 9.19 + Triton 3.6.0** | **11 / 11 PASS**（含 ResNet-18 AdamW 训练 `5.5e-9`、4 种 Llama SDPA、Triton、`PT-06` `empty_cache` 零死锁） | `PT-05-QOS`: `HP P50 = 0.552 ms` (**133.6×**), `SLO ≤ 2 ms = 100%`, `LP_ret = 101.9%` |
+| **微基准（Guardian / Mode 5 `84 CTAs` Evict & Restore）** | **`0.99 µs`** / **`50.9 µs`** & **`30.5 µs`**（`11/11 E2E ALL_PASS`） | **`0.43–0.97 µs`** / **`50.8 µs`** & **`62.9 µs`**（较 `v2.1.0` 快 **22×–100×**） |
+| **Suite 1 闭源 CUDA 库 + Blackwell 特性** | **15 / 15 PASS**（`cuBLAS 80–137 µs`, `CUB 55 µs`, 单波次 Cluster Mode 5 `111 µs`）+ `DEF-03/06` PASS (`34 µs`) | **15 / 15 PASS**（`cuBLAS 0.86 ms`, `cuSPARSE 0.11 ms`, 多波次 Cluster 自动 Lv1）+ `DEF-03/06` PASS (`68 µs`) |
+| **Suite 2 LLM Serving (`15 ms`, Mode 5)** | `HP P50 = 0.270 ms`, **`SUSP P50 = 32 µs`**, `SLO≤2ms = 100%`, **`LP_ret = 102.4%`** | `HP P50 = 0.475 ms`, **`SUSP P50 = 57 µs`**, `SLO≤2ms = 100%`, **`LP_ret = 98.2%`** |
+| **Suite 2 100% SM 饱和 Heavy QoS (`15 ms`, Mode 5)** | **`HP P50 = 0.060 ms`**（较 Lv1 低 **102.6×**）, **`SUSP P50 = 45 µs`**, `SLO≤2ms = 100%`, **`LP_ret = 103.4%`** | **`HP P50 = 0.083 ms`**（较 Lv1 低 **85×**）, **`SUSP P50 = 66 µs`**, `SLO≤2ms = 100%`, **`LP_ret = 100.7%`** |
+| **Suite 3 真实未修改 PyTorch 2.11 + cuDNN 9.19 + Triton 3.6.0** | **11 / 11 PASS**（ResNet-50 `70 µs`, ResNet-18 训练 `31 µs`, `cuDNN` SDPA **`23 µs`**, Triton `126 µs`, `PT-05-QOS HP P50 = 0.290 ms / LP_ret = 105.3%`） | **11 / 11 PASS**（ResNet-50 `291 µs`, ResNet-18 训练 `23 µs`, `cuDNN` SDPA **`33 µs`**, Triton `268 µs`, `PT-05-QOS HP P50 = 0.552 ms / LP_ret = 101.9%`） |
+| **跨进程 BAR0 旁观者干扰 (`bystander_pure`)** | **`0.011 ms → 0.011 ms`**（P99/Max 亦 `0.012 → 0.012 ms`, 0 错误 0 错配） | **`0.015 ms → 0.015 ms`**（0 错误 0 错配） |
 
 ---
 

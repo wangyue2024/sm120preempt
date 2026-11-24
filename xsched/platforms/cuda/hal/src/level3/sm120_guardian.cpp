@@ -97,36 +97,36 @@ std::vector<sass::Ins> BuildEntryGuardian()
     const int br_restore_wave = static_cast<int>(g.size());    // 14
     g.push_back(nop());                                        // 14 -> @P0 restore_path
 
-    // [15..25]: Normal/Evict multi-kernel FIFO guard (is_restore_wave == 0): if cmd != 0 &&
+    // [15..23]: Normal/Evict multi-kernel FIFO guard (is_restore_wave == 0): if cmd != 0 &&
     //           active_idx != 0 && my_idx != active_idx, queued K2 exits without touching K1.
     g.push_back(ld_e_32(0, 4, 0x0));                           // 15: cmd
     g.push_back(isetp_ne_imm(0, 0));                           // 16: P0 = (cmd != 0)
     const int br_cmd0_skip = static_cast<int>(g.size());       // 17
     g.push_back(nop());                                        // 17 -> norm_gate
     g.push_back(ld_e_64(10, 4, 0x08));                         // 18: active_kernel_idx
-    g.push_back(mov_imm(2, 0));                                // 19
-    g.push_back(mov_imm(3, 0));                                // 20
-    g.push_back(isetp_ne_u64_regs(10, 2));                     // 21: P0 = (active != 0)
-    const int br_no_active = static_cast<int>(g.size());       // 22
-    g.push_back(nop());                                        // 22 -> norm_gate
-    g.push_back(ldc_64(8, 0x180));                             // 23: my_idx
-    g.push_back(isetp_ne_u64_regs(8, 10));                     // 24: P0 = (my_idx != active)
-    g.push_back(exit_inst(kP0));                               // 25: queued K2 exits safely!
+    g.push_back(lop3_or3_p0(10, 11, kRegZero));                // 19: P0 = (active != 0)
+    const int br_no_active = static_cast<int>(g.size());       // 20
+    g.push_back(nop());                                        // 20 -> norm_gate
+    g.push_back(ldc_64(8, 0x180));                             // 21: my_idx
+    g.push_back(isetp_ne_u64_regs(8, 10));                     // 22: P0 = (my_idx != active)
+    g.push_back(exit_inst(kP0));                               // 23: queued K2 exits safely!
 
-    // [26..43]: norm_gate — 100% branchless intra-warp consensus before BAR.SYNC 0.
+    // [24..43]: norm_gate — 100% branchless intra-warp consensus before BAR.SYNC 0.
     // is_restore_wave is guaranteed 0 here (restore waves route exclusively to restore_path).
-    const int norm_gate_idx = static_cast<int>(g.size());      // 26
-    g.push_back(s2r(8, kSrTidX));                              // 26
-    g.push_back(s2r(9, kSrTidY));                              // 27
-    g.push_back(s2r(10, kSrTidZ));                             // 28
-    g.push_back(lop3_or3_p0(8, 9, 10));                        // 29: P0 = (tid != 0)
-    g.push_back(ld_e_32(0, 4, 0x0));                           // 30: R0 = cmd (coherent L2 read)
-    g.push_back(isetp_ne_and_notp0(0, 0));                     // 31: P0 = (tid==0 && cmd!=0)
-    g.push_back(mov_imm(2, 2));                                // 32: R2 = 2 (State C entry_dec)
-    g.push_back(isetp_eq_imm(0, 1, kP1));                      // 33: P1 = (cmd == 1)
-    g.push_back(mov_imm(2, 1, kP1));                           // 34: @P1 R2 = 1 (Mode 1 replay)
-    g.push_back(st_e_32(6, 0x50, 2, kP0));                     // 35: @P0 cta[b].state = R2
-    g.push_back(st_e_32(6, 0x54, 2, kP0));                     // 36: @P0 cta[b].entry_dec = R2
+    const int norm_gate_idx = static_cast<int>(g.size());      // 24
+    g.push_back(s2r(8, kSrTidX));                              // 24
+    g.push_back(s2r(9, kSrTidY));                              // 25
+    g.push_back(s2r(10, kSrTidZ));                             // 26
+    g.push_back(lop3_or3_p0(8, 9, 10));                        // 27: P0 = (tid != 0)
+    g.push_back(ld_e_32(0, 4, 0x0));                           // 28: R0 = cmd (coherent L2 read)
+    g.push_back(isetp_ne_and_notp0(0, 0));                     // 29: P0 = (tid==0 && cmd!=0)
+    g.push_back(mov_imm(2, 2));                                // 30: R2 = 2 (State C entry_dec)
+    g.push_back(isetp_eq_imm(0, 1, kP1));                      // 31: P1 = (cmd == 1)
+    g.push_back(mov_imm(2, 1, kP1));                           // 32: @P1 R2 = 1 (Mode 1 replay)
+    g.push_back(st_e_32(6, 0x50, 2, kP0));                     // 33: @P0 cta[b].state = R2
+    g.push_back(st_e_32(6, 0x54, 2, kP0));                     // 34: @P0 cta[b].entry_dec = R2
+    g.push_back(ldc_64(8, 0x180));                             // 35: R8:R9 = my_idx
+    g.push_back(st_e_64(4, 0x08, 8, kP0));                     // 36: @P0 active_kernel_idx = my_idx
     g.push_back(mov_imm(0, 1));                                // 37
     g.push_back(redg_add_u32(4, 0x14, 0, kP0));                // 38: @P0 drained_cnt++
     // Index 39 MUST match kGuardianBarOff (0x270).

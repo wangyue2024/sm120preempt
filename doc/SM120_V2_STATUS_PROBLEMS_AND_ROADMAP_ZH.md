@@ -1,6 +1,6 @@
 # Blackwell (`sm_120`) XSched Level-3 v2 项目阶段汇报：当前状态、已达成成果、现存问题与未来规划
 
-**文档版本**：`v2.2.0-sm120`（Phase 1–2 生产加固、100% GDDR7 显存控制面重构与全线 100% PASS 里程碑）  
+**文档版本**：`v2.2.1-sm120`（双卡 RTX 5080 `GB203` + RTX 5060 `GB206` 100% 实机闭环里程碑）  
 **更新日期**：2026-11-24  
 **研究合作**：NVIDIA × 上海交通大学 IPADS 实验室（仅用于学术研究）  
 **核心目标**：面向 NVIDIA Blackwell (`sm_120`) 架构，打造**用户态透明、零内核源码修改、不依赖幂等性假设**的硬件级细粒度 GPU 抢占与可恢复调度系统。
@@ -16,14 +16,14 @@
 | **Stage 1：v2 极简双模式架构重构** | 保留 Mode 1 (`kEarlyExit`) + Mode 5 (`kTrapFrame`) + 独立 Context CILP；静态 9-Cave 引擎（`1,045/1,390` 槽位）、永久 `0x500` B Entry Guardian 与 `BPT.TRAP 0x1` 0 脉冲自陷恢复 | **100% 完成** | [`sm120_sass.h`](../xsched/platforms/cuda/hal/include/xsched/cuda/hal/level3/sm120_sass.h)、[`sm120_arena.cpp`](../xsched/platforms/cuda/hal/src/level3/sm120_arena.cpp)、[`sm120_guardian.cpp`](../xsched/platforms/cuda/hal/src/level3/sm120_guardian.cpp)、[`sm120_trap_engine.cpp`](../xsched/platforms/cuda/hal/src/level3/sm120_trap_engine.cpp) |
 | **Stage 2：双机跨驱动基线验证** | 在 RTX 5080 (`GB203`, `580.95.05`) 与 RTX 5060 (`GB206`, `595.99.02`) 完成 `C++20 -Werror` 零警告、`nvdisasm` 79/79、代码洞跨驱动探测、11/11 E2E 与 CILP 回归 | **100% 完成** | [`SM120_V2_ARCHITECTURE_ZH.md`](SM120_V2_ARCHITECTURE_ZH.md)、[`SM120_V2_VERIFICATION_AND_BENCHMARK_ZH.md`](SM120_V2_VERIFICATION_AND_BENCHMARK_ZH.md) |
 | **Stage 3：五维真实负载评测 + FIX-1~6** | 建立 Suite 1–3 全方位评测体系并根治 6 项深层 HAL 并发/微架构 Bug | **100% 完成** | [`SM120_V2_COMPREHENSIVE_EVALUATION_ZH.md`](SM120_V2_COMPREHENSIVE_EVALUATION_ZH.md)、[`xsched/test/sm120_v2/eval/`](../xsched/test/sm120_v2/eval/) |
-| **Stage 4 (`v2.2.0`)：Phase 1–2 生产加固与 10×–548× 性能飞跃** | **100% GDDR7 显存控制面 + 高优 Copy Engine DMA + `sm120_cond_clear_hdr`**；自适应内核/模式路由器（`SYNCS`/Cluster/Coop/Graph）；`XMemFree_v2` 延迟释放队列；`cuDNN` 动态 SMEM 竞态自愈；`ScopedStreamContext`；`last_kernel_` 并发互斥；**全部 P0/P1 缺陷 `DEF-01..08` 清零** | **本地 5060 100% 完成并全线 PASS**；远程 5080 待 SSH 恢复后一键同步 | Suite 1 **15/15 PASS**、`test_def03_def06` **PASS**、Suite 2 **`57–70 µs` / `100%` SLO≤2ms**、Suite 3 PyTorch **11/11 PASS**（含 ResNet-18 训练 & `PT-05-QOS` **133.6×** 加速） |
+| **Stage 4 (`v2.2.1`)：Phase 1–2 生产加固 + 10×–548× 性能飞跃 + 双卡全线实机闭环** | **100% GDDR7 显存控制面 + 高优 Copy Engine DMA + `sm120_cond_clear_hdr`**；自适应内核/模式路由器（`SYNCS`/Cluster/Coop/Graph）；`XMemFree_v2` 延迟释放队列；`cuDNN` 动态 SMEM 竞态自愈；`ScopedStreamContext`；`last_kernel_` 并发互斥；SMEM `+0x400` 硬件粒度对齐；**全部 P0/P1 缺陷 `DEF-01..08` 清零** | **RTX 5060 与 RTX 5080 双卡 100% 完成并全线 PASS！** | 双卡 Suite 1 **15/15 PASS**、`DEF-03/06` **PASS**、Suite 2 **`32–70 µs` / `100%` SLO≤2ms**、Suite 3 PyTorch **11/11 PASS**、5080 **11/11 E2E ALL_PASS** & **BAR0 0.000 ms 旁观者干扰** |
 
 ### 双机状态与代码同步核对
 
-| 机器 | 硬件与驱动 | 已实测覆盖 | 待同步内容（SSH 恢复后一键执行） |
-| :--- | :--- | :--- | :--- |
-| **本地 `RTX 5060`** | `GB206`, 30 SMs, 8 GiB, Driver `595.99.02`, CUDA `12.9`, PyTorch `2.11.0+cu128`, cuDNN `9.19.0`, Triton `3.6.0` | **`v2.2.0-sm120` 全量实测 PASS**：`C++20 -Werror` 零警告；微基准 Guardian `0.43–0.97 µs` / Mode 5 Evict `48–55 µs`；Suite 1 **15/15 PASS** + `DEF-03/06` PASS；Suite 2 LLM/DNN/100% SM 饱和 **`100%` SLO≤2ms**；Suite 3 PyTorch **11/11 PASS**；跨进程 BAR0 干扰 **0.000 ms** | 已为最新权威基线（已同步至 GitHub `v2.2.0-sm120`） |
-| **服务器 `RTX 5080`** | `GB203`, 84 SMs, 16 GiB, Driver `580.95.05`, CUDA `12.9` | Stage 1–2 基线全通（`11/11 ALL_PASS` × 3、CILP `425 µs`）；当前远程 SSH 跳板机仍 `Connection timed out during banner exchange` | 待 SSH 恢复后直接 `git pull` 并执行第五节脚本，一键复跑 `v2.2.0` 全量 Suite 1–3 与 11/11 E2E |
+| 机器 | 硬件与驱动 | 已实测覆盖（`v2.2.1-sm120` 同一代码基线） | 状态 |
+| :--- | :--- | :--- | :---: |
+| **服务器 `RTX 5080`** | `GB203`, 84 SMs, 16 GiB, Driver `580.95.05`, CUDA `12.9`, PyTorch `2.11.0+cu128`, cuDNN `9.19.0`, Triton `3.6.0` | **全线闭环 PASS**：`C++20 -Werror` 零警告；`79/79` SASS、`11/1703` Caves、**`11/11 E2E ALL_PASS`**、Guardian **`0.99 µs`** / Mode 5 `84 CTAs` **`50.9 / 30.5 µs`**、CILP **`420 µs`**；Suite 1 **15/15 PASS** + `DEF-03/06` (`34 µs`)；Suite 2 LLM (`32 µs`, `102.4% LP_ret`) / Heavy 100% SM (**`60 µs`**, 较 Lv1 低 **102.6×**, `103.4% LP_ret`)；Suite 3 PyTorch **11/11 PASS**（`cuDNN` SDPA **`23 µs`**, `PT-05 HP P50=0.290 ms / LP_ret=105.3%`）；BAR0 旁观者 **`0.011 → 0.011 ms`** | **100% 同步 & 验毕** |
+| **本地 `RTX 5060`** | `GB206`, 30 SMs, 8 GiB, Driver `595.99.02`, CUDA `12.9`, PyTorch `2.11.0+cu128`, cuDNN `9.19.0`, Triton `3.6.0` | **全线闭环 PASS**：`C++20 -Werror` 零警告；Guardian **`0.43–0.97 µs`** / Mode 5 `512 CTAs` **`48.0 / 325.8 µs`**；Suite 1 **15/15 PASS** + `DEF-03/06` (`68 µs`)；Suite 2 LLM (`57 µs`, `98.2% LP_ret`) / Heavy 100% SM (**`83 µs`**, 较 Lv1 低 **85×**, `100.7% LP_ret`)；Suite 3 PyTorch **11/11 PASS**（`PT-05 HP P50=0.552 ms / LP_ret=101.9%`）；BAR0 旁观者 **`0.015 → 0.015 ms`** | **100% 同步 & 验毕** |
 
 ---
 

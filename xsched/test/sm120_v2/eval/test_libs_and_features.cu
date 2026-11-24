@@ -131,10 +131,16 @@ bool RunWithMidPreempt(XQueueHandle xq, cudaStream_t lp_stream, cudaStream_t hp_
 
     double sum_susp = 0, sum_hp = 0;
     if (const char *np_env = getenv("TEST_NP")) num_preempts = atoi(np_env);
+    static int cached_sms = []() {
+        int s = 30;
+        cudaDeviceGetAttribute(&s, cudaDevAttrMultiProcessorCount, 0);
+        return s > 0 ? s : 30;
+    }();
+    const int eff_delay_us = std::max(100, delay_us * 30 / std::max(30, cached_sms));
     int actual_preempts = 0;
     auto t_all0 = std::chrono::steady_clock::now();
     for (int p = 0; p < num_preempts; ++p) {
-        std::this_thread::sleep_for(std::chrono::microseconds(delay_us));
+        std::this_thread::sleep_for(std::chrono::microseconds(eff_delay_us));
         if (lp_done.load(std::memory_order_acquire)) break;
         auto ts0 = std::chrono::steady_clock::now();
         XResult sr = XQueueSuspend(xq, kQueueSuspendFlagSyncHwQueue);

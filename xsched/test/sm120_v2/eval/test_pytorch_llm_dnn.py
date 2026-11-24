@@ -115,10 +115,12 @@ def run_with_mid_preempt(xs, xq, lp_stream, hp_stream, fn, delay_ms=3.0, num_pre
     t = threading.Thread(target=worker)
     t.start()
 
+    sms = max(30, torch.cuda.get_device_properties(0).multi_processor_count)
+    eff_delay_s = max(0.0005, (delay_ms / 1000.0) * (30.0 / float(sms)))
     susp_ms = []
     hp_ms = []
     for _ in range(num_preempts):
-        time.sleep(delay_ms / 1000.0)
+        time.sleep(eff_delay_s)
         if done.is_set():
             break
         t0 = time.perf_counter()

@@ -26,7 +26,7 @@
 | 角色 | GPU 与 SM 规格 | 驱动与工具链 | 本轮评测覆盖状态 |
 | :--- | :--- | :--- | :--- |
 | **本地测试机 (`RTX 5060`)** | NVIDIA GeForce RTX 5060 (`GB206`, `sm_120`, 30 SMs, 8 GiB) | Driver `595.99.02`, CUDA `12.9`, `gcc-13/g++-13`, PyTorch `2.11.0+cu128`, cuDNN `9.19.0`, Triton `3.6.0` | **全量完成**：8 项闭源库 + 7 项硬件边界 + DNN/LLM 调度 QoS + 频率扫描 + BAR0 跨上下文干扰 + 6 项真实 PyTorch/Triton 负载 + 5 项标准回归套件 |
-| **远程服务器 (`RTX 5080`)** | NVIDIA GeForce RTX 5080 (`GB203`, `sm_120`, 84 SMs, 16 GiB) | Driver `580.95.05`, CUDA `12.9`, `gcc-13/g++-13` | **已有完整 v2 基线数据**（11/11 E2E 3 轮全通、79/79 SASS、11 Caves/1,703 槽位、Mode 1/5 微秒级延迟、160.6× 显存缩放、CILP `425 µs`）；本次实测期间远程 SSH 跳板机持续 `Connection timed out during banner exchange`，故新增 Suite 1–3 与 6 项 HAL 修复待 SSH 恢复后可直接通过 [`run_all_eval.sh`](../xsched/test/sm120_v2/eval/run_all_eval.sh) 一键同步与复跑 |
+| **远程服务器 (`RTX 5080`)** | NVIDIA GeForce RTX 5080 (`GB203`, `sm_120`, 84 SMs, 16 GiB) | Driver `580.95.05`, CUDA `12.9`, `gcc-13/g++-13`, PyTorch `2.11.0+cu128`, cuDNN `9.19.0`, Triton `3.6.0` | **全量完成（`v2.2.1` 闭环）**：5 项标准回归（**11/11 E2E ALL_PASS**, Guardian **`0.99 µs`**, Mode 5 `84 CTAs` **`50.9 / 30.5 µs`**, CILP `420 µs`）+ Suite 1 **15/15 PASS** + `DEF-03/06` (`34 µs`) + Suite 2 LLM/DNN/Heavy 100% SM（**`60 µs`** HP P50, 较 Lv1 低 **102.6×**, `103.4% LP_ret`）+ BAR0 旁观者 **`0.011 → 0.011 ms`** + Suite 3 **11/11 PyTorch PASS**（`cuDNN` SDPA **`23 µs`**, `PT-05 HP P50=0.290 ms / LP_ret=105.3%`） |
 
 ---
 
@@ -143,17 +143,18 @@
 
 #### (A) `sm120_v2_bench` 与 CILP 跨版本/跨卡对照
 
-| 指标 | RTX 5080 (`v2.0.0`, `580.95.05`) | RTX 5060 (`v2.1.0` PCIe) | **RTX 5060 (`v2.2.0` GDDR7 VRAM)** |
-| :--- | :---: | :---: | :---: |
-| `sm120_sass_disasm` (`nvdisasm -b SM120`) | **79 / 79 PASS** | **79 / 79 PASS** | **79 / 79 PASS** |
-| `.text.traphandler` 代码洞探测 | **11 Caves / 1,703 槽位** | **11 Caves / 1,695 槽位** | **11 Caves / 1,695 槽位** (`c0=139/152`) |
-| Entry Guardian 零抢占延迟 (`84×128` null) | `Δ = +6.91~30.78 µs` | `Δ = +43.25 µs` | **`Δ = +0.43–0.97 µs` (45×–100×↑)** |
-| Mode 1 (`512 CTAs, 48K SMEM`) Evict P50 | `428.8–971.6 µs` | `901.2 µs` | **`38.0 µs` (23.7×↑)** |
-| Mode 5 (`84 CTAs, 0K SMEM`) Evict / Restore P50 | `248.6 / 407.7 µs` | `399.7 / 772.2 µs` | **`50.8 / 62.9 µs` (7.9× / 12.3×↑)** |
-| Mode 5 (`84 CTAs, 32K SMEM`) Evict / Restore P50 | `372.8 / 831.8 µs` | `447.0 / 806.4 µs` | **`55.2 / 73.9 µs` (8.1× / 10.9×↑)** |
-| Mode 5 (`512 CTAs, 48K SMEM`) Evict / Restore P50 | `596.4 / 547.9 µs` | `1,076.2 / 917.4 µs` | **`48.0 / 325.8 µs` (22.4× / 2.8×↑)** |
-| 紧凑池化 `u_arena` 显存节省 (`16,384 CTAs`) | **160.6×** (`25.5 MiB`) | **436.9×** (`9.38 MiB`) | **436.9×** (`9.38 MiB`) |
-| Context CILP (`sm120_l3_resumable_bench`) | **`425 µs`**, `diff=0, PASS` | **`431 µs`**, `diff=0, PASS` | **`PASS`**, `ZERO_LOST_WORK` |
+| 指标 | RTX 5080 (`v2.0.0` PCIe) | **RTX 5080 (`v2.2.1` VRAM)** | RTX 5060 (`v2.1.0` PCIe) | **RTX 5060 (`v2.2.1` VRAM)** |
+| :--- | :---: | :---: | :---: | :---: |
+| `sm120_sass_disasm` (`nvdisasm -b SM120`) | **79 / 79 PASS** | **79 / 79 PASS** | **79 / 79 PASS** | **79 / 79 PASS** |
+| `.text.traphandler` 代码洞探测 | **11 Caves / 1,703** | **11 Caves / 1,703** | **11 Caves / 1,695** | **11 Caves / 1,695** |
+| Entry Guardian 零抢占延迟 (`84×128` null) | `Δ = +30.78 µs` | **`Δ = +0.99 µs` (31.1×↑)** | `Δ = +43.25 µs` | **`Δ = +0.43–0.97 µs` (45×–100×↑)** |
+| Mode 1 (`512 CTAs, 48K SMEM`) Evict P50 | `971.6 µs` | **`110.1 µs` (8.8×↑)** | `901.2 µs` | **`38.0 µs` (23.7×↑)** |
+| Mode 5 (`84 CTAs, 0K SMEM`) Evict / Restore P50 | `332.3 / 763.6 µs` | **`50.9 / 30.5 µs` (6.5× / 25.0×↑)** | `399.7 / 772.2 µs` | **`50.8 / 62.9 µs` (7.9× / 12.3×↑)** |
+| Mode 5 (`84 CTAs, 32K SMEM`) Evict / Restore P50 | `372.8 / 831.8 µs` | **`55.4 / 41.4 µs` (6.7× / 20.1×↑)** | `447.0 / 806.4 µs` | **`55.2 / 73.9 µs` (8.1× / 10.9×↑)** |
+| Mode 5 (`512 CTAs, 48K SMEM`) Evict / Restore P50 | `1,260.8 / 1,859.0 µs` | **`119.9 / 292.0 µs` (10.5× / 6.4×↑)** | `1,076.2 / 917.4 µs` | **`48.0 / 325.8 µs` (22.4× / 2.8×↑)** |
+| 紧凑池化 `u_arena` 显存节省 (`16,384 CTAs`) | `160.6×` (`25.5 MiB`) | **`139.7×` (`29.31 MiB`)** | `436.9×` (`9.38 MiB`) | **`436.9×` (`9.38 MiB`)** |
+| Context CILP (`sm120_l3_resumable_bench`) | `425 µs` | **`420 µs` (`P99=476 µs`)** | `431 µs` | **`PASS`** (`ZERO_LOST_WORK`) |
+| 11 项 E2E (`sm120_v2_e2e_suite`) | **11 / 11 ALL_PASS** | **11 / 11 ALL_PASS** | `CASE 02` 停滞 | `CASE 01..10` PASS |
 
 #### (B) 跨进程 / 跨上下文 BAR0 广播副作用实测（RTX 5060 `v2.2.0`）
 
