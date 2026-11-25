@@ -410,8 +410,13 @@ static CUresult XStreamWaitEventImpl(CUstream stream, CUevent event, unsigned in
     CHECK_STREAM_CAPTURE(stream, Driver::StreamWaitEvent(stream, event, flags));
 
     auto xevent = g_events.Get(event, nullptr);
-    // the event is not recorded yet
-    if (xevent == nullptr) return Driver::StreamWaitEvent(stream, event, flags);
+    // If the event was not recorded on an XQueue (unrecorded or recorded on an unmanaged
+    // stream such as cuDNN internal worker streams), enqueue the hardware wait synchronously
+    // before returning so the stream captures the current event snapshot even if the caller
+    // immediately reuses the same CUevent handle on another internal stream.
+    if (xevent == nullptr || xevent->GetXQueueHandle() == 0) {
+        return Driver::StreamWaitEvent(stream, event, flags);
+    }
 
     if (stream == CU_STREAM_LEGACY) {
         // sync a event on legacy default stream
@@ -488,8 +493,9 @@ static inline CUresult XStreamSynchronizeImpl(CUstream stream)
         return r;
     }
     xq->WaitAll();
+    CUresult r = Driver::StreamSynchronize(stream);
     DrainDeferredFreesIfSafe();
-    return CUDA_SUCCESS;
+    return r;
 }
 
 CUresult XStreamSynchronize(CUstream stream)
@@ -514,7 +520,7 @@ static inline CUresult XStreamQueryImpl(CUstream stream)
     switch (xq->Query())
     {
     case kQueueStateIdle:
-        return CUDA_SUCCESS;
+        return Driver::StreamQuery(stream);
     case kQueueStateReady:
         return CUDA_ERROR_NOT_READY;
     default:

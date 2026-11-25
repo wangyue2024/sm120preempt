@@ -264,6 +264,41 @@ private:
     }
 };
 // CUDA_COMMAND(CudaMemcpyHtoDV2Command, CudaMemoryCommand, Driver::MemcpyHtoDAsync_v2, CUdeviceptr, dstDevice, const void *, srcHost, size_t, ByteCount);
+class CudaMemcpyAsyncCommand : public CudaMemoryCommand
+{
+public:
+    CudaMemcpyAsyncCommand(CUdeviceptr dst, CUdeviceptr src, size_t ByteCount)
+        : CudaMemoryCommand(), dst_(dst), src_(src), ByteCount_(ByteCount)
+    {
+        if (src == 0 || ByteCount == 0) return;
+        uint32_t type = 0;
+        CUresult res = Driver::PointerGetAttribute(
+            &type, CU_POINTER_ATTRIBUTE_MEMORY_TYPE, src
+        );
+        if (res == CUDA_SUCCESS) return;
+        void *pinned_host = nullptr;
+        CUDA_ASSERT(Driver::MemAllocHost_v2(&pinned_host, ByteCount));
+        memcpy(pinned_host, reinterpret_cast<const void *>(src), ByteCount);
+        src_ = reinterpret_cast<CUdeviceptr>(pinned_host);
+        src_host_allocated_ = true;
+    }
+    virtual ~CudaMemcpyAsyncCommand()
+    {
+        if (!src_host_allocated_) return;
+        CUDA_ASSERT(Driver::MemFreeHost(reinterpret_cast<void *>(src_)));
+    }
+
+private:
+    CUdeviceptr dst_;
+    CUdeviceptr src_;
+    size_t ByteCount_;
+    bool src_host_allocated_ = false;
+
+    virtual CUresult Launch(CUstream stream) override
+    {
+        return Driver::MemcpyAsync(dst_, src_, ByteCount_, stream);
+    }
+};
 CUDA_COMMAND(CudaMemcpyDtoHV2Command, CudaMemoryCommand, Driver::MemcpyDtoHAsync_v2, void *, dstHost, CUdeviceptr, srcDevice, size_t, ByteCount);
 CUDA_COMMAND(CudaMemcpyDtoDV2Command, CudaMemoryCommand, Driver::MemcpyDtoDAsync_v2, CUdeviceptr, dstDevice, CUdeviceptr, srcDevice, size_t, ByteCount);
 CUDA_COMMAND(CudaMemsetD8Command, CudaMemoryCommand, Driver::MemsetD8Async, CUdeviceptr, dstDevice, unsigned char, uc, size_t, N);
@@ -273,6 +308,7 @@ CUDA_COMMAND(CudaMemsetD2D8Command, CudaMemoryCommand, Driver::MemsetD2D8Async, 
 CUDA_COMMAND(CudaMemsetD2D16Command, CudaMemoryCommand, Driver::MemsetD2D16Async, CUdeviceptr, dstDevice, size_t, dstPitch, unsigned short, us, size_t, Width, size_t, Height);
 CUDA_COMMAND(CudaMemsetD2D32Command, CudaMemoryCommand, Driver::MemsetD2D32Async, CUdeviceptr, dstDevice, size_t, dstPitch, unsigned int, ui, size_t, Width, size_t, Height);
 CUDA_COMMAND(CudaMemoryAllocCommand, CudaMemoryCommand, Driver::MemAllocAsync, CUdeviceptr *, dptr, size_t, bytesize);
+CUDA_COMMAND(CudaMemoryAllocFromPoolCommand, CudaMemoryCommand, Driver::MemAllocFromPoolAsync, CUdeviceptr *, dptr, size_t, bytesize, CUmemoryPool, pool);
 CUDA_COMMAND(CudaMemoryFreeCommand, CudaMemoryCommand, Driver::MemFreeAsync, CUdeviceptr, dptr);
 
 class CudaMemcpy2DV2Command : public CudaMemoryCommand

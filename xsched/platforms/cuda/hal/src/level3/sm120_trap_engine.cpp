@@ -165,9 +165,14 @@ std::vector<Ins> BuildRegCascadeCave(bool is_save, uint64_t cave_va, uint64_t re
     std::vector<Ins> c;
     c.reserve(136);
 
-    // Header: compute r_start = min(SR_REGALLOC - 3, 252). Skip if < 14.
+    // Header: compute r_top = min(SR_REGALLOC - 1, 252). Skip if < 14.
+    // DEF-20 (2026-11-25): SR_REGALLOC reports EXACTLY the kernel's register count
+    // (== CU_FUNC_ATTRIBUTE_NUM_REGS, measured on GB206/GB203 with a patched S2R probe); it does
+    // NOT include two reserved registers. The previous "SR_REGALLOC - 3" silently skipped the top
+    // 2-3 live registers of every kernel (R14/R15 entirely for 14..16-register kernels), causing
+    // Mode 5 restore crashes (700/717) and silent corruption (DEF-14/15/16).
     c.push_back(s2r(4, kSrRegAlloc));
-    c.push_back(iadd_imm(4, 4, static_cast<uint32_t>(-3)));
+    c.push_back(iadd_imm(4, 4, static_cast<uint32_t>(-1)));
     c.push_back(isetp_ge_u32_imm(4, 14));
     const int br_too_low = static_cast<int>(c.size());
     c.push_back(nop());
@@ -577,8 +582,6 @@ bool Sm120TrapEngine::LoadHelperModule()
         "    .reg .u32 %r<2>;\n"
         "    .reg .pred %p<2>;\n"
         "    ld.param.u64 %rd1, [p_ctrl];\n"
-        "    mov.u32 %r0, 0;\n"
-        "    st.global.cg.u32 [%rd1 + 28], %r0;\n"
         "    ld.global.cg.u32 %r1, [%rd1];\n"
         "    setp.eq.u32 %p0, %r1, 6;\n"
         "    setp.eq.u32 %p1, %r1, 2;\n"
@@ -588,7 +591,7 @@ bool Sm120TrapEngine::LoadHelperModule()
         "    st.global.cg.u64 [%rd1 + 0], %rd0;\n"
         "    st.global.cg.u64 [%rd1 + 8], %rd0;\n"
         "    st.global.cg.u64 [%rd1 + 16], %rd0;\n"
-        "    st.global.cg.u32 [%rd1 + 24], %r0;\n"
+        "    st.global.cg.u64 [%rd1 + 24], %rd0;\n"
         "DONE:\n"
         "    ret;\n"
         "}\n";
@@ -1515,18 +1518,30 @@ bool Sm120StreamContext::PreemptStream(Sm120PreemptMode mode)
     // arena recorded for active_kernel_idx in kernel_arena_map_.
     saved_arena_dev_ = static_cast<CUdeviceptr>(hdr.arena_va);
 
-    // Reset per-round mutable run state [0x04..0x1b] and overflow_err, preserving is_restore_wave (+0x1c),
-    // then publish new_cmd at +0x00 via high-priority Copy Engine DMA (~12 us even under 100% SM load).
+    // Reset per-round mutable run state and overflow_err, preserving is_restore_wave (+0x1c).
+    // If preempting mid-restore (cmd==6 or 2), ALSO preserve active_kernel_idx (+0x08..+0x0f) so
+    // queued K2 exits cleanly at Entry Guardian Slot 51 instead of stealing active_kernel_idx!
+    const bool was_restore_wave = (hdr.cmd == kCmdMode5Restore || hdr.cmd == kCmdMode1Replay);
     const uint32_t new_cmd = (mode == Sm120PreemptMode::kEarlyExit)
                            ? kCmdMode1Evict : kCmdMode5Evict;
-    uint32_t zeros6[6] = {};
-    memcpy(reinterpret_cast<uint8_t *>(ctrl_host_) + 4, zeros6, sizeof(zeros6));
     ctrl_host_->cmd = new_cmd;
+    ctrl_host_->evicted_slots = 0u;
+    ctrl_host_->restored_slots = 0u;
+    ctrl_host_->drained_cnt = 0u;
+    ctrl_host_->mode1_exit_cnt = 0u;
     ctrl_host_->overflow_err = 0u;
     Driver::MemcpyHtoDAsync_v2(ctrl_dev_ + offsetof(Sm120ControlHeader, overflow_err),
                                &ctrl_host_->overflow_err, sizeof(uint32_t), ctrl_op_stream_);
-    Driver::MemcpyHtoDAsync_v2(ctrl_dev_ + 4, reinterpret_cast<uint8_t *>(ctrl_host_) + 4,
-                               sizeof(zeros6), ctrl_op_stream_);
+    if (was_restore_wave) {
+        Driver::MemcpyHtoDAsync_v2(ctrl_dev_ + offsetof(Sm120ControlHeader, evicted_slots),
+                                   &ctrl_host_->evicted_slots, sizeof(uint32_t), ctrl_op_stream_);
+        Driver::MemcpyHtoDAsync_v2(ctrl_dev_ + offsetof(Sm120ControlHeader, restored_slots),
+                                   &ctrl_host_->restored_slots, 3 * sizeof(uint32_t), ctrl_op_stream_);
+    } else {
+        ctrl_host_->active_kernel_idx = 0ULL;
+        Driver::MemcpyHtoDAsync_v2(ctrl_dev_ + 4, reinterpret_cast<uint8_t *>(ctrl_host_) + 4,
+                                   6 * sizeof(uint32_t), ctrl_op_stream_);
+    }
     Driver::MemcpyHtoDAsync_v2(ctrl_dev_, ctrl_host_, sizeof(uint32_t), ctrl_op_stream_);
     Driver::StreamSynchronize(ctrl_op_stream_);
 
@@ -1693,6 +1708,93 @@ Sm120StreamTelemetry Sm120StreamContext::Telemetry() const
     t.active_kernel_idx = hdr.active_kernel_idx;
     t.arena_bytes       = arena_bytes_;
     return t;
+}
+
+void Sm120StreamContext::DebugDumpEvicted(const Sm120KernelRecord *rec, uint32_t num_ctas,
+                                          uint32_t threads_per_cta, uint32_t dyn_smem_bytes,
+                                          uint32_t max_ctas) const
+{
+    std::lock_guard<std::mutex> lock(mu_);
+    if (ctrl_dev_ == 0 || ctrl_op_stream_ == nullptr || rec == nullptr) return;
+    const CUdeviceptr ep_inst = rec->ep_inst;
+    const CUdeviceptr ep_orig = rec->ep_orig;
+    // Recompute the Mode 5 slot layout exactly as PrepareLaunch() does (diagnostic copy).
+    const uint32_t lw = std::max((threads_per_cta + 31u) / 32u, 1u);
+    const uint32_t l_thread_area_off = AlignUp(0x40u + lw * 0x160u, 128u);
+    const uint32_t l_reg_ceil = std::min(AlignUp(static_cast<uint32_t>(rec->clamped_regs) + 16u, 16u), 256u);
+    const uint32_t l_gpr_tail = (l_reg_ceil > 14u) ? (l_reg_ceil - 14u) : 0u;
+    const uint32_t l_thr_stride = AlignUp(0x78u + l_gpr_tail * 4u, 16u);
+    const uint32_t l_smem_off = AlignUp(l_thread_area_off + threads_per_cta * l_thr_stride, 128u);
+    const uint32_t l_user_smem = static_cast<uint32_t>(rec->static_smem_bytes) + dyn_smem_bytes;
+    const uint32_t l_smem_area = (l_user_smem > 0u) ? AlignUp(l_user_smem + 0x400u, 4096u) : 0u;
+    const uint32_t l_lmem_off = l_smem_off + l_smem_area;
+    const uint32_t l_slot_stride =
+        AlignUp(l_lmem_off + AlignUp(threads_per_cta * rec->desc.lmem_cap_bytes, 128u), 128u);
+    ScopedCudaCtx guard(ctx_);
+    Sm120ControlHeader hdr{};
+    if (!ReadHeaderLocked(&hdr)) return;
+    const uint32_t n = std::min(num_ctas, ctrl_cta_cap_);
+    std::vector<Sm120CtaEntry> ents(n);
+    if (n == 0 ||
+        Driver::MemcpyDtoHAsync_v2(ents.data(), ctrl_dev_ + sizeof(Sm120ControlHeader),
+                                   static_cast<size_t>(n) * sizeof(Sm120CtaEntry),
+                                   ctrl_op_stream_) != CUDA_SUCCESS ||
+        Driver::StreamSynchronize(ctrl_op_stream_) != CUDA_SUCCESS) {
+        return;
+    }
+    uint32_t cnt[8] = {};
+    for (const auto &e : ents) cnt[std::min(e.state, 7u)]++;
+    XINFO("sm120_dump: active-kernel layout stride=%u thr_off=%#x thr_stride=%u smem_off=%#x smem_area=%u "
+          "(regs=%d static_smem=%d dyn_smem=%u thr=%u)", l_slot_stride, l_thread_area_off, l_thr_stride,
+          l_smem_off, l_smem_area, rec->clamped_regs, rec->static_smem_bytes, dyn_smem_bytes,
+          threads_per_cta);
+    XINFO("sm120_dump: hdr(last DMA) cmd=%u evicted=%u drained=%u active=%llu arena=%#llx stride=%u "
+          "max_slots=%u thr_off=%#x thr_stride=%u smem_off=%#x | states: 0=%u 1=%u 2=%u 5=%u other=%u",
+          hdr.cmd, hdr.evicted_slots, hdr.drained_cnt,
+          static_cast<unsigned long long>(hdr.active_kernel_idx),
+          static_cast<unsigned long long>(hdr.arena_va), hdr.slot_stride_bytes, hdr.max_slots,
+          hdr.thread_area_off, hdr.thread_frame_stride, hdr.smem_area_off,
+          cnt[0], cnt[1], cnt[2], cnt[5], n - cnt[0] - cnt[1] - cnt[2] - cnt[5]);
+    uint32_t shown = 0;
+    const uint32_t warps = std::max((threads_per_cta + 31u) / 32u, 1u);
+    for (uint32_t b = 0; b < n && shown < max_ctas; ++b) {
+        if (ents[b].state != 5u) continue;
+        ++shown;
+        const CUdeviceptr arena = saved_arena_dev_ ? saved_arena_dev_ : static_cast<CUdeviceptr>(hdr.arena_va);
+        const CUdeviceptr slot = arena + static_cast<CUdeviceptr>(ents[b].slot_id) * l_slot_stride;
+        std::string pcs;
+        for (uint32_t w = 0; w < warps && w < 32; ++w) {
+            if (((ents[b].warp_mask >> w) & 1u) == 0) { pcs += "w" + std::to_string(w) + ":dead "; continue; }
+            // Lanes 0 and 31 of each live warp: 112B HW frame, TRAP_RETURN_PC at +0x18.
+            for (uint32_t lane : {0u, 31u}) {
+                const uint32_t tid = w * 32u + lane;
+                if (tid >= threads_per_cta) break;
+                uint64_t pc = 0;
+                const CUdeviceptr fr = slot + l_thread_area_off +
+                                       static_cast<CUdeviceptr>(tid) * l_thr_stride;
+                Driver::MemcpyDtoHAsync_v2(&pc, fr + 0x18, sizeof(pc), ctrl_op_stream_);
+                Driver::StreamSynchronize(ctrl_op_stream_);
+                char buf[64];
+                if (pc >= ep_inst + 0x500 && pc < ep_inst + 0x500 + (1u << 24)) {
+                    snprintf(buf, sizeof(buf), "w%u.%u:+%#llx ", w, lane,
+                             static_cast<unsigned long long>(pc - ep_inst - 0x500));
+                } else if (pc >= ep_inst && pc < ep_inst + 0x500) {
+                    snprintf(buf, sizeof(buf), "w%u.%u:G%#llx ", w, lane,
+                             static_cast<unsigned long long>(pc - ep_inst));
+                } else if (ep_orig != 0 && pc >= ep_orig && pc < ep_orig + (1u << 24)) {
+                    snprintf(buf, sizeof(buf), "w%u.%u:ORIG+%#llx ", w, lane,
+                             static_cast<unsigned long long>(pc - ep_orig));
+                } else {
+                    snprintf(buf, sizeof(buf), "w%u.%u:abs%#llx ", w, lane,
+                             static_cast<unsigned long long>(pc));
+                }
+                pcs += buf;
+            }
+            if (pcs.size() > 600) { pcs += "..."; break; }
+        }
+        XINFO("sm120_dump: cta=%u slot=%u warp_mask=%#x entry_dec=%u pcs=[%s]", b, ents[b].slot_id,
+              ents[b].warp_mask, ents[b].entry_dec, pcs.c_str());
+    }
 }
 
 bool Sm120StreamContext::ReadCtaEntries(std::vector<Sm120CtaEntry> &out, uint32_t count) const

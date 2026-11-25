@@ -134,7 +134,7 @@ DEFINE_EXPORT_C_REDIRECT_CALL(Driver::Memcpy2D_v2_ptds, CUresult, cuMemcpy2D_v2_
 DEFINE_EXPORT_C_REDIRECT_CALL(Driver::Memcpy2DUnaligned_v2_ptds, CUresult, cuMemcpy2DUnaligned_v2_ptds, const CUDA_MEMCPY2D *, pCopy);
 DEFINE_EXPORT_C_REDIRECT_CALL(Driver::Memcpy3D_v2_ptds, CUresult, cuMemcpy3D_v2_ptds, const CUDA_MEMCPY3D *, pCopy);
 DEFINE_EXPORT_C_REDIRECT_CALL(Driver::Memcpy3DPeer_ptds, CUresult, cuMemcpy3DPeer_ptds, const CUDA_MEMCPY3D_PEER *, pCopy);
-DEFINE_EXPORT_C_REDIRECT_CALL(Driver::MemcpyAsync_ptsz, CUresult, cuMemcpyAsync_ptsz, CUdeviceptr, dst, CUdeviceptr, src, size_t, ByteCount, CUstream, hStream);
+DEFINE_EXPORT_C_REDIRECT_CALL(XMemcpyAsync_ptsz, CUresult, cuMemcpyAsync_ptsz, CUdeviceptr, dst, CUdeviceptr, src, size_t, ByteCount, CUstream, hStream);
 DEFINE_EXPORT_C_REDIRECT_CALL(Driver::MemcpyPeerAsync_ptsz, CUresult, cuMemcpyPeerAsync_ptsz, CUdeviceptr, dstDevice, CUcontext, dstContext, CUdeviceptr, srcDevice, CUcontext, srcContext, size_t, ByteCount, CUstream, hStream);
 DEFINE_EXPORT_C_REDIRECT_CALL(XMemcpyHtoDAsync_v2_ptsz, CUresult, cuMemcpyHtoDAsync_v2_ptsz, CUdeviceptr, dstDevice, const void *, srcHost, size_t, ByteCount, CUstream, hStream);
 DEFINE_EXPORT_C_REDIRECT_CALL(XMemcpyDtoHAsync_v2_ptsz, CUresult, cuMemcpyDtoHAsync_v2_ptsz, void *, dstHost, CUdeviceptr, srcDevice, size_t, ByteCount, CUstream, hStream);
@@ -196,7 +196,7 @@ DEFINE_EXPORT_C_REDIRECT_CALL(Driver::MemPoolSetAccess, CUresult, cuMemPoolSetAc
 DEFINE_EXPORT_C_REDIRECT_CALL(Driver::MemPoolGetAccess, CUresult, cuMemPoolGetAccess, CUmemAccess_flags *, flags, CUmemoryPool, memPool, CUmemLocation *, location);
 DEFINE_EXPORT_C_REDIRECT_CALL(Driver::MemPoolCreate, CUresult, cuMemPoolCreate, CUmemoryPool *, pool, const CUmemPoolProps *, poolProps);
 DEFINE_EXPORT_C_REDIRECT_CALL(Driver::MemPoolDestroy, CUresult, cuMemPoolDestroy, CUmemoryPool, pool);
-DEFINE_EXPORT_C_REDIRECT_CALL(Driver::MemAllocFromPoolAsync_ptsz, CUresult, cuMemAllocFromPoolAsync_ptsz, CUdeviceptr *, dptr, size_t, bytesize, CUmemoryPool, pool, CUstream, hStream);
+DEFINE_EXPORT_C_REDIRECT_CALL(XMemAllocFromPoolAsync_ptsz, CUresult, cuMemAllocFromPoolAsync_ptsz, CUdeviceptr *, dptr, size_t, bytesize, CUmemoryPool, pool, CUstream, hStream);
 DEFINE_EXPORT_C_REDIRECT_CALL(Driver::MemPoolExportToShareableHandle, CUresult, cuMemPoolExportToShareableHandle, void *, handle_out, CUmemoryPool, pool, CUmemAllocationHandleType, handleType, unsigned long long, flags);
 DEFINE_EXPORT_C_REDIRECT_CALL(Driver::MemPoolImportFromShareableHandle, CUresult, cuMemPoolImportFromShareableHandle, CUmemoryPool *, pool_out, void *, handle, CUmemAllocationHandleType, handleType, unsigned long long, flags);
 DEFINE_EXPORT_C_REDIRECT_CALL(Driver::MemPoolExportPointer, CUresult, cuMemPoolExportPointer, CUmemPoolPtrExportData *, shareData_out, CUdeviceptr, ptr);
@@ -538,7 +538,7 @@ DEFINE_EXPORT_C_REDIRECT_CALL(Driver::MemsetD2D8_v2, CUresult, cuMemsetD2D8_v2, 
 DEFINE_EXPORT_C_REDIRECT_CALL(Driver::MemsetD2D16_v2, CUresult, cuMemsetD2D16_v2, CUdeviceptr, dstDevice, size_t, dstPitch, unsigned short, us, size_t, Width, size_t, Height);
 DEFINE_EXPORT_C_REDIRECT_CALL(Driver::MemsetD2D32_v2, CUresult, cuMemsetD2D32_v2, CUdeviceptr, dstDevice, size_t, dstPitch, unsigned int, ui, size_t, Width, size_t, Height);
 DEFINE_EXPORT_C_REDIRECT_CALL(Driver::Memcpy, CUresult, cuMemcpy, CUdeviceptr, dst, CUdeviceptr, src, size_t, ByteCount);
-DEFINE_EXPORT_C_REDIRECT_CALL(Driver::MemcpyAsync, CUresult, cuMemcpyAsync, CUdeviceptr, dst, CUdeviceptr, src, size_t, ByteCount, CUstream, hStream);
+DEFINE_EXPORT_C_REDIRECT_CALL(XMemcpyAsync, CUresult, cuMemcpyAsync, CUdeviceptr, dst, CUdeviceptr, src, size_t, ByteCount, CUstream, hStream);
 DEFINE_EXPORT_C_REDIRECT_CALL(Driver::MemcpyPeer, CUresult, cuMemcpyPeer, CUdeviceptr, dstDevice, CUcontext, dstContext, CUdeviceptr, srcDevice, CUcontext, srcContext, size_t, ByteCount);
 DEFINE_EXPORT_C_REDIRECT_CALL(Driver::MemcpyPeerAsync, CUresult, cuMemcpyPeerAsync, CUdeviceptr, dstDevice, CUcontext, dstContext, CUdeviceptr, srcDevice, CUcontext, srcContext, size_t, ByteCount, CUstream, hStream);
 DEFINE_EXPORT_C_REDIRECT_CALL(Driver::Memcpy3DPeer, CUresult, cuMemcpy3DPeer, const CUDA_MEMCPY3D_PEER *, pCopy);
@@ -616,7 +616,7 @@ DEFINE_EXPORT_C_REDIRECT_CALL(Driver::GraphInstantiate_v2, CUresult, cuGraphInst
 DEFINE_EXPORT_C_REDIRECT_CALL(Driver::MemMapArrayAsync, CUresult, cuMemMapArrayAsync, CUarrayMapInfo *, mapInfoList, unsigned int, count, CUstream, hStream);
 DEFINE_EXPORT_C_REDIRECT_CALL(XMemFreeAsync, CUresult, cuMemFreeAsync, CUdeviceptr, dptr, CUstream, hStream);
 DEFINE_EXPORT_C_REDIRECT_CALL(XMemAllocAsync, CUresult, cuMemAllocAsync, CUdeviceptr *, dptr, size_t, bytesize, CUstream, hStream);
-DEFINE_EXPORT_C_REDIRECT_CALL(Driver::MemAllocFromPoolAsync, CUresult, cuMemAllocFromPoolAsync, CUdeviceptr *, dptr, size_t, bytesize, CUmemoryPool, pool, CUstream, hStream);
+DEFINE_EXPORT_C_REDIRECT_CALL(XMemAllocFromPoolAsync, CUresult, cuMemAllocFromPoolAsync, CUdeviceptr *, dptr, size_t, bytesize, CUmemoryPool, pool, CUstream, hStream);
 DEFINE_EXPORT_C_REDIRECT_CALL(Driver::StreamUpdateCaptureDependencies, CUresult, cuStreamUpdateCaptureDependencies, CUstream, hStream, CUgraphNode *, dependencies, size_t, numDependencies, unsigned int, flags);
 DEFINE_EXPORT_C_REDIRECT_CALL(Driver::StreamUpdateCaptureDependencies_v2, CUresult, cuStreamUpdateCaptureDependencies_v2, CUstream, hStream, CUgraphNode *, dependencies, const CUgraphEdgeData *, dependencyData, size_t, numDependencies, unsigned int, flags);
 DEFINE_EXPORT_C_REDIRECT_CALL(Driver::MemBatchDecompressAsync, CUresult, cuMemBatchDecompressAsync, CUmemDecompressParams *, paramsArray, size_t, count, unsigned int, flags, size_t *, errorIndex, CUstream, stream);

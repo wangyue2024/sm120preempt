@@ -1,13 +1,54 @@
+#include <atomic>
 #include <cstdlib>
 #include <mutex>
+#include <string>
 
 #include "xsched/utils/env.h"
+#include "xsched/utils/common.h"
 #include "xsched/utils/xassert.h"
 #include "xsched/cuda/hal/level3/cuda_queue.h"
 #include "xsched/cuda/hal/common/cuda_assert.h"
 
 using namespace xsched::cuda;
 using namespace xsched::preempt;
+
+namespace
+{
+// Process-wide SM120 adaptive-router telemetry (relaxed counters, test/eval observability only).
+// Counts every kernel/graph submitted to a Level>=2 SM120 trap queue by routing decision.
+enum Sm120RouteStat : int {
+    kRouteLv3Killable = 0,  // instrumented, in-kernel preemptible (Mode 1 / Mode 5)
+    kRouteLv1Mbarrier,      // SYNCS / hardware mbarrier kernel -> Level-1 boundary
+    kRouteLv1Cooperative,   // cooperative launch (grid.sync) -> Level-1 boundary
+    kRouteLv1Cluster,       // multi-wave thread block cluster -> Level-1 boundary
+    kRouteLv1Graph,         // CUDA graph launch -> Level-1 graph boundary
+    kRouteLv1Uninstrumentable, // Entry Guardian instrumentation failed -> Level-1 boundary
+    kRouteStatCount,
+};
+std::atomic<uint64_t> g_sm120_route_stats[kRouteStatCount] = {};
+
+inline void CountRoute(Sm120RouteStat s)
+{
+    g_sm120_route_stats[s].fetch_add(1, std::memory_order_relaxed);
+}
+} // namespace
+
+/// @brief Read (and optionally reset) SM120 adaptive-router counters.
+/// @param out   array of at least `n` uint64: [lv3_killable, lv1_mbarrier, lv1_cooperative,
+///              lv1_cluster, lv1_graph, lv1_uninstrumentable]
+/// @param n     number of entries to copy (clamped to 6)
+/// @param reset non-zero to atomically reset the copied counters to zero
+/// @return number of entries written
+EXPORT_C_FUNC int XSm120GetRouteStats(uint64_t *out, int n, int reset)
+{
+    if (out == nullptr || n <= 0) return 0;
+    if (n > kRouteStatCount) n = kRouteStatCount;
+    for (int i = 0; i < n; ++i) {
+        out[i] = reset ? g_sm120_route_stats[i].exchange(0, std::memory_order_relaxed)
+                       : g_sm120_route_stats[i].load(std::memory_order_relaxed);
+    }
+    return n;
+}
 
 bool CudaQueueLv3Trap::IsSm120Stream(CUstream stream)
 {
@@ -59,6 +100,17 @@ void CudaQueueLv3Trap::Launch(std::shared_ptr<HwCommand> hw_cmd)
             relaunched_ = true;
             const auto mode = SelectSm120Mode(hw_cmd);
             const uint64_t kidx = static_cast<uint64_t>(hw_cmd->GetIdx());
+            static const bool trace_launch = GetEnvOption("XSCHED_SM120_TRACE_LAUNCH", false);
+            if (trace_launch) {
+                const char *fname = nullptr;
+                if (Driver::FuncGetName(&fname, kernel->kFuncHandle) != CUDA_SUCCESS) fname = nullptr;
+                XINFO("sm120_trace: idx=%llu func=%p name=%.160s ctas=%u thr=%u dyn_smem=%u "
+                      "level=%d killable=%d mode=%d",
+                      static_cast<unsigned long long>(kidx), static_cast<void *>(kernel->kFuncHandle),
+                      fname ? fname : "?", kernel->BlockCnt(), kernel->ThreadCnt(),
+                      kernel->DynSmemBytes(), static_cast<int>(level_), kernel->killable ? 1 : 0,
+                      static_cast<int>(mode));
+            }
             std::lock_guard<std::mutex> lock(sm120::Sm120TrapEngine::LaunchMutex(context_));
             if (level_ >= kPreemptLevelDeactivate && kernel->killable) {
                 XASSERT(sm120_stream_->PrepareLaunch(
@@ -158,8 +210,42 @@ void CudaQueueLv3Trap::Reactivate(const CommandLog &log)
         const auto t = sm120_stream_->Telemetry();
         const bool has_preempted =
             (t.evicted_slots > 0 || t.drained_cnt > 0 || t.mode1_exit_cnt > 0);
+        static const bool trace_launch = GetEnvOption("XSCHED_SM120_TRACE_LAUNCH", false);
+        if (trace_launch) {
+            std::string kinds;
+            for (const auto &c : log) {
+                const char k = std::dynamic_pointer_cast<CudaKernelCommand>(c) != nullptr ? 'K'
+                             : std::dynamic_pointer_cast<CudaMemoryCommand>(c) != nullptr ? 'M' : 'O';
+                kinds += std::to_string(c->GetIdx()) + k + " ";
+                if (kinds.size() > 400) { kinds += "..."; break; }
+            }
+            XINFO("sm120_trace: reactivate cmd=%u evicted=%u restored=%u drained=%u m1exit=%u "
+                  "restore_wave=%u active_idx=%llu preempted=%d log=[%s]",
+                  t.cmd, t.evicted_slots, t.restored_slots, t.drained_cnt, t.mode1_exit_cnt,
+                  t.is_restore_wave, static_cast<unsigned long long>(t.active_kernel_idx),
+                  has_preempted ? 1 : 0, kinds.c_str());
+            if (t.evicted_slots > 0) {
+                for (const auto &c : log) {
+                    if (static_cast<uint64_t>(c->GetIdx()) != t.active_kernel_idx) continue;
+                    auto k = std::dynamic_pointer_cast<CudaKernelCommand>(c);
+                    if (k == nullptr) break;
+                    const auto *rec = sm120::Sm120GuardianRegistry::Instance(context_)->Find(
+                        k->kFuncHandle);
+                    sm120_stream_->DebugDumpEvicted(rec, k->BlockCnt(), k->ThreadCnt(),
+                                                    k->DynSmemBytes(), 4);
+                    break;
+                }
+            }
+        }
         if (!has_preempted) {
             sm120_stream_->ResetControlSync();
+            if (t.active_kernel_idx != 0) {
+                for (const auto &cmd : log) {
+                    if (static_cast<uint64_t>(cmd->GetIdx()) > t.active_kernel_idx) {
+                        this->Launch(cmd);
+                    }
+                }
+            }
             return;
         }
         const uint64_t active_idx = sm120_stream_->PrepareRestore(last_preempt_mode_);
@@ -228,6 +314,7 @@ void CudaQueueLv3Trap::OnHwCommandSubmit(std::shared_ptr<preempt::HwCommand> hw_
         if (level_ < kPreemptLevelDeactivate) return;
 
         if (std::dynamic_pointer_cast<CudaGraphCommand>(hw_cmd) != nullptr) {
+            CountRoute(kRouteLv1Graph);
             static bool warned_graph = false;
             if (!warned_graph) {
                 warned_graph = true;
@@ -241,6 +328,7 @@ void CudaQueueLv3Trap::OnHwCommandSubmit(std::shared_ptr<preempt::HwCommand> hw_
             // Adaptive SM120 Preemption Policy Router:
             // Route hardware-incompatible kernels cleanly to Level-1 boundary instead of faulting.
             if (kernel->IsCooperative()) {
+                CountRoute(kRouteLv1Cooperative);
                 kernel->killable = false;
                 kernel->ClearProps(kCommandPropertyDeactivatable);
                 static bool warned_coop = false;
@@ -254,6 +342,7 @@ void CudaQueueLv3Trap::OnHwCommandSubmit(std::shared_ptr<preempt::HwCommand> hw_
             const unsigned int cluster_sz = kernel->ClusterSize();
             if (cluster_sz > 1 && sm_count_ > 0 &&
                 kernel->BlockCnt() > static_cast<unsigned int>(sm_count_)) {
+                CountRoute(kRouteLv1Cluster);
                 kernel->killable = false;
                 kernel->ClearProps(kCommandPropertyDeactivatable);
                 static bool warned_cluster = false;
@@ -268,6 +357,7 @@ void CudaQueueLv3Trap::OnHwCommandSubmit(std::shared_ptr<preempt::HwCommand> hw_
             const auto *rec = sm120::Sm120GuardianRegistry::Instance(context_)->EnsureInstrumented(
                 kernel->kFuncHandle);
             if (rec == nullptr || rec->has_hw_mbarrier) {
+                CountRoute(rec == nullptr ? kRouteLv1Uninstrumentable : kRouteLv1Mbarrier);
                 kernel->killable = false;
                 kernel->ClearProps(kCommandPropertyDeactivatable);
                 static bool warned_mbar = false;
@@ -278,6 +368,7 @@ void CudaQueueLv3Trap::OnHwCommandSubmit(std::shared_ptr<preempt::HwCommand> hw_
                 }
                 return;
             }
+            CountRoute(kRouteLv3Killable);
             kernel->killable = true;
         }
         return;

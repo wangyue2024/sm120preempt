@@ -162,6 +162,15 @@ public:
 
     Sm120StreamTelemetry Telemetry() const;
     bool ReadCtaEntries(std::vector<Sm120CtaEntry> &out, uint32_t count) const;
+
+    /// @brief Diagnostics (XSCHED_SM120_TRACE_LAUNCH): after a Mode 5 evict, log up to
+    /// `max_ctas` State-B CTAs of the active kernel with slot id, warp mask and the saved
+    /// per-lane TRAP_RETURN_PC expressed as an offset into the ORIGINAL kernel SASS
+    /// (pc - ep_inst - kGuardianBytes), for correlation with `nvdisasm -b SM120`.
+    /// The trap-frame layout is recomputed from `rec` (the header layout slot may already have
+    /// been overwritten by queued kernels' stream-ordered layout DMAs during the drain).
+    void DebugDumpEvicted(const Sm120KernelRecord *rec, uint32_t num_ctas, uint32_t threads_per_cta,
+                          uint32_t dyn_smem_bytes, uint32_t max_ctas) const;
     CUdeviceptr ControlDevVA() const { return ctrl_dev_; }
     volatile uint32_t *ControlHostPtr() const { return reinterpret_cast<volatile uint32_t *>(ctrl_host_); }
 

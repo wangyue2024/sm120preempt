@@ -150,6 +150,7 @@ CUDA_SHIM_FUNC(GraphUpload, CudaGraphUploadCommand, CUgraphExec, graph_exec);
 CUDA_SHIM_FUNC(GraphLaunch, CudaGraphLaunchCommand, CUgraphExec, graph_exec);
 
 ////////////////////////////// memory related //////////////////////////////
+CUDA_SHIM_FUNC(MemcpyAsync, CudaMemcpyAsyncCommand, CUdeviceptr, dst, CUdeviceptr, src, size_t, ByteCount);
 CUDA_SHIM_FUNC(MemcpyHtoDAsync_v2, CudaMemcpyHtoDV2Command, CUdeviceptr, dstDevice, const void *, srcHost, size_t, ByteCount);
 CUDA_SHIM_FUNC(MemcpyDtoHAsync_v2, CudaMemcpyDtoHV2Command, void *, dstHost, CUdeviceptr, srcDevice, size_t, ByteCount);
 CUDA_SHIM_FUNC(MemcpyDtoDAsync_v2, CudaMemcpyDtoDV2Command, CUdeviceptr, dstDevice, CUdeviceptr, srcDevice, size_t, ByteCount);
@@ -163,6 +164,7 @@ CUDA_SHIM_FUNC(MemsetD2D16Async, CudaMemsetD2D16Command, CUdeviceptr, dstDevice,
 CUDA_SHIM_FUNC(MemsetD2D32Async, CudaMemsetD2D32Command, CUdeviceptr, dstDevice, size_t, dstPitch, unsigned int, ui, size_t, Width, size_t, Height);
 CUDA_SHIM_FUNC(MemFreeAsync, CudaMemoryFreeCommand, CUdeviceptr, dptr);
 CUDA_SHIM_FUNC(MemAllocAsync, CudaMemoryAllocCommand, CUdeviceptr *, dptr, size_t, bytesize);
+CUDA_SHIM_FUNC(MemAllocFromPoolAsync, CudaMemoryAllocFromPoolCommand, CUdeviceptr *, dptr, size_t, bytesize, CUmemoryPool, pool);
 
 CUresult XMemFree_v2(CUdeviceptr dptr);
 

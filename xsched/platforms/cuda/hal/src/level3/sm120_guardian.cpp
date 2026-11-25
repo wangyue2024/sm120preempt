@@ -1,6 +1,7 @@
 #include "xsched/cuda/hal/level3/sm120_guardian.h"
 
 #include <algorithm>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <map>
@@ -304,7 +305,11 @@ const Sm120KernelRecord *Sm120GuardianRegistry::EnsureInstrumented(CUfunction fu
 
     const uint32_t raw_bars = static_cast<uint32_t>(cuXtraGetBarrierCnt(func));
     const uint32_t clamped_bars = std::max(raw_bars, 1u);
-    const int clamped_regs = std::max(raw_regs, 16);
+    // DEF-20 fix (2026-11-25): round the register allocation up to an EVEN count so the trap engine's
+    // 64-bit register-pair cascade (Cave 2/5) never straddles the allocation boundary. 255 is the
+    // per-thread maximum and is left as is (known residual: R254 of a 255-register kernel is not saved).
+    int clamped_regs = std::max(raw_regs, 16);
+    if (clamped_regs < 255) clamped_regs = (clamped_regs + 1) & ~1;
 
     const bool has_mbar = BinaryHasHwMbarrier(static_cast<const uint8_t *>(orig_bin), orig_bin_sz);
     if (has_mbar) {
@@ -377,13 +382,29 @@ const Sm120KernelRecord *Sm120GuardianRegistry::EnsureInstrumented(CUfunction fu
 
     auto [ins_it, inserted] = records_.emplace(func, rec);
     (void)inserted;
+    const char *fname = nullptr;
+    if (Driver::FuncGetName(&fname, func) != CUDA_SUCCESS) fname = nullptr;
+    if (const char *dump_dir = getenv("XSCHED_SM120_DUMP_DIR")) {
+        // Debug aid: dump the original SASS image (disassemble with `nvdisasm -b SM120 <file>`).
+        char path[4096];
+        snprintf(path, sizeof(path), "%s/k_%p.bin", dump_dir, static_cast<void *>(func));
+        if (FILE *fp = fopen(path, "wb")) {
+            fwrite(orig_bin, 1, orig_bin_sz, fp);
+            fclose(fp);
+        }
+        snprintf(path, sizeof(path), "%s/k_%p.name", dump_dir, static_cast<void *>(func));
+        if (FILE *fp = fopen(path, "w")) {
+            fprintf(fp, "%s\n", fname ? fname : "?");
+            fclose(fp);
+        }
+    }
     XINFO("sm120_guardian: instrumented func=%p orig_ep=%#llx -> ep_inst=%#llx "
-          "regs=%d->%d bars=%u lmem=%u(cap=%u,calls=%d) static_smem=%d",
+          "regs=%d->%d bars=%u lmem=%u(cap=%u,calls=%d) static_smem=%d bin=%zuB name=%.120s",
           static_cast<void *>(func),
           static_cast<unsigned long long>(ep_orig),
           static_cast<unsigned long long>(ep_inst),
           raw_regs, clamped_regs, clamped_bars, lmem_static, lmem_cap,
-          has_calls ? 1 : 0, static_smem);
+          has_calls ? 1 : 0, static_smem, orig_bin_sz, fname ? fname : "?");
     return &ins_it->second;
 }
 
