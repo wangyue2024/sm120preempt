@@ -1,6 +1,7 @@
 #include "xsched/utils/xassert.h"
 #include "xsched/preempt/sched/agent.h"
 #include "xsched/preempt/xqueue/command_buffer.h"
+#include "xsched/preempt/xqueue/spin.h"
 
 using namespace xsched::sched;
 using namespace xsched::preempt;
@@ -43,6 +44,7 @@ std::shared_ptr<XCommand> CommandBuffer::Dequeue()
     if (!cmds_.empty()) {
         auto xcmd = cmds_.front();
         cmds_.pop_front();
+        pending_.fetch_sub(1, std::memory_order_relaxed);
         last_dequeued_cmd_ = xcmd;
         XDEBG("xcmd (%p) dequeued from cmd buf (%p)", xcmd.get(), this);
         return xcmd;
@@ -61,9 +63,16 @@ std::shared_ptr<XCommand> CommandBuffer::Dequeue()
             SchedAgent::SendEvent(std::make_shared<XQueueIdleEvent>(kXQueueHandle));
         }
 
+        if (cmds_.empty() && SpinBudgetUs() > 0) {
+            // Bounded spin before sleeping: back-to-back submissions avoid a futex wake-up.
+            lock.unlock();
+            SpinUntil([this]() { return pending_.load(std::memory_order_acquire) > 0; });
+            lock.lock();
+        }
         while (cmds_.empty()) cv_.wait(lock);
         auto xcmd = cmds_.front();
         cmds_.pop_front();
+        pending_.fetch_sub(1, std::memory_order_relaxed);
         last_dequeued_cmd_ = xcmd;
         XDEBG("xcmd (%p) dequeued from cmd buf (%p)", xcmd.get(), this);
         return xcmd;
@@ -111,6 +120,7 @@ void CommandBuffer::Enqueue(std::shared_ptr<XCommand> xcmd)
 
     last_enqueued_cmd_ = xcmd;
     cmds_.emplace_back(xcmd);
+    pending_.fetch_add(1, std::memory_order_release);
     XDEBG("xcmd (%p) type (%d) enqueued to cmd buf (%p)", xcmd.get(), xcmd->GetType(), this);
 
     mtx_.unlock();
@@ -122,6 +132,7 @@ void CommandBuffer::DropAll()
     std::lock_guard<std::mutex> lock(mtx_);
     for (auto &xcmd : cmds_) xcmd->SetState(kCommandStateCompleted);
     cmds_.clear();
+    pending_.store(0, std::memory_order_release);
 }
 
 std::shared_ptr<XQueueWaitAllCommand> CommandBuffer::EnqueueXQueueWaitAllCommand()
@@ -148,6 +159,7 @@ std::shared_ptr<XQueueWaitAllCommand> CommandBuffer::EnqueueXQueueWaitAllCommand
     xcmd->SetState(kCommandStatePending);
     last_enqueued_cmd_ = xcmd;
     cmds_.emplace_back(xcmd);
+    pending_.fetch_add(1, std::memory_order_release);
 
     lock.unlock();
     cv_.notify_all();

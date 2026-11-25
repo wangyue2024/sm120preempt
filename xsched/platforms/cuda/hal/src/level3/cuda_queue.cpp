@@ -220,10 +220,10 @@ void CudaQueueLv3Trap::Reactivate(const CommandLog &log)
                 if (kinds.size() > 400) { kinds += "..."; break; }
             }
             XINFO("sm120_trace: reactivate cmd=%u evicted=%u restored=%u drained=%u m1exit=%u "
-                  "restore_wave=%u active_idx=%llu preempted=%d log=[%s]",
+                  "restore_wave=%u active_idx=%llu preempted=%d arena_bytes=%zu log=[%s]",
                   t.cmd, t.evicted_slots, t.restored_slots, t.drained_cnt, t.mode1_exit_cnt,
                   t.is_restore_wave, static_cast<unsigned long long>(t.active_kernel_idx),
-                  has_preempted ? 1 : 0, kinds.c_str());
+                  has_preempted ? 1 : 0, t.arena_bytes, kinds.c_str());
             if (t.evicted_slots > 0) {
                 for (const auto &c : log) {
                     if (static_cast<uint64_t>(c->GetIdx()) != t.active_kernel_idx) continue;
@@ -339,16 +339,23 @@ void CudaQueueLv3Trap::OnHwCommandSubmit(std::shared_ptr<preempt::HwCommand> hw_
                 }
                 return;
             }
+            // DEF-19: thread block clusters are routed to the Level-1 boundary. Cluster-scope state
+            // (cluster barriers, DSMEM mapping, co-scheduling of the cluster's CTAs) is not part of
+            // the Mode 5 trap frame; single-wave clusters under Mode 5 returned wrong results for 1-2
+            // CTAs in ~10-40% of HW-06 runs on RTX 5080. XSCHED_SM120_CLUSTER_MODE5=1 re-enables the
+            // experimental single-wave Mode 5 path (multi-wave clusters always use Level-1).
+            static const bool cluster_mode5 = GetEnvOption("XSCHED_SM120_CLUSTER_MODE5", false);
             const unsigned int cluster_sz = kernel->ClusterSize();
-            if (cluster_sz > 1 && sm_count_ > 0 &&
-                kernel->BlockCnt() > static_cast<unsigned int>(sm_count_)) {
+            const bool multi_wave = sm_count_ > 0 &&
+                                    kernel->BlockCnt() > static_cast<unsigned int>(sm_count_);
+            if (cluster_sz > 1 && (multi_wave || !cluster_mode5)) {
                 CountRoute(kRouteLv1Cluster);
                 kernel->killable = false;
                 kernel->ClearProps(kCommandPropertyDeactivatable);
                 static bool warned_cluster = false;
                 if (!warned_cluster) {
                     warned_cluster = true;
-                    XWARN("Multi-wave thread block cluster (cluster=%u, blocks=%u > sm=%d), "
+                    XWARN("Thread block cluster (cluster=%u, blocks=%u, sm=%d), "
                           "routing cleanly to level-1 boundary",
                           cluster_sz, kernel->BlockCnt(), sm_count_);
                 }

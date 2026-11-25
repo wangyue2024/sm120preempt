@@ -2,6 +2,7 @@
 
 #include <list>
 #include <mutex>
+#include <atomic>
 #include <cstdint>
 #include <functional>
 #include <condition_variable>
@@ -98,6 +99,8 @@ public:
 private:
     const XCommandType kCommandType;
     XCommandState state_ = kCommandStateCreated;
+    // Lock-free mirror of state_ for the bounded spin in WaitUntil().
+    std::atomic<int> state_atomic_{kCommandStateCreated};
     XCommandProperties props_;
 
     std::mutex mtx_;

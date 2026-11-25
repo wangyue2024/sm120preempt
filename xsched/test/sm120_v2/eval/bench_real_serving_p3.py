@@ -109,7 +109,7 @@ def run(args):
     torch.manual_seed(0)
     torch.cuda.set_device(0)
     prop = torch.cuda.get_device_properties(0)
-    res = {"mode": args.mode, "lp": args.lp, "model": args.model, "gpu": prop.name,
+    res = {"mode": args.mode, "policy": args.policy if args.mode in ("lv1", "lv3") else "-", "lp": args.lp, "model": args.model, "gpu": prop.name,
            "sm": prop.multi_processor_count, "host": socket.gethostname(), "error": None}
 
     tok = AutoTokenizer.from_pretrained(args.model)
@@ -132,25 +132,31 @@ def run(args):
         arrivals.append(t / 1000.0)
 
     @torch.no_grad()
-    def serve(ids):
-        """Greedy decode on the HP stream; returns (tokens, ttft_ms, [tpot_ms])."""
+    def serve(ids, pre_prefill=None, post_prefill=None, pre_step=None, post_step=None):
+        """Greedy decode on the HP stream; returns (tokens, ttft_ms, [tpot_ms]).
+        Optional hooks run around the prefill / each decode step (scheduling policies);
+        timers start BEFORE the pre-hook so suspend latency is part of TTFT / TPOT."""
         out = []
         with torch.cuda.stream(hp):
             t0 = time.perf_counter()
+            if pre_prefill: pre_prefill()
             o = model(input_ids=ids, use_cache=True)
             nxt = o.logits[:, -1, :].argmax(-1, keepdim=True)
             hp.synchronize()
             ttft = (time.perf_counter() - t0) * 1e3
+            if post_prefill: post_prefill()
             out.append(int(nxt.item()))
             past = o.past_key_values
             tpots = []
             for _ in range(args.new_tokens - 1):
                 t1 = time.perf_counter()
+                if pre_step: pre_step()
                 o = model(input_ids=nxt, past_key_values=past, use_cache=True)
                 past = o.past_key_values
                 nxt = o.logits[:, -1, :].argmax(-1, keepdim=True)
                 hp.synchronize()
                 tpots.append((time.perf_counter() - t1) * 1e3)
+                if post_step: post_step(tpots[-1])
                 out.append(int(nxt.item()))
         return out, ttft, tpots
 
@@ -171,7 +177,12 @@ def run(args):
 
     # Goldens (solo, before any XQueue exists)
     hp_gold = [serve(ids)[0] for ids in reqs[: min(len(reqs), len(PROMPTS))]]  # warm + golden
-    hp_gold = [serve(ids)[0] for ids in reqs[: min(len(reqs), len(PROMPTS))]]
+    gold_runs = [serve(ids) for ids in reqs[: min(len(reqs), len(PROMPTS))]]
+    hp_gold = [g[0] for g in gold_runs]
+    solo_tpot_p50 = statistics.median([t for g in gold_runs for t in g[2]])
+    slo_ms = args.tpot_slo_ms if args.tpot_slo_ms > 0 else 1.15 * solo_tpot_p50
+    res["solo_tpot_p50_ms"] = solo_tpot_p50
+    res["tpot_slo_ms"] = slo_ms
     lp_gold = lp_step(); lp.synchronize()
     lp_gold2 = lp_step(); lp.synchronize()
     res["lp_native_deterministic"] = bool(torch.equal(lp_gold, lp_gold2))
@@ -217,14 +228,43 @@ def run(args):
             while time.perf_counter() < target:
                 time.sleep(0.0005)
             ta = time.perf_counter()
-            if xq is not None:
+
+            def do_suspend():
+                t_s = time.perf_counter()
                 xs.suspend(xq)
-                susp.append((time.perf_counter() - ta) * 1e3)
-            toks, tt, tp = serve(ids)
-            if xq is not None:
+                susp.append((time.perf_counter() - t_s) * 1e3)
+
+            def do_resume(*_):
                 xs.resume(xq)
+
+            slo_state = {"suspended": False}
+
+            def slo_post_step(step_ms):
+                # SLO-aware: co-run during decode; once a step misses the TPOT SLO, keep the LP
+                # suspended for the rest of this request.
+                if not slo_state["suspended"] and step_ms > slo_ms:
+                    do_suspend()
+                    slo_state["suspended"] = True
+
+            if xq is None:
+                toks, tt, tp = serve(ids)
+            elif args.policy == "request":      # LP suspended for the whole HP request
+                do_suspend()
+                toks, tt, tp = serve(ids)
+                do_resume()
+                tt += susp[-1]
+            elif args.policy == "prefill":      # suspend only for the compute-heavy prefill
+                toks, tt, tp = serve(ids, pre_prefill=do_suspend, post_prefill=do_resume)
+            elif args.policy == "token":        # suspend around every GPU step
+                toks, tt, tp = serve(ids, pre_prefill=do_suspend, post_prefill=do_resume,
+                                     pre_step=do_suspend, post_step=do_resume)
+            else:                               # "slo": prefill suspended; decode co-runs until an SLO miss
+                toks, tt, tp = serve(ids, pre_prefill=do_suspend, post_prefill=do_resume,
+                                     post_step=slo_post_step)
+                if slo_state["suspended"]:
+                    do_resume()
             e2e.append((time.perf_counter() - ta) * 1e3)
-            ttft.append(tt + (susp[-1] if xq is not None else 0.0))
+            ttft.append(tt)
             tpot += tp
             if i < len(hp_gold) and toks == hp_gold[i]:
                 hp_ok += 1
@@ -281,11 +321,15 @@ def report(paths, md=None):
             lines.append(f"\n#### {gpu} — LP = `{lpk}` ({sub[0]['model']})\n")
             lines.append("| mode | TTFT P50/P99 ms | TPOT P50/P99 ms | E2E P50/P99 ms | suspend P50/P99 ms | HP exact | LP iters (bad) | LP tput % of solo | LP use of HP-idle time | status |")
             lines.append("|---|---:|---:|---:|---:|---:|---:|---:|---:|---|")
-            for m in ("solo", "native", "lv1", "lv3"):
-                r = next((x for x in sub if x["mode"] == m), None)
+            keys = [("solo", "-"), ("native", "-")] + [(m, pol) for m in ("lv1", "lv3")
+                                                        for pol in ("request", "prefill", "token", "slo")]
+            for m, pol in keys:
+                r = next((x for x in sub if x["mode"] == m and x.get("policy", "request" if m in ("lv1", "lv3") else "-") == pol), None)
                 if r is None:
-                    lines.append(f"| {m} | | | | | | | | | CRASH / no result |")
+                    if pol in ("-", "request"):
+                        lines.append(f"| {m} | | | | | | | | | CRASH / no result |")
                     continue
+                m = m if pol == "-" else f"{m}/{pol}"
                 st = "ERR: " + r["error"][:60] if r.get("error") else (
                     "PASS" if r["hp_exact"] == r["n_req"] and r.get("lp_bad_iters", 0) == 0 else "FAIL")
                 lines.append(
@@ -308,6 +352,11 @@ def main():
     r = sp.add_parser("run")
     r.add_argument("--mode", required=True, choices=["solo", "native", "lv1", "lv3"])
     r.add_argument("--lp", default="ppl", choices=["ppl", "prefill"])
+    r.add_argument("--policy", default="request", choices=["request", "prefill", "token", "slo"],
+                   help="lv1/lv3 suspension policy: whole request / prefill only / every GPU step / "
+                        "SLO-aware (prefill suspended, decode co-runs until a step misses --tpot-slo-ms)")
+    r.add_argument("--tpot-slo-ms", type=float, default=0.0,
+                   help="TPOT SLO for --policy slo (default: 1.15 x measured solo TPOT P50)")
     r.add_argument("--model", default=os.environ.get("REAL_LLM_MODEL", "Qwen/Qwen2.5-0.5B-Instruct"))
     r.add_argument("--n-req", type=int, default=20)
     r.add_argument("--new-tokens", type=int, default=16)
@@ -330,7 +379,7 @@ def main():
         fh.write(json.dumps(res) + "\n")
     st = "ERR " + res["error"] if res.get("error") else (
         "PASS" if res["hp_exact"] == res["n_req"] and res.get("lp_bad_iters", 0) == 0 else "FAIL")
-    print(f"[SERVE mode={a.mode} lp={a.lp}] {st} TTFT p50/p99={fmt(res.get('ttft_ms_p50'))}/{fmt(res.get('ttft_ms_p99'))}ms "
+    print(f"[SERVE mode={a.mode} policy={res.get('policy')} lp={a.lp}] {st} TTFT p50/p99={fmt(res.get('ttft_ms_p50'))}/{fmt(res.get('ttft_ms_p99'))}ms "
           f"TPOT p50/p99={fmt(res.get('tpot_ms_p50'))}/{fmt(res.get('tpot_ms_p99'))}ms hp_exact={res['hp_exact']}/{res['n_req']} "
           f"lp_iters={res.get('lp_iters')} bad={res.get('lp_bad_iters')} lp_tput={fmt(res.get('lp_tput_pct_of_solo'), '{:.1f}%')} "
           f"hp_duty={fmt(res.get('hp_duty_pct'), '{:.0f}%')}",

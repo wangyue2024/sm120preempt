@@ -31,6 +31,13 @@
     std::fprintf(stderr, "CUDA error %d (%s) at %s:%d\n", (int)e_, cudaGetErrorString(e_), __FILE__, __LINE__); \
     std::exit(2); } } while (0)
 
+// Host->device upload that is complete before returning. A synchronous cudaMemcpy from PAGEABLE
+// memory may return once the data is staged, before the DMA reaches the destination; kernels on
+// NON-BLOCKING streams are not ordered after it. (This race produced false "contiguous tail of
+// wrong CTAs" failures in the first version of these tests.)
+#define H2D(dst, src, bytes) do { CK(cudaMemcpy((dst), (src), (bytes), cudaMemcpyHostToDevice)); \
+                                  CK(cudaDeviceSynchronize()); } while (0)
+
 __device__ __forceinline__ uint32_t mix(uint32_t a) { a = a * 1664525u + 1013904223u; return a ^ (a >> 13); }
 
 // Depth-D nest of data-dependent loops, each with a divergent break (compiler allocates ~B0..B(D-1)).
@@ -156,7 +163,13 @@ int main(int argc, char **argv)
     int sms = 0;
     CK(cudaSetDevice(0));
     CK(cudaDeviceGetAttribute(&sms, cudaDevAttrMultiProcessorCount, 0));
-    const int threads = 256, blocks = sms * 2;
+    // Stress knobs (DEF-21): GRID_MULT (CTAs per SM, default 2 = single wave), CHAIN (kernels queued
+    // back-to-back per run, default 1), GAP_US (uniform gap between preemptions, default 6 ms + 3 ms*p),
+    // TARGET_MS (per-kernel duration, default 40).
+    auto envi = [](const char *k, int d) { const char *v = std::getenv(k); return v ? std::atoi(v) : d; };
+    const int grid_mult = envi("GRID_MULT", 2), chain = envi("CHAIN", 1), gap_us = envi("GAP_US", 0);
+    const float target_ms = static_cast<float>(envi("TARGET_MS", 40));
+    const int threads = 256, blocks = sms * grid_mult;
     const size_t n = static_cast<size_t>(blocks) * threads;
     cudaStream_t gold_s, lp;
     CK(cudaStreamCreateWithFlags(&gold_s, cudaStreamNonBlocking));
@@ -174,12 +187,12 @@ int main(int argc, char **argv)
         if (CudaQueueCreate(&qh, lp) != kXSchedSuccess ||
             XQueueCreate(&qx, qh, kPreemptLevelInterrupt, kQueueCreateFlagNone) != kXSchedSuccess) return 2;
         const int outer = 3000;
-        CK(cudaMemcpy(d_gold, h_init.data(), n * 4, cudaMemcpyHostToDevice));
+        H2D(d_gold, h_init.data(), n * 4);
         k_regs_dump<E><<<blocks, threads, 0, gold_s>>>(d_gold, g2, outer);
         CK(cudaStreamSynchronize(gold_s)); CK(cudaMemcpy(hg2.data(), g2, n * E * 4, cudaMemcpyDeviceToHost));
         CK(cudaMemcpy(h_gold.data(), d_gold, n * 4, cudaMemcpyDeviceToHost));
         for (int r = 0; r < runs; ++r) {
-            CK(cudaMemcpy(d_acc, h_init.data(), n * 4, cudaMemcpyHostToDevice));
+            H2D(d_acc, h_init.data(), n * 4);
             k_regs_dump<E><<<blocks, threads, 0, lp>>>(d_acc, d2, outer);
             for (int p = 0; p < np; ++p) {
                 std::this_thread::sleep_for(std::chrono::microseconds(6000 + 3000 * p));
@@ -226,22 +239,28 @@ int main(int argc, char **argv)
         // calibrate ~40 ms on the golden stream
         int outer = 64;
         {
-            CK(cudaMemcpy(d_gold, h_init.data(), n * 4, cudaMemcpyHostToDevice));
+            H2D(d_gold, h_init.data(), n * 4);
             cudaEvent_t e0, e1; CK(cudaEventCreate(&e0)); CK(cudaEventCreate(&e1));
             CK(cudaEventRecord(e0, gold_s)); launch(d_gold, gold_s, outer); CK(cudaEventRecord(e1, gold_s));
             CK(cudaEventSynchronize(e1)); float ms = 0; CK(cudaEventElapsedTime(&ms, e0, e1));
-            outer = std::max(1, static_cast<int>(outer * 40.0f / std::max(ms, 0.01f)));
+            outer = std::max(1, static_cast<int>(outer * target_ms / std::max(ms, 0.01f)));
         }
-        CK(cudaMemcpy(d_gold, h_init.data(), n * 4, cudaMemcpyHostToDevice));
-        launch(d_gold, gold_s, outer);
+        H2D(d_gold, h_init.data(), n * 4);
+        for (int c = 0; c < chain; ++c) launch(d_gold, gold_s, outer);
         CK(cudaStreamSynchronize(gold_s));
         CK(cudaMemcpy(h_gold.data(), d_gold, n * 4, cudaMemcpyDeviceToHost));
         int ok = 0;
         for (int r = 0; r < runs; ++r) {
-            CK(cudaMemcpy(d_acc, h_init.data(), n * 4, cudaMemcpyHostToDevice));
-            launch(d_acc, lp, outer);
-            for (int p = 0; p < np; ++p) {
-                std::this_thread::sleep_for(std::chrono::microseconds(6000 + 3000 * p));
+            H2D(d_acc, h_init.data(), n * 4);
+            for (int c = 0; c < chain; ++c) launch(d_acc, lp, outer);
+            // Optional per-run preemption count list, e.g. NP_LIST=0,2,1,2 (cycled over runs).
+            int np_run = np;
+            if (const char *nl = std::getenv("NP_LIST")) {
+                std::vector<int> v; for (const char *q = nl; *q; ) { v.push_back(std::atoi(q)); while (*q && *q != ',') ++q; if (*q) ++q; }
+                if (!v.empty()) np_run = v[r % v.size()];
+            }
+            for (int p = 0; p < np_run; ++p) {
+                std::this_thread::sleep_for(std::chrono::microseconds(gap_us > 0 ? gap_us : 6000 + 3000 * p));
                 XQueueSuspend(xq, kQueueSuspendFlagSyncHwQueue);
                 XQueueResume(xq, kQueueResumeFlagNone);
             }
@@ -253,7 +272,7 @@ int main(int argc, char **argv)
             }
             CK(cudaMemcpy(h_out.data(), d_acc, n * 4, cudaMemcpyDeviceToHost));
             size_t bad = 0; for (size_t i = 0; i < n; ++i) bad += (h_out[i] != h_gold[i]);
-            if (bad == 0) ++ok; else std::printf("  run %d: mismatched=%zu/%zu\n", r, bad, n);
+            if (bad == 0) ++ok; else std::printf("  run %d (np=%d): mismatched=%zu/%zu\n", r, np_run, bad, n);
             if (bad != 0 && std::getenv("MISMATCH_DETAIL")) {
                 // Histogram of wrong threads by lane, by warp-in-CTA, and number of CTAs affected.
                 int lane_h[32] = {}, warp_h[32] = {}; std::vector<int> cta_h(blocks, 0);
@@ -265,11 +284,15 @@ int main(int argc, char **argv)
                 std::printf("    lanes:"); for (int l = 0; l < 32; ++l) std::printf(" %d", lane_h[l]);
                 std::printf("\n    warp-in-cta:"); for (int w = 0; w < threads / 32; ++w) std::printf(" %d", warp_h[w]);
                 std::printf("\n    ctas_affected=%d/%d fully_wrong_warps=%d\n", ctas, blocks, full_warps);
+                size_t unchanged = 0; for (size_t i = 0; i < n; ++i) if (h_out[i] != h_gold[i] && h_out[i] == h_init[i]) ++unchanged;
+                std::printf("    wrong_and_equal_to_initial_value=%zu  wrong CTA ids:", unchanged);
+                for (int b = 0; b < blocks; ++b) if (cta_h[b]) std::printf(" %d", b);
+                std::printf("\n");
             }
         }
         fails += (ok != runs);
-        std::printf("[P3-CONVBAR %s] %s | runs=%d ok=%d np=%d outer=%d blocks=%d thr=%d\n", name,
-                    ok == runs ? "PASS" : "FAIL", runs, ok, np, outer, blocks, threads);
+        std::printf("[P3-CONVBAR %s] %s | runs=%d ok=%d np=%d outer=%d blocks=%d thr=%d chain=%d gap_us=%d\n", name,
+                    ok == runs ? "PASS" : "FAIL", runs, ok, np, outer, blocks, threads, chain, gap_us);
     }
     XQueueDestroy(xq); HwQueueDestroy(hwq);
     return fails ? 1 : 0;

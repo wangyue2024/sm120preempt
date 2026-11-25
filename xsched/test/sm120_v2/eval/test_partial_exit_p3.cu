@@ -38,6 +38,13 @@
     std::fprintf(stderr, "CUDA error %d (%s) at %s:%d\n", (int)e_, cudaGetErrorString(e_), __FILE__, __LINE__); \
     std::exit(2); } } while (0)
 
+// Host->device upload that is complete before returning. A synchronous cudaMemcpy from PAGEABLE
+// memory may return once the data is staged, before the DMA reaches the destination; kernels on
+// NON-BLOCKING streams are not ordered after it. (This race produced false "contiguous tail of
+// wrong CTAs" failures in the first version of these tests.)
+#define H2D(dst, src, bytes) do { CK(cudaMemcpy((dst), (src), (bytes), cudaMemcpyHostToDevice)); \
+                                  CK(cudaDeviceSynchronize()); } while (0)
+
 __device__ __forceinline__ uint32_t lcg_iter(uint32_t a, int n)
 {
     for (int i = 0; i < n; ++i) {
@@ -101,7 +108,7 @@ int main(int argc, char **argv)
     for (size_t i = 0; i < n; ++i) h_init[i] = static_cast<uint32_t>(i * 2654435761u + 12345u);
     int base = 20000;
     {
-        CK(cudaMemcpy(d_acc, h_init.data(), n * 4, cudaMemcpyHostToDevice));
+        H2D(d_acc, h_init.data(), n * 4);
         cudaEvent_t e0, e1; CK(cudaEventCreate(&e0)); CK(cudaEventCreate(&e1));
         CK(cudaEventRecord(e0, gold_s));
         k_warp_patterns<<<blocks, threads, 0, gold_s>>>(d_acc, base, 0, 0);
@@ -124,7 +131,7 @@ int main(int argc, char **argv)
     for (const auto &c : cases) {
         if (which != "all" && which != std::string(c.name).substr(0, 2)) continue;
         // Golden (native stream, no XQueue).
-        CK(cudaMemcpy(d_gold, h_init.data(), n * 4, cudaMemcpyHostToDevice));
+        H2D(d_gold, h_init.data(), n * 4);
         k_warp_patterns<<<blocks, threads, 0, gold_s>>>(d_gold, base, step, c.mode);
         CK(cudaStreamSynchronize(gold_s));
         CK(cudaMemcpy(h_gold.data(), d_gold, n * 4, cudaMemcpyDeviceToHost));
@@ -132,7 +139,7 @@ int main(int argc, char **argv)
         int ok_runs = 0;
         double susp_sum = 0; int susp_n = 0;
         for (int r = 0; r < runs; ++r) {
-            CK(cudaMemcpy(d_acc, h_init.data(), n * 4, cudaMemcpyHostToDevice));
+            H2D(d_acc, h_init.data(), n * 4);
             k_warp_patterns<<<blocks, threads, 0, lp>>>(d_acc, base, step, c.mode);
             for (int p = 0; p < np; ++p) {
                 std::this_thread::sleep_for(std::chrono::microseconds(6000 + 3000 * p));

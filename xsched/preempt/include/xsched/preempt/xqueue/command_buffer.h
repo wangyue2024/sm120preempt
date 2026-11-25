@@ -2,6 +2,7 @@
 
 #include <list>
 #include <mutex>
+#include <atomic>
 #include <memory>
 #include <condition_variable>
 
@@ -42,6 +43,8 @@ private:
     std::shared_ptr<XCommand> last_enqueued_cmd_ = nullptr;
     std::shared_ptr<XCommand> last_dequeued_cmd_ = nullptr;
     std::list<std::shared_ptr<XCommand>> cmds_;
+    // Number of queued commands, readable without the lock (bounded spin in Dequeue()).
+    std::atomic<size_t> pending_{0};
 
     uint64_t idle_cnt_ = 0;
     std::condition_variable idle_cv_;

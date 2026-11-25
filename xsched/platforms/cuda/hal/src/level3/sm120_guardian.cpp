@@ -23,10 +23,17 @@ namespace
 
 uint32_t AlignUp16(uint32_t v) { return (v + 15u) & ~15u; }
 
-uint32_t ConfiguredLmemCapBytes(uint32_t static_aligned, bool has_calls)
+// Per-thread LMEM bytes the Mode 5 trap frame must be able to save (DEF-23, 2026-11-25):
+//  - no device calls: the local frame is fixed -> exactly the static local size;
+//  - device calls: callee frames live in the per-thread stack, which the hardware bounds by the
+//    context's CU_LIMIT_STACK_SIZE -> static local + stack limit (a deeper stack faults by itself).
+// The previous fixed max(static, 4096 B) reserved 4 KiB per thread for every such kernel (e.g.
+// 231 MiB arena for LayerNorm on RTX 5060). XSCHED_SM120_LMEM_CAP_BYTES still overrides.
+uint32_t ConfiguredLmemCapBytes(uint32_t static_aligned, bool has_calls, size_t stack_limit)
 {
     if (static_aligned == 0 && !has_calls) return 0;
-    uint32_t def_cap = std::max(static_aligned, 4096u);
+    const size_t stack = has_calls ? std::min<size_t>(stack_limit, 256u << 10) : 0;
+    uint32_t def_cap = AlignUp16(static_cast<uint32_t>(std::min<size_t>(static_aligned + stack, 256u << 10)));
     if (const char *env = getenv("XSCHED_SM120_LMEM_CAP_BYTES")) {
         unsigned long long parsed = strtoull(env, nullptr, 0);
         if (parsed >= static_aligned && parsed <= (256ULL << 10)) {
@@ -44,7 +51,13 @@ bool BinaryHasDeviceCalls(const uint8_t *bin, size_t bytes)
         uint64_t w0 = 0;
         memcpy(&w0, bin + i * 16, sizeof(w0));
         const uint32_t op12 = static_cast<uint32_t>(w0 & 0xfffU);
-        if (op12 == 0x943U || op12 == 0x944U) {
+        // 0x943/0x944: CALL.REL(.NOINC); 0x343: CALL.ABS.NOINC Rx (DEF-22: previously missed, e.g.
+        // PyTorch reduce_kernel / direct_copy / gather kernels -> calls=0, no stack save area).
+        static const bool detect_abs = []() {
+            const char *e = getenv("XSCHED_SM120_DETECT_CALL_ABS");
+            return !(e != nullptr && e[0] == '0');
+        }();
+        if (op12 == 0x943U || op12 == 0x944U || (detect_abs && op12 == 0x343U)) {
             return true;
         }
     }
@@ -73,37 +86,75 @@ std::vector<sass::Ins> BuildEntryGuardian()
     constexpr size_t kSlots = kGuardianBytes / 16; // 80 slots
     std::vector<Ins> g;
     g.reserve(kSlots);
+    // Entry Guardian variants (DEF-17, 2026-11-25):
+    //  - default : original fully serialized issue (every LDC/S2R/LD waits before the next one), but
+    //              without the redundant slot-28 cmd re-read (pure ordering argument, no async window).
+    //  - XSCHED_SM120_GUARDIAN_V1=1 : exact original guardian (with the slot-28 re-read).
+    //  - XSCHED_SM120_GUARDIAN_V2=1 : EXPERIMENTAL, additionally issues the control-header loads and the
+    //    S2R/LDC chains asynchronously (scoreboards SB2..SB5). 20-35% lower Lv3 overhead on short-CTA
+    //    kernels, but LLM-08 (two Lv3 queues + HP stream) failed 11/61 vs 0/78 with serialized issue on
+    //    RTX 5080; suspected: traps delivered while guardian-issued ops are outstanding. Not default.
+    //    Sub-switches for bisecting: XSCHED_SM120_GUARDIAN_V2_SERIAL_HDR=1 / _SERIAL_SREG=1.
+    auto env_on = [](const char *k) { const char *e = getenv(k); return e != nullptr && e[0] == '1'; };
+    const bool exact_v1 = env_on("XSCHED_SM120_GUARDIAN_V1");
+    const bool exp_v2 = !exact_v1 && env_on("XSCHED_SM120_GUARDIAN_V2");
+    const bool v2_reload = exact_v1;
+    const bool v2_par_hdr = exp_v2 && !env_on("XSCHED_SM120_GUARDIAN_V2_SERIAL_HDR");
+    const bool v2_par_sreg = exp_v2 && !env_on("XSCHED_SM120_GUARDIAN_V2_SERIAL_SREG");
+    // v2 helpers (DEF-17): issue a variable-latency producer (LDC/S2R/LD) on scoreboard `sb` without
+    // waiting (original stall/yield kept), and add scoreboard waits to its first consumer.
+    auto issue_on = [v2_par_sreg](Ins ins, uint32_t sb) -> Ins {
+        if (!v2_par_sreg) return ins;
+        const uint64_t ctl = (ins.w1 >> 41) & 0x1fffffULL;
+        return with_ctl(ins, static_cast<uint32_t>(ctl & 0xf), static_cast<uint32_t>((ctl >> 4) & 1), sb, 7, 0);
+    };
+    auto wait_on = [v2_par_sreg](Ins ins, uint32_t mask) -> Ins { return v2_par_sreg ? with_extra_wait(ins, mask) : ins; };
+    constexpr uint32_t kSb2 = 1u << 2, kSb3 = 1u << 3, kSb4 = 1u << 4, kSb5 = 1u << 5;
 
     // [0..3]: Fast bypass if c[0][0x170..0x177] == 0 (unmanaged / high-priority direct launches).
-    g.push_back(ldc_u32(4, 0x170));                            // 0
-    g.push_back(ldc_u32(5, 0x174));                            // 1
-    g.push_back(lop3_or3_p0(4, 5, kRegZero));                  // 2: P0 = ((R4 | R5) != 0)
+    g.push_back(issue_on(ldc_u32(4, 0x170), 2));               // 0
+    g.push_back(issue_on(ldc_u32(5, 0x174), 3));               // 1
+    g.push_back(wait_on(lop3_or3_p0(4, 5, kRegZero), kSb2 | kSb3)); // 2: P0 = ((R4 | R5) != 0)
     const int br_unmanaged = static_cast<int>(g.size());
     g.push_back(nop());                                        // 3 -> orig_kernel (+0x500)
 
     // [4..11]: Full 3D linear cta_id -> R3; CtaEntry ptr -> R6:R7 = u_ctrl + 0x50 + 16*cta_id.
-    g.push_back(s2r(0, kSrCtaIdZ));                            // 4
-    g.push_back(ldc_u32(6, 0x374));                            // 5: gridDim.y
-    g.push_back(s2r(7, kSrCtaIdY));                            // 6
-    g.push_back(ldc_u32(8, 0x370));                            // 7: gridDim.x
-    g.push_back(s2r(9, kSrCtaIdX));                            // 8
-    g.push_back(imad_regs(3, 0, 6, 7));                        // 9
-    g.push_back(imad_regs(3, 3, 8, 9));                        // 10: R3 = cta_id
+    g.push_back(issue_on(s2r(0, kSrCtaIdZ), 2));               // 4
+    g.push_back(issue_on(ldc_u32(6, 0x374), 3));               // 5: gridDim.y
+    g.push_back(issue_on(s2r(7, kSrCtaIdY), 4));               // 6
+    g.push_back(issue_on(ldc_u32(8, 0x370), 5));               // 7: gridDim.x
+    g.push_back(s2r(9, kSrCtaIdX));                            // 8 (SB0, as v1)
+    g.push_back(wait_on(imad_regs(3, 0, 6, 7), kSb2 | kSb3 | kSb4)); // 9
+    g.push_back(wait_on(imad_regs(3, 3, 8, 9), kSb5));         // 10: R3 = cta_id
     g.push_back(imad_wide_u32(6, 3, 16, 4));                   // 11: R6:R7 = u_ctrl + 16*cta_id
 
-    // [12..14]: Route by is_restore_wave (u_ctrl + 0x1c) so ALL warps of a CTA take
-    // restore_path unanimously even if Preempt #2 flips cmd 6->5 or 2->1 mid-wave.
-    g.push_back(ld_e_32(1, 4, 0x1c));                          // 12: is_restore_wave
-    g.push_back(isetp_ne_imm(1, 0));                           // 13
-    const int br_restore_wave = static_cast<int>(g.size());    // 14
-    g.push_back(nop());                                        // 14 -> @P0 restore_path
-
-    // [15..23]: Normal/Evict multi-kernel FIFO guard (is_restore_wave == 0): if cmd != 0 &&
-    //           active_idx != 0 && my_idx != active_idx, queued K2 exits without touching K1.
-    g.push_back(ld_e_32(0, 4, 0x0));                           // 15: cmd
-    g.push_back(isetp_ne_imm(0, 0));                           // 16: P0 = (cmd != 0)
-    const int br_cmd0_skip = static_cast<int>(g.size());       // 17
-    g.push_back(nop());                                        // 17 -> norm_gate
+    // [12..17] experimental v2: issue the two control-header loads back-to-back on independent
+    // scoreboards (SB2 / SB3) and wait once; default / v1 keep the original serialized sequence.
+    // Route by is_restore_wave (u_ctrl + 0x1c) so ALL warps of a CTA take restore_path
+    // unanimously even if Preempt #2 flips cmd 6->5 or 2->1 mid-wave.
+    int br_restore_wave = -1;
+    int br_cmd0_skip = -1;
+    if (v2_par_hdr) {
+        g.push_back(with_ctl(ld_e_32(1, 4, 0x1c), 1, 1, 2, 7, 0)); // 12: is_restore_wave -> SB2
+        g.push_back(with_ctl(ld_e_32(0, 4, 0x0), 1, 1, 3, 7, 0));  // 13: cmd -> SB3
+        g.push_back(with_extra_wait(isetp_ne_imm(1, 0), (1u << 2) | (1u << 3))); // 14: + wait SB2|SB3
+        br_restore_wave = static_cast<int>(g.size());           // 15
+        g.push_back(nop());                                     // 15 -> @P0 restore_path
+        g.push_back(isetp_ne_imm(0, 0));                        // 16: P0 = (cmd != 0)
+        br_cmd0_skip = static_cast<int>(g.size());              // 17
+        g.push_back(nop());                                     // 17 -> norm_gate
+    } else {
+        g.push_back(ld_e_32(1, 4, 0x1c));                       // 12: is_restore_wave
+        g.push_back(isetp_ne_imm(1, 0));                        // 13
+        br_restore_wave = static_cast<int>(g.size());           // 14
+        g.push_back(nop());                                     // 14 -> @P0 restore_path
+        // [15..23]: Normal/Evict multi-kernel FIFO guard (is_restore_wave == 0): if cmd != 0 &&
+        //           active_idx != 0 && my_idx != active_idx, queued K2 exits without touching K1.
+        g.push_back(ld_e_32(0, 4, 0x0));                        // 15: cmd
+        g.push_back(isetp_ne_imm(0, 0));                        // 16: P0 = (cmd != 0)
+        br_cmd0_skip = static_cast<int>(g.size());              // 17
+        g.push_back(nop());                                     // 17 -> norm_gate
+    }
     g.push_back(ld_e_64(10, 4, 0x08));                         // 18: active_kernel_idx
     g.push_back(lop3_or3_p0(10, 11, kRegZero));                // 19: P0 = (active != 0)
     const int br_no_active = static_cast<int>(g.size());       // 20
@@ -115,11 +166,15 @@ std::vector<sass::Ins> BuildEntryGuardian()
     // [24..43]: norm_gate — 100% branchless intra-warp consensus before BAR.SYNC 0.
     // is_restore_wave is guaranteed 0 here (restore waves route exclusively to restore_path).
     const int norm_gate_idx = static_cast<int>(g.size());      // 24
-    g.push_back(s2r(8, kSrTidX));                              // 24
-    g.push_back(s2r(9, kSrTidY));                              // 25
-    g.push_back(s2r(10, kSrTidZ));                             // 26
-    g.push_back(lop3_or3_p0(8, 9, 10));                        // 27: P0 = (tid != 0)
-    g.push_back(ld_e_32(0, 4, 0x0));                           // 28: R0 = cmd (coherent L2 read)
+    g.push_back(issue_on(s2r(8, kSrTidX), 2));                 // 24
+    g.push_back(issue_on(s2r(9, kSrTidY), 3));                 // 25
+    g.push_back(issue_on(s2r(10, kSrTidZ), 4));                // 26
+    g.push_back(wait_on(lop3_or3_p0(8, 9, 10), kSb2 | kSb3 | kSb4)); // 27: P0 = (tid != 0)
+    // 28: exact v1 re-reads cmd; default/v2 reuse R0 = cmd from the earlier read (R0 is untouched on
+    // every path to here).
+    // Safe: a CTA that observed cmd == 0 was resident before the host published cmd, and the BAR0
+    // pulse is fired only after that write completes, so such a CTA is either finished or trapped.
+    g.push_back(v2_reload ? ld_e_32(0, 4, 0x0) : nop());       // 28
     g.push_back(isetp_ne_and_notp0(0, 0));                     // 29: P0 = (tid==0 && cmd!=0)
     g.push_back(mov_imm(2, 2));                                // 30: R2 = 2 (State C entry_dec)
     g.push_back(isetp_eq_imm(0, 1, kP1));                      // 31: P1 = (cmd == 1)
@@ -332,7 +387,9 @@ const Sm120KernelRecord *Sm120GuardianRegistry::EnsureInstrumented(CUfunction fu
 
     const bool has_calls = BinaryHasDeviceCalls(static_cast<const uint8_t *>(orig_bin), orig_bin_sz);
     const uint32_t lmem_static = AlignUp16(static_cast<uint32_t>(std::max(local_bytes, 0)));
-    const uint32_t lmem_cap = ConfiguredLmemCapBytes(lmem_static, has_calls);
+    size_t stack_limit = 1024;
+    if (Driver::CtxGetLimit(&stack_limit, CU_LIMIT_STACK_SIZE) != CUDA_SUCCESS) stack_limit = 4096;
+    const uint32_t lmem_cap = ConfiguredLmemCapBytes(lmem_static, has_calls, stack_limit);
 
     const size_t total_alloc = (kGuardianBytes + orig_bin_sz + 127ULL) & ~127ULL;
     const CUdeviceptr ep_inst = instr_mem_->Alloc(total_alloc);
@@ -395,6 +452,11 @@ const Sm120KernelRecord *Sm120GuardianRegistry::EnsureInstrumented(CUfunction fu
         snprintf(path, sizeof(path), "%s/k_%p.name", dump_dir, static_cast<void *>(func));
         if (FILE *fp = fopen(path, "w")) {
             fprintf(fp, "%s\n", fname ? fname : "?");
+            fclose(fp);
+        }
+        snprintf(path, sizeof(path), "%s/entry_guardian.bin", dump_dir);
+        if (FILE *fp = fopen(path, "wb")) {
+            fwrite(guardian_code.data(), 1, kGuardianBytes, fp);
             fclose(fp);
         }
     }

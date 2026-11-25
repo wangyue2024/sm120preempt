@@ -57,6 +57,25 @@ inline constexpr Ins with_req(Ins ins, uint64_t req_mask)
 
 inline constexpr Ins nop() { return {0x0000000000007918ULL, 0x000fda0000000000ULL}; }
 
+// Override the 21-bit scheduling control field (w1 bits [41..61]) of an instruction:
+// stall[3:0] yield[4] write-scoreboard[7:5] read-scoreboard[10:8] wait-mask[16:11] (reuse = 0).
+// Scoreboard index 7 = none. Verified with `nvdisasm -b SM120` (&wr= / &req= annotations).
+inline constexpr Ins with_ctl(Ins ins, uint32_t stall, uint32_t yield, uint32_t wr_sb, uint32_t rd_sb,
+                              uint32_t wait_mask)
+{
+    const uint64_t ctl = (stall & 0xfULL) | ((yield & 1ULL) << 4) | ((wr_sb & 7ULL) << 5) |
+                         ((rd_sb & 7ULL) << 8) | ((wait_mask & 0x3fULL) << 11);
+    return {ins.w0, (ins.w1 & ~(0x1fffffULL << 41)) | (ctl << 41)};
+}
+
+// Add scoreboard waits to an instruction while KEEPING its original stall count / scoreboards.
+// (Fixed-latency producers such as ISETP rely on their stall count to cover the latency before a
+// dependent BRA reads the predicate; shortening it makes the branch observe a stale predicate.)
+inline constexpr Ins with_extra_wait(Ins ins, uint32_t wait_mask)
+{
+    return {ins.w0, ins.w1 | ((static_cast<uint64_t>(wait_mask) & 0x3fULL) << (41 + 11))};
+}
+
 inline constexpr Ins exit_inst(int pred = kPT)
 {
     return with_pred({0x794dULL, (0xfea00ULL << 32) | 0x3800000ULL}, pred);
