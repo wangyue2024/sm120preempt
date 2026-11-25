@@ -1,0 +1,724 @@
+=== guarded run start 2026-11-25T23:54:46+08:00 host=<host5080> plan=~/p3runs/fix_5080.plan ===
+>>> [FIX-WT-OPS-gemm_bf16_4k] 23:54:46
+[OPS gemm_bf16_4k mode=lv3] PASS batch=1293.1us single=1307.1us susp_p50=0.168ms hp_p50=0.24ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-gemm_bf16_4k] rc=0 wall=2.1s
+>>> [FIX-VAR-OPS-gemm_bf16_4k] 23:54:48
+[OPS gemm_bf16_4k mode=lv3] PASS batch=1292.9us single=1305.5us susp_p50=0.171ms hp_p50=0.25ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-gemm_bf16_4k] rc=0 wall=1.9s
+>>> [FIX-WT-OPS-gemm_bf16_decode] 23:54:50
+[OPS gemm_bf16_decode mode=lv3] PASS batch=137.4us single=157.3us susp_p50=0.058ms hp_p50=0.12ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-gemm_bf16_decode] rc=0 wall=1.9s
+>>> [FIX-VAR-OPS-gemm_bf16_decode] 23:54:52
+[OPS gemm_bf16_decode mode=lv3] PASS batch=137.4us single=157.7us susp_p50=0.059ms hp_p50=0.11ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-gemm_bf16_decode] rc=0 wall=1.9s
+>>> [FIX-WT-OPS-linear_bias_ffn] 23:54:53
+[OPS linear_bias_ffn mode=lv3] PASS batch=1669.0us single=1687.6us susp_p50=0.200ms hp_p50=0.26ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-linear_bias_ffn] rc=0 wall=1.9s
+>>> [FIX-VAR-OPS-linear_bias_ffn] 23:54:55
+[OPS linear_bias_ffn mode=lv3] PASS batch=1669.1us single=1687.5us susp_p50=0.201ms hp_p50=0.26ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-linear_bias_ffn] rc=0 wall=1.9s
+>>> [FIX-WT-OPS-gemm_fp8_e4m3] 23:54:57
+[OPS gemm_fp8_e4m3 mode=lv3] PASS batch=584.2us single=606.1us susp_p50=0.169ms hp_p50=0.24ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-gemm_fp8_e4m3] rc=0 wall=2.0s
+>>> [FIX-VAR-OPS-gemm_fp8_e4m3] 23:54:59
+[OPS gemm_fp8_e4m3 mode=lv3] PASS batch=583.1us single=607.6us susp_p50=0.161ms hp_p50=0.23ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-gemm_fp8_e4m3] rc=0 wall=2.0s
+>>> [FIX-WT-OPS-moe_bmm_8x] 23:55:01
+[OPS moe_bmm_8x mode=lv3] PASS batch=401.2us single=423.1us susp_p50=0.091ms hp_p50=0.15ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-moe_bmm_8x] rc=0 wall=1.9s
+>>> [FIX-VAR-OPS-moe_bmm_8x] 23:55:03
+[OPS moe_bmm_8x mode=lv3] PASS batch=401.5us single=423.9us susp_p50=0.088ms hp_p50=0.14ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-moe_bmm_8x] rc=0 wall=1.9s
+>>> [FIX-WT-OPS-int8_mm] 23:55:05
+[OPS int8_mm mode=lv3] PASS batch=636.0us single=653.2us susp_p50=0.098ms hp_p50=0.22ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-int8_mm] rc=0 wall=1.9s
+>>> [FIX-VAR-OPS-int8_mm] 23:55:07
+[OPS int8_mm mode=lv3] PASS batch=636.1us single=654.9us susp_p50=0.120ms hp_p50=0.22ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-int8_mm] rc=0 wall=1.9s
+>>> [FIX-WT-OPS-sdpa_prefill_causal] 23:55:09
+[OPS sdpa_prefill_causal mode=lv3] PASS batch=418.9us single=438.4us susp_p50=0.110ms hp_p50=0.16ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-sdpa_prefill_causal] rc=0 wall=1.9s
+>>> [FIX-VAR-OPS-sdpa_prefill_causal] 23:55:11
+[OPS sdpa_prefill_causal mode=lv3] PASS batch=418.9us single=438.6us susp_p50=0.108ms hp_p50=0.16ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-sdpa_prefill_causal] rc=0 wall=1.9s
+>>> [FIX-WT-OPS-sdpa_decode_kv4k] 23:55:13
+[OPS sdpa_decode_kv4k mode=lv3] PASS batch=832.2us single=851.4us susp_p50=0.113ms hp_p50=0.18ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-sdpa_decode_kv4k] rc=0 wall=1.9s
+>>> [FIX-VAR-OPS-sdpa_decode_kv4k] 23:55:15
+[OPS sdpa_decode_kv4k mode=lv3] PASS batch=831.8us single=848.7us susp_p50=0.113ms hp_p50=0.17ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-sdpa_decode_kv4k] rc=0 wall=1.9s
+>>> [FIX-WT-OPS-rope_apply] 23:55:17
+[OPS rope_apply mode=lv3] PASS batch=728.2us single=744.9us susp_p50=0.427ms hp_p50=0.49ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-rope_apply] rc=0 wall=2.0s
+>>> [FIX-VAR-OPS-rope_apply] 23:55:19
+[OPS rope_apply mode=lv3] PASS batch=727.9us single=748.2us susp_p50=0.398ms hp_p50=0.52ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-rope_apply] rc=0 wall=2.0s
+>>> [FIX-WT-OPS-rmsnorm] 23:55:21
+[OPS rmsnorm mode=lv3] PASS batch=166.4us single=185.6us susp_p50=0.260ms hp_p50=0.36ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-rmsnorm] rc=0 wall=2.5s
+>>> [FIX-VAR-OPS-rmsnorm] 23:55:23
+[OPS rmsnorm mode=lv3] PASS batch=166.5us single=185.0us susp_p50=0.290ms hp_p50=0.37ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-rmsnorm] rc=0 wall=2.5s
+>>> [FIX-WT-OPS-layernorm] 23:55:26
+[OPS layernorm mode=lv3] PASS batch=168.9us single=187.6us susp_p50=0.299ms hp_p50=0.42ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-layernorm] rc=0 wall=2.5s
+>>> [FIX-VAR-OPS-layernorm] 23:55:28
+[OPS layernorm mode=lv3] PASS batch=168.9us single=188.1us susp_p50=0.404ms hp_p50=0.46ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-layernorm] rc=0 wall=2.5s
+>>> [FIX-WT-OPS-softmax] 23:55:31
+[OPS softmax mode=lv3] PASS batch=347.9us single=365.3us susp_p50=0.515ms hp_p50=0.61ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-softmax] rc=0 wall=2.7s
+>>> [FIX-VAR-OPS-softmax] 23:55:34
+[OPS softmax mode=lv3] PASS batch=347.9us single=365.1us susp_p50=0.525ms hp_p50=0.63ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-softmax] rc=0 wall=2.7s
+>>> [FIX-WT-OPS-swiglu] 23:55:36
+[OPS swiglu mode=lv3] PASS batch=1152.3us single=1169.2us susp_p50=0.988ms hp_p50=1.07ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-swiglu] rc=0 wall=2.3s
+>>> [FIX-VAR-OPS-swiglu] 23:55:39
+[OPS swiglu mode=lv3] PASS batch=1152.2us single=1168.2us susp_p50=0.979ms hp_p50=1.07ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-swiglu] rc=0 wall=2.3s
+>>> [FIX-WT-OPS-gelu_tanh] 23:55:41
+[OPS gelu_tanh mode=lv3] PASS batch=522.4us single=539.7us susp_p50=0.440ms hp_p50=0.50ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-gelu_tanh] rc=0 wall=2.6s
+>>> [FIX-VAR-OPS-gelu_tanh] 23:55:44
+[OPS gelu_tanh mode=lv3] PASS batch=522.4us single=540.0us susp_p50=0.445ms hp_p50=0.50ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-gelu_tanh] rc=0 wall=2.6s
+>>> [FIX-WT-OPS-cross_entropy] 23:55:46
+[OPS cross_entropy mode=lv3] PASS batch=1313.2us single=1330.8us susp_p50=0.265ms hp_p50=0.32ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-cross_entropy] rc=0 wall=1.9s
+>>> [FIX-VAR-OPS-cross_entropy] 23:55:48
+[OPS cross_entropy mode=lv3] PASS batch=1312.9us single=1331.3us susp_p50=0.279ms hp_p50=0.33ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-cross_entropy] rc=0 wall=1.9s
+>>> [FIX-WT-OPS-triton_rmsnorm] 23:55:50
+[OPS triton_rmsnorm mode=lv3] PASS batch=165.4us single=188.0us susp_p50=0.263ms hp_p50=0.31ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-triton_rmsnorm] rc=0 wall=2.7s
+>>> [FIX-VAR-OPS-triton_rmsnorm] 23:55:53
+[OPS triton_rmsnorm mode=lv3] PASS batch=165.4us single=187.9us susp_p50=0.276ms hp_p50=0.35ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-triton_rmsnorm] rc=0 wall=2.7s
+>>> [FIX-WT-OPS-conv3x3_nhwc] 23:55:55
+[OPS conv3x3_nhwc mode=lv3] PASS batch=1058.1us single=1073.1us susp_p50=0.202ms hp_p50=0.26ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-conv3x3_nhwc] rc=0 wall=2.0s
+>>> [FIX-VAR-OPS-conv3x3_nhwc] 23:55:57
+[OPS conv3x3_nhwc mode=lv3] PASS batch=1058.6us single=1072.8us susp_p50=0.201ms hp_p50=0.25ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-conv3x3_nhwc] rc=0 wall=2.0s
+>>> [FIX-WT-OPS-conv1x1_nchw_fp32] 23:56:00
+[OPS conv1x1_nchw_fp32 mode=lv3] PASS batch=582.0us single=601.1us susp_p50=0.200ms hp_p50=0.26ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-conv1x1_nchw_fp32] rc=0 wall=2.2s
+>>> [FIX-VAR-OPS-conv1x1_nchw_fp32] 23:56:02
+[OPS conv1x1_nchw_fp32 mode=lv3] PASS batch=581.9us single=600.4us susp_p50=0.188ms hp_p50=0.24ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-conv1x1_nchw_fp32] rc=0 wall=2.2s
+>>> [FIX-WT-OPS-batchnorm_train] 23:56:04
+[OPS batchnorm_train mode=lv3] PASS batch=479.8us single=499.9us susp_p50=0.671ms hp_p50=0.81ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-batchnorm_train] rc=0 wall=1.8s
+>>> [FIX-VAR-OPS-batchnorm_train] 23:56:06
+[OPS batchnorm_train mode=lv3] PASS batch=479.8us single=500.9us susp_p50=0.756ms hp_p50=0.85ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-batchnorm_train] rc=0 wall=1.8s
+>>> [FIX-WT-OPS-reduce_sum] 23:56:08
+[OPS reduce_sum mode=lv3] PASS batch=308.6us single=327.0us susp_p50=0.366ms hp_p50=0.44ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-reduce_sum] rc=0 wall=1.9s
+>>> [FIX-VAR-OPS-reduce_sum] 23:56:10
+[OPS reduce_sum mode=lv3] PASS batch=308.6us single=327.5us susp_p50=0.379ms hp_p50=0.46ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-reduce_sum] rc=0 wall=1.9s
+>>> [FIX-WT-OPS-cumsum_64m] 23:56:11
+[OPS cumsum_64m mode=lv3] PASS batch=2394.2us single=2414.7us susp_p50=0.639ms hp_p50=0.69ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-cumsum_64m] rc=0 wall=2.6s
+>>> [FIX-VAR-OPS-cumsum_64m] 23:56:14
+[OPS cumsum_64m mode=lv3] PASS batch=2391.3us single=2411.2us susp_p50=0.777ms hp_p50=0.83ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-cumsum_64m] rc=0 wall=2.6s
+>>> [FIX-WT-OPS-sort_16m] 23:56:17
+[OPS sort_16m mode=lv3] PASS batch=3001.4us single=3020.5us susp_p50=0.172ms hp_p50=0.23ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-sort_16m] rc=0 wall=2.0s
+>>> [FIX-VAR-OPS-sort_16m] 23:56:19
+[OPS sort_16m mode=lv3] PASS batch=3000.8us single=3017.1us susp_p50=0.178ms hp_p50=0.23ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-sort_16m] rc=0 wall=2.0s
+>>> [FIX-WT-OPS-topk_sampling] 23:56:21
+[OPS topk_sampling mode=lv3] PASS batch=1232.9us single=1252.5us susp_p50=0.279ms hp_p50=0.35ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-topk_sampling] rc=0 wall=1.9s
+>>> [FIX-VAR-OPS-topk_sampling] 23:56:23
+[OPS topk_sampling mode=lv3] PASS batch=1231.8us single=1252.6us susp_p50=0.290ms hp_p50=0.37ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-topk_sampling] rc=0 wall=1.9s
+>>> [FIX-WT-OPS-embedding] 23:56:25
+[OPS embedding mode=lv3] PASS batch=199.3us single=218.7us susp_p50=0.234ms hp_p50=0.36ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-embedding] rc=0 wall=2.5s
+>>> [FIX-VAR-OPS-embedding] 23:56:27
+[OPS embedding mode=lv3] PASS batch=199.4us single=219.9us susp_p50=0.318ms hp_p50=0.37ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-embedding] rc=0 wall=2.5s
+>>> [FIX-WT-OPS-index_add_int32] 23:56:30
+[OPS index_add_int32 mode=lv3] PASS batch=2758.1us single=2775.4us susp_p50=0.178ms hp_p50=0.24ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-index_add_int32] rc=0 wall=2.0s
+>>> [FIX-VAR-OPS-index_add_int32] 23:56:32
+[OPS index_add_int32 mode=lv3] PASS batch=2757.8us single=2774.7us susp_p50=0.175ms hp_p50=0.23ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-index_add_int32] rc=0 wall=2.0s
+>>> [FIX-WT-OPS-cast_bool_to_i64] 23:56:34
+[OPS cast_bool_to_i64 mode=lv3] PASS batch=400.3us single=418.6us susp_p50=0.492ms hp_p50=0.60ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-cast_bool_to_i64] rc=0 wall=2.8s
+>>> [FIX-VAR-OPS-cast_bool_to_i64] 23:56:37
+[OPS cast_bool_to_i64 mode=lv3] PASS batch=400.2us single=418.3us susp_p50=0.570ms hp_p50=0.65ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-cast_bool_to_i64] rc=0 wall=2.9s
+>>> [FIX-WT-OPS-transpose_copy] 23:56:39
+[OPS transpose_copy mode=lv3] PASS batch=1602.3us single=1620.8us susp_p50=1.215ms hp_p50=1.27ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-transpose_copy] rc=0 wall=2.1s
+>>> [FIX-VAR-OPS-transpose_copy] 23:56:42
+[OPS transpose_copy mode=lv3] PASS batch=1602.1us single=1620.3us susp_p50=1.211ms hp_p50=1.26ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-transpose_copy] rc=0 wall=2.1s
+>>> [FIX-WT-OPS-adamw_fused_32m] 23:56:44
+[OPS adamw_fused_32m mode=lv3] PASS batch=1161.6us single=1199.9us susp_p50=0.323ms hp_p50=0.40ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-adamw_fused_32m] rc=0 wall=2.9s
+>>> [FIX-VAR-OPS-adamw_fused_32m] 23:56:47
+[OPS adamw_fused_32m mode=lv3] PASS batch=1167.7us single=1204.2us susp_p50=0.339ms hp_p50=0.41ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-adamw_fused_32m] rc=0 wall=2.9s
+>>> [FIX-WT-OPS-linear_bwd_accum] 23:56:50
+[OPS linear_bwd_accum mode=lv3] PASS batch=1513.8us single=1539.1us susp_p50=0.483ms hp_p50=0.54ms cov=100% ok=5/5 
+<<< [FIX-WT-OPS-linear_bwd_accum] rc=0 wall=2.1s
+>>> [FIX-VAR-OPS-linear_bwd_accum] 23:56:52
+[OPS linear_bwd_accum mode=lv3] PASS batch=1513.6us single=1539.4us susp_p50=0.485ms hp_p50=0.54ms cov=100% ok=5/5 
+<<< [FIX-VAR-OPS-linear_bwd_accum] rc=0 wall=2.1s
+>>> [FIX-WT-L8-r1] 23:56:54
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r1] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r1] 23:56:54
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r1] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r2] 23:56:55
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r2] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r2] 23:56:55
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r2] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r3] 23:56:55
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r3] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r3] 23:56:56
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r3] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r4] 23:56:56
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r4] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r4] 23:56:57
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r4] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r5] 23:56:57
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r5] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r5] 23:56:57
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r5] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r6] 23:56:58
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r6] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r6] 23:56:58
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r6] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r7] 23:56:59
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r7] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r7] 23:56:59
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r7] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r8] 23:56:59
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r8] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r8] 23:57:00
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r8] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r9] 23:57:00
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r9] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r9] 23:57:00
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r9] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r10] 23:57:01
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r10] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r10] 23:57:01
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r10] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r11] 23:57:02
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r11] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r11] 23:57:02
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r11] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r12] 23:57:02
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r12] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r12] 23:57:03
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r12] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r13] 23:57:03
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r13] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r13] 23:57:04
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r13] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r14] 23:57:04
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r14] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r14] 23:57:04
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r14] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r15] 23:57:05
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r15] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r15] 23:57:05
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r15] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r16] 23:57:06
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r16] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r16] 23:57:06
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r16] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r17] 23:57:06
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r17] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r17] 23:57:07
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r17] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r18] 23:57:07
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r18] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r18] 23:57:08
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r18] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r19] 23:57:08
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r19] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r19] 23:57:08
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r19] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r20] 23:57:09
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r20] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r20] 23:57:09
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r20] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r21] 23:57:09
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r21] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r21] 23:57:10
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r21] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r22] 23:57:10
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r22] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r22] 23:57:11
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r22] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r23] 23:57:11
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r23] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r23] 23:57:11
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r23] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r24] 23:57:12
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r24] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r24] 23:57:12
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r24] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r25] 23:57:13
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r25] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r25] 23:57:13
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r25] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r26] 23:57:13
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r26] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r26] 23:57:14
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r26] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r27] 23:57:14
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r27] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r27] 23:57:15
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r27] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r28] 23:57:15
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r28] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r28] 23:57:15
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r28] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r29] 23:57:16
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r29] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r29] 23:57:16
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r29] rc=0 wall=0.4s
+>>> [FIX-WT-L8-r30] 23:57:17
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-WT-L8-r30] rc=0 wall=0.4s
+>>> [FIX-VAR-L8-r30] 23:57:17
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+<<< [FIX-VAR-L8-r30] rc=0 wall=0.4s
+>>> [FIX-WT-HW06-r1] 23:57:17
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+<<< [FIX-WT-HW06-r1] rc=0 wall=0.3s
+>>> [FIX-VAR-HW06-r1] 23:57:18
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=512/7680 -> FAIL
+<<< [FIX-VAR-HW06-r1] rc=1 wall=0.3s
+>>> [FIX-WT-HW06-r2] 23:57:18
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+<<< [FIX-WT-HW06-r2] rc=0 wall=0.3s
+>>> [FIX-VAR-HW06-r2] 23:57:18
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+<<< [FIX-VAR-HW06-r2] rc=0 wall=0.3s
+>>> [FIX-WT-HW06-r3] 23:57:19
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+<<< [FIX-WT-HW06-r3] rc=0 wall=0.3s
+>>> [FIX-VAR-HW06-r3] 23:57:19
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=256/7680 -> FAIL
+<<< [FIX-VAR-HW06-r3] rc=1 wall=0.3s
+>>> [FIX-WT-HW06-r4] 23:57:19
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+<<< [FIX-WT-HW06-r4] rc=0 wall=0.3s
+>>> [FIX-VAR-HW06-r4] 23:57:19
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+<<< [FIX-VAR-HW06-r4] rc=0 wall=0.3s
+>>> [FIX-WT-HW06-r5] 23:57:20
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+<<< [FIX-WT-HW06-r5] rc=0 wall=0.3s
+>>> [FIX-VAR-HW06-r5] 23:57:20
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=256/7680 -> FAIL
+<<< [FIX-VAR-HW06-r5] rc=1 wall=0.3s
+>>> [FIX-WT-HW06-r6] 23:57:20
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+<<< [FIX-WT-HW06-r6] rc=0 wall=0.3s
+>>> [FIX-VAR-HW06-r6] 23:57:21
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+<<< [FIX-VAR-HW06-r6] rc=0 wall=0.3s
+>>> [FIX-WT-HW06-r7] 23:57:21
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=256/7680 -> FAIL
+<<< [FIX-WT-HW06-r7] rc=1 wall=0.3s
+>>> [FIX-VAR-HW06-r7] 23:57:21
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+<<< [FIX-VAR-HW06-r7] rc=0 wall=0.3s
+>>> [FIX-WT-HW06-r8] 23:57:22
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+<<< [FIX-WT-HW06-r8] rc=0 wall=0.3s
+>>> [FIX-VAR-HW06-r8] 23:57:22
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=256/7680 -> FAIL
+<<< [FIX-VAR-HW06-r8] rc=1 wall=0.3s
+>>> [FIX-WT-HW06-r9] 23:57:22
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+<<< [FIX-WT-HW06-r9] rc=0 wall=0.3s
+>>> [FIX-VAR-HW06-r9] 23:57:22
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+<<< [FIX-VAR-HW06-r9] rc=0 wall=0.3s
+>>> [FIX-WT-HW06-r10] 23:57:23
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+<<< [FIX-WT-HW06-r10] rc=0 wall=0.3s
+>>> [FIX-VAR-HW06-r10] 23:57:23
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+<<< [FIX-VAR-HW06-r10] rc=0 wall=0.3s
+>>> [FIX-WT-LLM07-r1] 23:57:23
+[LLM-07 QoS LoRA-Train+Decode mode=m5] PASS | HP_TPOT P50=3.282ms P99=4.289ms SLO<=8ms=100.0% | SUSP_P50=0.122ms | LP_steps=14 LP_ret=119.0% | hp_err=0.000e+00
+<<< [FIX-WT-LLM07-r1] rc=0 wall=5.0s
+>>> [FIX-VAR-LLM07-r1] 23:57:28
+[LLM-07 QoS LoRA-Train+Decode mode=m5] PASS | HP_TPOT P50=3.282ms P99=4.455ms SLO<=8ms=100.0% | SUSP_P50=0.122ms | LP_steps=14 LP_ret=119.4% | hp_err=0.000e+00
+<<< [FIX-VAR-LLM07-r1] rc=0 wall=5.0s
+>>> [FIX-WT-LLM07-r2] 23:57:33
+[LLM-07 QoS LoRA-Train+Decode mode=m5] PASS | HP_TPOT P50=3.352ms P99=4.558ms SLO<=8ms=100.0% | SUSP_P50=0.132ms | LP_steps=14 LP_ret=119.5% | hp_err=0.000e+00
+<<< [FIX-WT-LLM07-r2] rc=0 wall=5.0s
+>>> [FIX-VAR-LLM07-r2] 23:57:38
+[LLM-07 QoS LoRA-Train+Decode mode=m5] PASS | HP_TPOT P50=3.277ms P99=4.417ms SLO<=8ms=100.0% | SUSP_P50=0.113ms | LP_steps=14 LP_ret=119.1% | hp_err=0.000e+00
+<<< [FIX-VAR-LLM07-r2] rc=0 wall=5.0s
+>>> [FIX-WT-LLM07-r3] 23:57:44
+[LLM-07 QoS LoRA-Train+Decode mode=m5] PASS | HP_TPOT P50=3.373ms P99=4.378ms SLO<=8ms=100.0% | SUSP_P50=0.126ms | LP_steps=14 LP_ret=119.1% | hp_err=0.000e+00
+<<< [FIX-WT-LLM07-r3] rc=0 wall=5.1s
+>>> [FIX-VAR-LLM07-r3] 23:57:49
+[LLM-07 QoS LoRA-Train+Decode mode=m5] PASS | HP_TPOT P50=3.354ms P99=4.665ms SLO<=8ms=100.0% | SUSP_P50=0.150ms | LP_steps=14 LP_ret=119.4% | hp_err=0.000e+00
+<<< [FIX-VAR-LLM07-r3] rc=0 wall=5.0s
+>>> [FIX-WT-LLM07-r4] 23:57:54
+[LLM-07 QoS LoRA-Train+Decode mode=m5] PASS | HP_TPOT P50=3.266ms P99=4.466ms SLO<=8ms=100.0% | SUSP_P50=0.122ms | LP_steps=14 LP_ret=119.0% | hp_err=0.000e+00
+<<< [FIX-WT-LLM07-r4] rc=0 wall=5.0s
+>>> [FIX-VAR-LLM07-r4] 23:57:59
+[LLM-07 QoS LoRA-Train+Decode mode=m5] PASS | HP_TPOT P50=3.364ms P99=4.604ms SLO<=8ms=100.0% | SUSP_P50=0.141ms | LP_steps=14 LP_ret=119.2% | hp_err=0.000e+00
+<<< [FIX-VAR-LLM07-r4] rc=0 wall=5.0s
+>>> [FIX-WT-LLM07-r5] 23:58:04
+[LLM-07 QoS LoRA-Train+Decode mode=m5] PASS | HP_TPOT P50=3.368ms P99=4.536ms SLO<=8ms=100.0% | SUSP_P50=0.135ms | LP_steps=14 LP_ret=119.4% | hp_err=0.000e+00
+<<< [FIX-WT-LLM07-r5] rc=0 wall=5.0s
+>>> [FIX-VAR-LLM07-r5] 23:58:09
+[LLM-07 QoS LoRA-Train+Decode mode=m5] PASS | HP_TPOT P50=3.412ms P99=4.713ms SLO<=8ms=100.0% | SUSP_P50=0.122ms | LP_steps=14 LP_ret=119.4% | hp_err=0.000e+00
+<<< [FIX-VAR-LLM07-r5] rc=0 wall=5.0s
+>>> [FIX-WT-S1-LIB-01] 23:58:14
+[LIB-01] cuBLAS SGEMM 3072x3072 beta=0.0: max_err=0.000000e+00 mismatch=0/9437184 -> PASS
+<<< [FIX-WT-S1-LIB-01] rc=0 wall=0.4s
+>>> [FIX-WT-S1-LIB-02] 23:58:14
+[LIB-02] cuBLAS SGEMM 3072x3072 beta=1.0: max_err=0.000000e+00 mismatch=0/9437184 -> PASS
+<<< [FIX-WT-S1-LIB-02] rc=0 wall=0.4s
+>>> [FIX-WT-S1-LIB-03] 23:58:15
+[LIB-03] cuBLAS GemmEx FP16 TC 4096x4096 beta=1.0: max_err=0.000000e+00 mismatch=0/16777216 -> PASS
+<<< [FIX-WT-S1-LIB-03] rc=0 wall=0.5s
+>>> [FIX-WT-S1-LIB-04] 23:58:15
+[LIB-04] cuBLAS GemmEx BF16 TC 4096x4096 beta=1.0: max_err=0.000000e+00 mismatch=0/16777216 -> PASS
+<<< [FIX-WT-S1-LIB-04] rc=0 wall=0.5s
+>>> [FIX-WT-S1-LIB-05] 23:58:16
+[LIB-05] cuBLASLt FP16 TC 4096x4096 beta=1.0: max_err=0.000000e+00 mismatch=0/16777216 -> PASS
+<<< [FIX-WT-S1-LIB-05] rc=0 wall=0.5s
+>>> [FIX-WT-S1-LIB-06] 23:58:16
+[LIB-06] cuFFT In-Place C2C (65536 x 256): max_err=0.000000e+00 mismatch=0/16777216 -> PASS
+<<< [FIX-WT-S1-LIB-06] rc=0 wall=0.5s
+>>> [FIX-WT-S1-LIB-07] 23:58:17
+[LIB-07] cuSPARSE SpMM (4096x512 nnz=524288 beta=1.0): max_err=1.430511e-06 mismatch=0/2097152 -> PASS
+<<< [FIX-WT-S1-LIB-07] rc=0 wall=0.3s
+>>> [FIX-WT-S1-HW-01] 23:58:17
+[HW-01] PTX TensorCore mma.sync (non-idemp): mismatch=0/61440 cnt=450240/450240 -> PASS
+<<< [FIX-WT-S1-HW-01] rc=0 wall=0.3s
+>>> [FIX-WT-S1-HW-02] 23:58:17
+[HW-02] PTX cp.async (LDGSTS) pipeline: mismatch=0/15360 -> PASS
+<<< [FIX-WT-S1-HW-02] rc=0 wall=0.3s
+>>> [FIX-WT-S1-HW-03] 23:58:18
+[HW-03] PTX SMEM mbarrier (arrive/try_wait): mismatch=0/15360 -> PASS
+<<< [FIX-WT-S1-HW-03] rc=0 wall=0.3s
+>>> [FIX-WT-S1-HW-04] 23:58:18
+[HW-04] CUDA Graph (4-node, 9.35ms): max_err=0.000000e+00 susp=8.590ms (Lv1 boundary fallback!) -> PASS (Lv1-fallback)
+<<< [FIX-WT-S1-HW-04] rc=0 wall=0.3s
+>>> [FIX-WT-S1-HW-05] 23:58:18
+[HW-05] Idle Queue Suspend/Resume Safety: mismatch=0/4096 -> PASS
+<<< [FIX-WT-S1-HW-05] rc=0 wall=0.3s
+>>> [FIX-WT-S1-HW-07] 23:58:19
+[HW-07] Cooperative Groups (grid.sync): mismatch=0/3840 susp=17.968ms (Shim bypass check) -> PASS (Shim-bypass)
+<<< [FIX-WT-S1-HW-07] rc=0 wall=0.3s
+>>> [FIX-WT-S4-LIB-09] 23:58:19
+[LIB-09 cuSOLVER LU+Solve 2048x2048] PASS | preempts=2 susp=0.142 ms hp=0.300 ms | info=0 max_err=0.000e+00 bad=0/131072
+<<< [FIX-WT-S4-LIB-09] rc=0 wall=0.5s
+>>> [FIX-WT-S4-LIB-10] 23:58:19
+[LIB-10 cuSOLVER Cholesky 3072x3072] PASS | preempts=1 susp=0.099 ms hp=0.295 ms | info=0 max_err=0.000e+00 bad=0
+<<< [FIX-WT-S4-LIB-10] rc=0 wall=0.4s
+>>> [FIX-WT-S4-LIB-11] 23:58:20
+[LIB-11 cuRAND Stateful XORWOW+Philox 60x8M] PASS | preempts=2+2 susp=0.087/0.163 ms | bad_bits=0+0 / 16777216
+<<< [FIX-WT-S4-LIB-11] rc=0 wall=0.4s
+>>> [FIX-WT-S4-LIB-12] 23:58:20
+[LIB-12 cuFFT 2D R2C+C2R 64x256x256] PASS | preempts=2 susp=0.398 ms hp=0.023 ms | max_err=0.000e+00 bad=0/4194304
+<<< [FIX-WT-S4-LIB-12] rc=0 wall=0.3s
+>>> [FIX-WT-S4-LIB-13] 23:58:21
+[LIB-13 CUB LookBack Scan+Reduce+Select 16M] PASS | preempts=2 susp=0.322 ms hp=0.022 ms | bad=0 sum_ok=1 sel_ok=1
+<<< [FIX-WT-S4-LIB-13] rc=0 wall=0.4s
+>>> [FIX-WT-S4-LIB-14] 23:58:21
+[LIB-14 cuBLASLt FP8-E4M3 4096^3 beta=1] PASS | preempts=2 susp=0.129 ms hp=0.299 ms | max_err=0.000e+00 bad=0/16777216
+<<< [FIX-WT-S4-LIB-14] rc=0 wall=0.5s
+>>> [FIX-WT-S5-dnn01] 23:58:22
+[DNN-01 ViT-B/16 BF16 B=16] PASS | preempts=3 susp_ms=[0.034, 0.019, 3.311] hp_ms=[1.183, 0.047, 0.039] max_err=0.000e+00
+<<< [FIX-WT-S5-dnn01] rc=0 wall=2.0s
+>>> [FIX-WT-S5-dnn02] 23:58:23
+[DNN-02 Swin-B + ConvNeXt-NHWC] PASS | swin_preempts=3 susp=[0.035, 0.109, 0.017] err=0.000e+00 | cnxt_preempts=3 susp=[0.033, 0.018, 0.015] err=0.000e+00
+<<< [FIX-WT-S5-dnn02] rc=0 wall=6.1s
+>>> [FIX-WT-S5-dnn03] 23:58:30
+[DNN-03 DeepLabV3 + RoIAlign + NMS] PASS | preempts=3 susp=[0.034, 0.245, 0.191] err_seg=0.000e+00 err_roi=0.000e+00 nms_exact=True
+<<< [FIX-WT-S5-dnn03] rc=0 wall=2.3s
+>>> [FIX-WT-S5-dnn04] 23:58:32
+[DNN-04 AMP-BF16 + 4xGradAccum + FusedAdamW] PASS | preempts=4 susp=[0.039, 0.015, 0.267, 0.016] loss_err=0.000e+00 max_w_err=0.000e+00
+<<< [FIX-WT-S5-dnn04] rc=0 wall=2.7s
+>>> [FIX-WT-S5-dnn05] 23:58:35
+[DNN-05 20-Step Convergence (31 preempts)] PASS | susp_p50=0.087 ms max_loss_diff=0.000e+00 max_w_diff=0.000e+00
+<<< [FIX-WT-S5-dnn05] rc=0 wall=1.9s
+>>> [FIX-WT-S5-dnn06] 23:58:37
+[DNN-06 torch.compile(inductor, default)] PASS | preempts=3 susp=[2.175, 1.464, 1.44] max_err=0.000e+00
+<<< [FIX-WT-S5-dnn06] rc=0 wall=3.5s
+>>> [FIX-WT-S5-dnn07] 23:58:40
+[DNN-07 torch.compile(reduce-overhead/CUDAGraph)] PASS | preempts=2 susp=[10.25, 10.077] max_err=0.000e+00
+<<< [FIX-WT-S5-dnn07] rc=0 wall=3.3s
+>>> [FIX-WT-S5-dnn08] 23:58:43
+[DNN-08 cuDNN-LSTM + Diffusers-UNet2D 10-Step] PASS | lstm_p=3 susp=[0.037, 0.022, 0.016] err=0.000e+00 | diff_p=4 susp=[0.034, 0.019, 0.018, 0.017] err=0.000e+00
+<<< [FIX-WT-S5-dnn08] rc=0 wall=3.8s
+>>> [FIX-WT-S6-llm01] 23:58:47
+[LLM-01 Qwen2-16L Prefill T=2048 BF16] PASS | preempts=4 susp=[0.072, 0.285, 0.378, 0.363] logit_err=0.000e+00 kv_err=0.000e+00
+<<< [FIX-WT-S6-llm01] rc=0 wall=6.0s
+>>> [FIX-WT-S6-llm02] 23:58:53
+[LLM-02 Qwen2-12L 32-Token Decode+KVCache] PASS | preempts=6 susp_p50=0.062 ms exact_toks=32/32 logit_err=0.000e+00
+<<< [FIX-WT-S6-llm02] rc=0 wall=5.7s
+>>> [FIX-WT-S6-llm03] 23:58:59
+[LLM-03 PEFT LoRA SFT Qwen2-8L (r=16)] PASS | preempts=6 susp_p50=0.066 ms loss_err=0.000e+00 lora_w_err=0.000e+00
+<<< [FIX-WT-S6-llm03] rc=0 wall=6.6s
+>>> [FIX-WT-S6-llm04] 23:59:06
+[LLM-04 Quantized FP8+INT8+Triton-W4A16] PASS | preempts=4 susp=[0.062, 0.157, 0.14, 0.165] e_fp8=0.000e+00 e_int8=0 e_w4a16=0.000e+00
+<<< [FIX-WT-S6-llm04] rc=0 wall=2.5s
+>>> [FIX-WT-S6-llm05] 23:59:08
+[LLM-05 Triton PagedAttention + DynamicBuckets] PASS | preempts=5 susp_p50=0.138 ms e_paged=0.000e+00 e_dyn=0.000e+00
+<<< [FIX-WT-S6-llm05] rc=0 wall=3.4s
+>>> [FIX-WT-S6-llm08] 23:59:12
+[LLM-08 Multi-Stream 2xLP+1xHP Concurrent] PASS | p1=2 susp1=[0.134, 0.208] | p2=1 susp2=[0.306] | e1=0.000e+00 e2=0.000e+00
+<<< [FIX-WT-S6-llm08] rc=0 wall=3.7s
+>>> [FIX-WT-S6-llm06:m5] 23:59:15
+[LLM-06 QoS Prefill+Decode mode=m5] PASS | HP_TPOT P50=4.590ms P99=6.752ms SLO<=10ms=100.0% | SUSP_P50=0.190ms | LP_iters=11 LP_ret=110.4% | lp_err=0.000e+00 hp_err=0.000e+00
+<<< [FIX-WT-S6-llm06:m5] rc=0 wall=6.0s
+>>> [FIX-WT-SYN-convbar-np3] 23:59:21
+[P3-CONVBAR C0 shallow] PASS | runs=3 ok=3 np=3 outer=10819 blocks=168 thr=256
+[P3-CONVBAR C1 deep] PASS | runs=3 ok=3 np=3 outer=335 blocks=168 thr=256
+[P3-CONVBAR D1 depth1] PASS | runs=3 ok=3 np=3 outer=87241 blocks=168 thr=256
+[P3-CONVBAR D2 depth2] PASS | runs=3 ok=3 np=3 outer=58181 blocks=168 thr=256
+[P3-CONVBAR D3 depth3] PASS | runs=3 ok=3 np=3 outer=18908 blocks=168 thr=256
+[P3-CONVBAR D4 depth4] PASS | runs=3 ok=3 np=3 outer=5426 blocks=168 thr=256
+[P3-CONVBAR D5 depth5] PASS | runs=3 ok=3 np=3 outer=1438 blocks=168 thr=256
+[P3-CONVBAR D6 depth6] PASS | runs=3 ok=3 np=3 outer=373 blocks=168 thr=256
+[P3-CONVBAR R0 regs+0] PASS | runs=3 ok=3 np=3 outer=27519 blocks=168 thr=256
+[P3-CONVBAR R1 regs+4] PASS | runs=3 ok=3 np=3 outer=23571 blocks=168 thr=256
+[P3-CONVBAR R2 regs+16] PASS | runs=3 ok=3 np=3 outer=10305 blocks=168 thr=256
+[P3-CONVBAR R3 regs+48] PASS | runs=3 ok=3 np=3 outer=4278 blocks=168 thr=256
+<<< [FIX-WT-SYN-convbar-np3] rc=0 wall=2.0s
+>>> [FIX-WT-SYN-convbar-np2] 23:59:23
+[P3-CONVBAR C0 shallow] PASS | runs=3 ok=3 np=2 outer=10781 blocks=168 thr=256
+[P3-CONVBAR C1 deep] PASS | runs=3 ok=3 np=2 outer=334 blocks=168 thr=256
+[P3-CONVBAR D1 depth1] PASS | runs=3 ok=3 np=2 outer=105960 blocks=168 thr=256
+[P3-CONVBAR D2 depth2] PASS | runs=3 ok=3 np=2 outer=56980 blocks=168 thr=256
+[P3-CONVBAR D3 depth3] PASS | runs=3 ok=3 np=2 outer=19757 blocks=168 thr=256
+[P3-CONVBAR D4 depth4] PASS | runs=3 ok=3 np=2 outer=5428 blocks=168 thr=256
+[P3-CONVBAR D5 depth5] PASS | runs=3 ok=3 np=2 outer=1436 blocks=168 thr=256
+[P3-CONVBAR D6 depth6] PASS | runs=3 ok=3 np=2 outer=373 blocks=168 thr=256
+[P3-CONVBAR R0 regs+0] PASS | runs=3 ok=3 np=2 outer=27247 blocks=168 thr=256
+[P3-CONVBAR R1 regs+4] PASS | runs=3 ok=3 np=2 outer=23550 blocks=168 thr=256
+[P3-CONVBAR R2 regs+16] PASS | runs=3 ok=3 np=2 outer=10311 blocks=168 thr=256
+[P3-CONVBAR R3 regs+48] PASS | runs=3 ok=3 np=2 outer=4242 blocks=168 thr=256
+<<< [FIX-WT-SYN-convbar-np2] rc=0 wall=1.9s
+>>> [FIX-WT-SYN-C1-np2] 23:59:25
+[P3-CONVBAR C1 deep] PASS | runs=10 ok=10 np=2 outer=329 blocks=168 thr=256
+<<< [FIX-WT-SYN-C1-np2] rc=0 wall=0.7s
+>>> [FIX-WT-SYN-partial] 23:59:26
+[P3-PARTIAL K0 uniform] PASS | runs=5 ok=5 np=3 susp_avg=0.086 ms | blocks=168 thr=256 base=3341799 step=52215
+[P3-PARTIAL K1 half_exit] PASS | runs=5 ok=5 np=3 susp_avg=0.085 ms | blocks=168 thr=256 base=3341799 step=52215
+[P3-PARTIAL K2 staggered_exit] PASS | runs=5 ok=5 np=3 susp_avg=0.145 ms | blocks=168 thr=256 base=3341799 step=52215
+[P3-PARTIAL K3 staggered_reconv] PASS | runs=5 ok=5 np=3 susp_avg=0.145 ms | blocks=168 thr=256 base=3341799 step=52215
+<<< [FIX-WT-SYN-partial] rc=0 wall=0.9s
+>>> [FIX-VAR-S1-LIB-01] 23:59:27
+[LIB-01] cuBLAS SGEMM 3072x3072 beta=0.0: max_err=0.000000e+00 mismatch=0/9437184 -> PASS
+<<< [FIX-VAR-S1-LIB-01] rc=0 wall=0.5s
+>>> [FIX-VAR-S1-LIB-02] 23:59:27
+[LIB-02] cuBLAS SGEMM 3072x3072 beta=1.0: max_err=0.000000e+00 mismatch=0/9437184 -> PASS
+<<< [FIX-VAR-S1-LIB-02] rc=0 wall=0.4s
+>>> [FIX-VAR-S1-LIB-03] 23:59:28
+[LIB-03] cuBLAS GemmEx FP16 TC 4096x4096 beta=1.0: max_err=0.000000e+00 mismatch=0/16777216 -> PASS
+<<< [FIX-VAR-S1-LIB-03] rc=0 wall=0.5s
+>>> [FIX-VAR-S1-LIB-04] 23:59:28
+[LIB-04] cuBLAS GemmEx BF16 TC 4096x4096 beta=1.0: max_err=0.000000e+00 mismatch=0/16777216 -> PASS
+<<< [FIX-VAR-S1-LIB-04] rc=0 wall=0.5s
+>>> [FIX-VAR-S1-LIB-05] 23:59:29
+[LIB-05] cuBLASLt FP16 TC 4096x4096 beta=1.0: max_err=0.000000e+00 mismatch=0/16777216 -> PASS
+<<< [FIX-VAR-S1-LIB-05] rc=0 wall=0.5s
+>>> [FIX-VAR-S1-LIB-06] 23:59:29
+[LIB-06] cuFFT In-Place C2C (65536 x 256): max_err=0.000000e+00 mismatch=0/16777216 -> PASS
+<<< [FIX-VAR-S1-LIB-06] rc=0 wall=0.5s
+>>> [FIX-VAR-S1-LIB-07] 23:59:30
+[LIB-07] cuSPARSE SpMM (4096x512 nnz=524288 beta=1.0): max_err=1.430511e-06 mismatch=0/2097152 -> PASS
+<<< [FIX-VAR-S1-LIB-07] rc=0 wall=0.3s
+>>> [FIX-VAR-S1-HW-01] 23:59:30
+[HW-01] PTX TensorCore mma.sync (non-idemp): mismatch=0/61440 cnt=450240/450240 -> PASS
+<<< [FIX-VAR-S1-HW-01] rc=0 wall=0.3s
+>>> [FIX-VAR-S1-HW-02] 23:59:31
+[HW-02] PTX cp.async (LDGSTS) pipeline: mismatch=0/15360 -> PASS
+<<< [FIX-VAR-S1-HW-02] rc=0 wall=0.3s
+>>> [FIX-VAR-S1-HW-03] 23:59:31
+[HW-03] PTX SMEM mbarrier (arrive/try_wait): mismatch=0/15360 -> PASS
+<<< [FIX-VAR-S1-HW-03] rc=0 wall=0.3s
+>>> [FIX-VAR-S1-HW-04] 23:59:31
+[HW-04] CUDA Graph (4-node, 9.35ms): max_err=0.000000e+00 susp=8.575ms (Lv1 boundary fallback!) -> PASS (Lv1-fallback)
+<<< [FIX-VAR-S1-HW-04] rc=0 wall=0.3s
+>>> [FIX-VAR-S1-HW-05] 23:59:31
+[HW-05] Idle Queue Suspend/Resume Safety: mismatch=0/4096 -> PASS
+<<< [FIX-VAR-S1-HW-05] rc=0 wall=0.3s
+>>> [FIX-VAR-S1-HW-07] 23:59:32
+[HW-07] Cooperative Groups (grid.sync): mismatch=0/3840 susp=17.905ms (Shim bypass check) -> PASS (Shim-bypass)
+<<< [FIX-VAR-S1-HW-07] rc=0 wall=0.3s
+>>> [FIX-VAR-S4-LIB-09] 23:59:32
+[LIB-09 cuSOLVER LU+Solve 2048x2048] PASS | preempts=2 susp=0.152 ms hp=0.292 ms | info=0 max_err=0.000e+00 bad=0/131072
+<<< [FIX-VAR-S4-LIB-09] rc=0 wall=0.5s
+>>> [FIX-VAR-S4-LIB-10] 23:59:33
+[LIB-10 cuSOLVER Cholesky 3072x3072] PASS | preempts=1 susp=0.100 ms hp=0.287 ms | info=0 max_err=0.000e+00 bad=0
+<<< [FIX-VAR-S4-LIB-10] rc=0 wall=0.4s
+>>> [FIX-VAR-S4-LIB-11] 23:59:33
+[LIB-11 cuRAND Stateful XORWOW+Philox 60x8M] PASS | preempts=2+2 susp=0.084/0.101 ms | bad_bits=0+0 / 16777216
+<<< [FIX-VAR-S4-LIB-11] rc=0 wall=0.4s
+>>> [FIX-VAR-S4-LIB-12] 23:59:33
+[LIB-12 cuFFT 2D R2C+C2R 64x256x256] PASS | preempts=2 susp=0.391 ms hp=0.023 ms | max_err=0.000e+00 bad=0/4194304
+<<< [FIX-VAR-S4-LIB-12] rc=0 wall=0.3s
+>>> [FIX-VAR-S4-LIB-13] 23:59:34
+[LIB-13 CUB LookBack Scan+Reduce+Select 16M] PASS | preempts=2 susp=0.304 ms hp=0.021 ms | bad=0 sum_ok=1 sel_ok=1
+<<< [FIX-VAR-S4-LIB-13] rc=0 wall=0.4s
+>>> [FIX-VAR-S4-LIB-14] 23:59:34
+[LIB-14 cuBLASLt FP8-E4M3 4096^3 beta=1] PASS | preempts=2 susp=0.121 ms hp=0.301 ms | max_err=0.000e+00 bad=0/16777216
+<<< [FIX-VAR-S4-LIB-14] rc=0 wall=0.5s
+>>> [FIX-VAR-S5-dnn01] 23:59:35
+[DNN-01 ViT-B/16 BF16 B=16] PASS | preempts=3 susp_ms=[0.034, 0.035, 3.327] hp_ms=[1.019, 0.048, 0.039] max_err=0.000e+00
+<<< [FIX-VAR-S5-dnn01] rc=0 wall=2.0s
+>>> [FIX-VAR-S5-dnn02] 23:59:37
+[DNN-02 Swin-B + ConvNeXt-NHWC] PASS | swin_preempts=3 susp=[0.034, 0.015, 0.016] err=0.000e+00 | cnxt_preempts=3 susp=[0.562, 0.018, 0.015] err=0.000e+00
+<<< [FIX-VAR-S5-dnn02] rc=0 wall=6.2s
+>>> [FIX-VAR-S5-dnn03] 23:59:43
+[DNN-03 DeepLabV3 + RoIAlign + NMS] PASS | preempts=3 susp=[0.033, 0.246, 0.194] err_seg=0.000e+00 err_roi=0.000e+00 nms_exact=True
+<<< [FIX-VAR-S5-dnn03] rc=0 wall=2.3s
+>>> [FIX-VAR-S5-dnn04] 23:59:45
+[DNN-04 AMP-BF16 + 4xGradAccum + FusedAdamW] PASS | preempts=4 susp=[0.043, 0.173, 0.016, 0.018] loss_err=0.000e+00 max_w_err=0.000e+00
+<<< [FIX-VAR-S5-dnn04] rc=0 wall=2.7s
+>>> [FIX-VAR-S5-dnn05] 23:59:48
+[DNN-05 20-Step Convergence (31 preempts)] PASS | susp_p50=0.081 ms max_loss_diff=0.000e+00 max_w_diff=0.000e+00
+<<< [FIX-VAR-S5-dnn05] rc=0 wall=1.9s
+>>> [FIX-VAR-S5-dnn06] 23:59:50
+[DNN-06 torch.compile(inductor, default)] FAIL | preempts=3 susp=[2.183, 2.544, 1.78] max_err=8.750e-01
+<<< [FIX-VAR-S5-dnn06] rc=1 wall=3.6s
+>>> [FIX-VAR-S5-dnn07] 23:59:53
+[DNN-07 torch.compile(reduce-overhead/CUDAGraph)] PASS | preempts=2 susp=[10.253, 10.081] max_err=0.000e+00
+<<< [FIX-VAR-S5-dnn07] rc=0 wall=3.3s
+>>> [FIX-VAR-S5-dnn08] 23:59:57
+[DNN-08 cuDNN-LSTM + Diffusers-UNet2D 10-Step] PASS | lstm_p=3 susp=[0.04, 0.024, 0.015] err=0.000e+00 | diff_p=4 susp=[0.035, 0.018, 0.018, 0.021] err=0.000e+00
+<<< [FIX-VAR-S5-dnn08] rc=0 wall=3.8s
+>>> [FIX-VAR-S6-llm01] 00:00:01
+[LLM-01 Qwen2-16L Prefill T=2048 BF16] PASS | preempts=4 susp=[0.151, 0.273, 0.394, 0.363] logit_err=0.000e+00 kv_err=0.000e+00
+<<< [FIX-VAR-S6-llm01] rc=0 wall=6.0s
+>>> [FIX-VAR-S6-llm02] 00:00:07
+[LLM-02 Qwen2-12L 32-Token Decode+KVCache] PASS | preempts=6 susp_p50=0.047 ms exact_toks=32/32 logit_err=0.000e+00
+<<< [FIX-VAR-S6-llm02] rc=0 wall=5.7s
+>>> [FIX-VAR-S6-llm03] 00:00:12
+[LLM-03 PEFT LoRA SFT Qwen2-8L (r=16)] PASS | preempts=6 susp_p50=0.134 ms loss_err=0.000e+00 lora_w_err=0.000e+00
+<<< [FIX-VAR-S6-llm03] rc=0 wall=6.7s
+>>> [FIX-VAR-S6-llm04] 00:00:19
+[LLM-04 Quantized FP8+INT8+Triton-W4A16] PASS | preempts=4 susp=[0.062, 0.488, 0.18, 0.104] e_fp8=0.000e+00 e_int8=0 e_w4a16=0.000e+00
+<<< [FIX-VAR-S6-llm04] rc=0 wall=2.5s
+>>> [FIX-VAR-S6-llm05] 00:00:21
+[LLM-05 Triton PagedAttention + DynamicBuckets] PASS | preempts=5 susp_p50=0.137 ms e_paged=0.000e+00 e_dyn=0.000e+00
+<<< [FIX-VAR-S6-llm05] rc=0 wall=3.4s
+>>> [FIX-VAR-S6-llm08] 00:00:25
+[LLM-08 Multi-Stream 2xLP+1xHP Concurrent] PASS | p1=2 susp1=[0.158, 0.235] | p2=1 susp2=[0.479] | e1=0.000e+00 e2=0.000e+00
+<<< [FIX-VAR-S6-llm08] rc=0 wall=3.7s
+>>> [FIX-VAR-S6-llm06:m5] 00:00:29
+[LLM-06 QoS Prefill+Decode mode=m5] PASS | HP_TPOT P50=4.371ms P99=6.492ms SLO<=10ms=100.0% | SUSP_P50=0.188ms | LP_iters=11 LP_ret=110.4% | lp_err=0.000e+00 hp_err=0.000e+00
+<<< [FIX-VAR-S6-llm06:m5] rc=0 wall=6.1s
+>>> [FIX-VAR-SYN-convbar-np3] 00:00:35
+[P3-CONVBAR C0 shallow] PASS | runs=3 ok=3 np=3 outer=10636 blocks=168 thr=256
+[P3-CONVBAR C1 deep] PASS | runs=3 ok=3 np=3 outer=335 blocks=168 thr=256
+[P3-CONVBAR D1 depth1] PASS | runs=3 ok=3 np=3 outer=119940 blocks=168 thr=256
+[P3-CONVBAR D2 depth2] PASS | runs=3 ok=3 np=3 outer=57224 blocks=168 thr=256
+[P3-CONVBAR D3 depth3] PASS | runs=3 ok=3 np=3 outer=19792 blocks=168 thr=256
+[P3-CONVBAR D4 depth4] PASS | runs=3 ok=3 np=3 outer=5473 blocks=168 thr=256
+[P3-CONVBAR D5 depth5] PASS | runs=3 ok=3 np=3 outer=1440 blocks=168 thr=256
+[P3-CONVBAR D6 depth6] PASS | runs=3 ok=3 np=3 outer=373 blocks=168 thr=256
+[P3-CONVBAR R0 regs+0] PASS | runs=3 ok=3 np=3 outer=26972 blocks=168 thr=256
+[P3-CONVBAR R1 regs+4] PASS | runs=3 ok=3 np=3 outer=23619 blocks=168 thr=256
+[P3-CONVBAR R2 regs+16] PASS | runs=3 ok=3 np=3 outer=10244 blocks=168 thr=256
+[P3-CONVBAR R3 regs+48] PASS | runs=3 ok=3 np=3 outer=4258 blocks=168 thr=256
+<<< [FIX-VAR-SYN-convbar-np3] rc=0 wall=2.0s
+>>> [FIX-VAR-SYN-convbar-np2] 00:00:37
+[P3-CONVBAR C0 shallow] PASS | runs=3 ok=3 np=2 outer=10427 blocks=168 thr=256
+[P3-CONVBAR C1 deep] PASS | runs=3 ok=3 np=2 outer=334 blocks=168 thr=256
+[P3-CONVBAR D1 depth1] PASS | runs=3 ok=3 np=2 outer=109289 blocks=168 thr=256
+[P3-CONVBAR D2 depth2] PASS | runs=3 ok=3 np=2 outer=57845 blocks=168 thr=256
+[P3-CONVBAR D3 depth3] PASS | runs=3 ok=3 np=2 outer=19651 blocks=168 thr=256
+[P3-CONVBAR D4 depth4] PASS | runs=3 ok=3 np=2 outer=5488 blocks=168 thr=256
+[P3-CONVBAR D5 depth5] PASS | runs=3 ok=3 np=2 outer=1438 blocks=168 thr=256
+[P3-CONVBAR D6 depth6] PASS | runs=3 ok=3 np=2 outer=373 blocks=168 thr=256
+[P3-CONVBAR R0 regs+0] PASS | runs=3 ok=3 np=2 outer=27192 blocks=168 thr=256
+[P3-CONVBAR R1 regs+4] PASS | runs=3 ok=3 np=2 outer=23675 blocks=168 thr=256
+[P3-CONVBAR R2 regs+16] PASS | runs=3 ok=3 np=2 outer=10147 blocks=168 thr=256
+[P3-CONVBAR R3 regs+48] PASS | runs=3 ok=3 np=2 outer=4249 blocks=168 thr=256
+<<< [FIX-VAR-SYN-convbar-np2] rc=0 wall=1.9s
+>>> [FIX-VAR-SYN-C1-np2] 00:00:39
+[P3-CONVBAR C1 deep] PASS | runs=10 ok=10 np=2 outer=329 blocks=168 thr=256
+<<< [FIX-VAR-SYN-C1-np2] rc=0 wall=0.7s
+>>> [FIX-VAR-SYN-partial] 00:00:39
+[P3-PARTIAL K0 uniform] PASS | runs=5 ok=5 np=3 susp_avg=0.086 ms | blocks=168 thr=256 base=3432180 step=53627
+[P3-PARTIAL K1 half_exit] PASS | runs=5 ok=5 np=3 susp_avg=0.085 ms | blocks=168 thr=256 base=3432180 step=53627
+[P3-PARTIAL K2 staggered_exit] PASS | runs=5 ok=5 np=3 susp_avg=0.144 ms | blocks=168 thr=256 base=3432180 step=53627
+[P3-PARTIAL K3 staggered_reconv] PASS | runs=5 ok=5 np=3 susp_avg=0.144 ms | blocks=168 thr=256 base=3432180 step=53627
+<<< [FIX-VAR-SYN-partial] rc=0 wall=1.0s
+=== guarded run done 2026-11-26T00:00:40+08:00 ===

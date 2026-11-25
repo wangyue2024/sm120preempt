@@ -1,0 +1,80 @@
+# SASS excerpts (nvdisasm -b SM120 of the original kernel images dumped via XSCHED_SM120_DUMP_DIR)
+
+## PyTorch unrolled_elementwise_kernel<direct_copy_kernel_cuda> around trap PCs +0x3190 and +0x49c0
+ /*3110*/ @P0 BRA 0x3490
+ /*3120*/ ISETP.GT.AND P0, PT, R0, 0xe, PT
+ /*3130*/ @P0 BRA 0x31f0
+ /*3140*/ ISETP.NE.AND P0, PT, R0, 0xa, PT
+ /*3150*/ @!P0 BRA 0x31c0
+ /*3160*/ ISETP.NE.AND P0, PT, R0, 0xb, PT
+ /*3170*/ @P0 BRA 0x39d0
+ /*3180*/ LDG.E.U8 R2, desc[UR36][R2.64] &wr=0x2
+ /*3190*/ ISETP.NE.AND P0, PT, R2, RZ, PT &req={2}
+ /*31a0*/ SEL.64 R16, RZ, 0x1, !P0
+ /*31b0*/ BRA 0x3b20
+ /*31c0*/ LDG.E.64 R2, desc[UR36][R2.64] &wr=0x2
+
+ /*4940*/ @!P0 IADD3 R0, PT, PT, R4, RZ, RZ
+ /*4950*/ @P1 MOV R5, R0
+ /*4960*/ STG.E.U8 desc[UR36][R2.64], R5 &rd=0x0
+ /*4970*/ BRA 0x49b0
+ /*4980*/ STG.E.64 desc[UR36][R2.64], R24 &req={5} &rd=0x0
+ /*4990*/ BRA 0x49b0
+ /*49a0*/ STG.E desc[UR36][R2.64], R24 &req={5} &rd=0x0
+ /*49b0*/ ISETP.GE.AND P0, PT, R29, R27, PT
+ /*49c0*/ @P0 BREAK.RELIABLE B6
+ /*49d0*/ @P0 BRA 0x6660
+ /*49e0*/ LDCU UR4, c[0x0][0x3a8] &wr=0x5
+ /*49f0*/ PRMT R0, R28, 0x9910, RZ &req={0}
+
+## Triton _rmsnorm_kernel: barrier / shared-memory reduction region (trap PCs +0x650..0x710)
+ /*04f0*/ @!P0 STS [R5+UR4], R10 &rd=0x1
+ /*0500*/ BAR.SYNC.DEFER_BLOCKING 0x0
+ /*0510*/ LOP3.LUT P0, RZ, R32, 0x7, RZ, 0xc0, !PT
+ /*0520*/ ISETP.LT.U32.AND P0, PT, R4, 0x8, !P0
+ /*0530*/ CS2R R4, SRZ &req={1}
+ /*0540*/ @!P3 LDS R30, [R31] &wr=0x1
+ /*0550*/ SHFL.BFLY PT, R3, R30, 0x4, 0x1f &req={1} &wr=0x1
+ /*0560*/ FADD R8, R30, R3 &req={1}
+ /*0570*/ SHFL.BFLY PT, R3, R8, 0x2, 0x1f &wr=0x1
+ /*0580*/ FADD R9, R8, R3 &req={1}
+ /*0590*/ LDC.64 R2, c[0x0][0x388] &wr=0x1
+ /*05a0*/ SHFL.BFLY PT, R6, R9, 0x1, 0x1f &wr=0x2
+ /*05b0*/ CS2R R10, SRZ
+ /*05c0*/ IMAD.WIDE.U32 R2, R12, 0x2, R2 &req={1}
+ /*05d0*/ FADD R32, R9, R6 &req={2}
+ /*05e0*/ CS2R R6, SRZ
+ /*05f0*/ @P0 STS [R31], R32
+ /*0600*/ BAR.SYNC.DEFER_BLOCKING 0x0
+ /*0610*/ CS2R R8, SRZ
+ /*0620*/ @!P2 LDG.E.128 R4, desc[UR6][R2.64] &wr=0x2
+ /*0630*/ @!P1 LDG.E.128 R8, desc[UR6][R2.64+0x1000] &rd=0x1 &wr=0x3
+ /*0640*/ I2FP.F32.S32 R15, R15
+ /*0650*/ LDS R30, [UR4] &wr=0x4
+ /*0660*/ LDCU UR4, c[0x0][0x39c] &wr=0x5
+ /*0670*/ FSETP.GT.AND P0, PT, |R15|.reuse, 8.50705917302346158658e+37, PT
+ /*0680*/ FSETP.GEU.AND P3, PT, |R15|, 1.175494350822287508e-38, PT
+ /*0690*/ HFMA2 R2, -RZ, RZ, 1.625, 0 &req={1}
+ /*06a0*/ @P0 FMUL R15, R15, 0.25
+ /*06b0*/ @!P3 FMUL R15, R15, 16777216
+ /*06c0*/ MUFU.RCP R15, R15 &wr=0x5
+ /*06d0*/ @P0 FMUL R30, R30, 0.25 &req={4}
+ /*06e0*/ @!P3 FMUL R30, R30, 16777216
+ /*06f0*/ FFMA R30, R15, R30, UR4 &req={5}
+ /*0700*/ MUFU.SQRT R32, R30 &wr=0x1
+ /*0710*/ FSETP.GT.AND P0, PT, |R32|.reuse, 8.50705917302346158658e+37, PT &req={1}
+ /*0720*/ FSETP.GEU.AND P3, PT, |R32|, 1.175494350822287508e-38, PT
+
+## bf16 vectorized copy (passing) around trap PC +0x9e0
+ /*0960*/ IMAD.WIDE.U32 R2, R0, 0x4, R2 &req={1}
+ /*0970*/ IMAD.WIDE.U32 R2, R11, 0x10, R2 &req={0}
+ /*0980*/ LDG.E.128 R12, desc[UR4][R2.64] &wr=0x3
+ /*0990*/ LDG.E.128 R4, desc[UR4][R2.64+0x800] &wr=0x4
+ /*09a0*/ IMAD.WIDE.U32 R8, R0, 0x2, R8 &req={2}
+ /*09b0*/ IMAD.WIDE.U32 R8, R11, 0x8, R8
+ /*09c0*/ F2FP.BF16.F32.PACK_AB R12, R13, R12 &req={3}
+ /*09d0*/ F2FP.BF16.F32.PACK_AB R13, R15, R14
+ /*09e0*/ F2FP.BF16.F32.PACK_AB R4, R5, R4 &req={4}
+ /*09f0*/ F2FP.BF16.F32.PACK_AB R5, R7, R6
+ /*0a00*/ STG.E.64 desc[UR4][R8.64], R12
+ /*0a10*/ STG.E.64 desc[UR4][R8.64+0x400], R4

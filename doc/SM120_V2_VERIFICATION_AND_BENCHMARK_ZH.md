@@ -86,7 +86,7 @@
 1. **驱动版本间 `.text.traphandler` 基址漂移（`580.95.05` vs `595.99.02`）**：不同驱动的 ToolsMemory 内部偏移存在 `+0x5900` 漂移，但 `tools_pc - handler_va == 0x4400` 恒定；动态指纹扫描与通用 `CALL.ABS` 编码实现跨驱动零硬编码。
 2. **部分已退出 CTA（Partially-Exited CTA）**：引入 `cta[b].warp_mask` + `@P0 ATOMG.E.OR` 动态 CTA Leader 选举 + `Cave 8` Partial-CTA 32-lane 合并 SMEM 保存 + `Cave 1` 死 Warp `c1_clean_exit_idx` 清理退出。
 3. **SM120 `BRX Rn` 消费 64-bit 寄存器对 `Rn:Rn+1`**：在 `Cave 2/5` 的 `BRX R10` 前显式 `mov_imm(11, 0)` 消除高位残留 `0xffffffff` 负跳。
-4. **`REG:255`（`SR_REGALLOC == 256`）最高寄存器 `R253` 边界**：`R254:R255` 为硬件 Trap 寄存器，在 `Cave 2/5` 增加 `SR_REGALLOC - 3 >= 253` 显式谓词保护。
+4. **`REG:255`（`SR_REGALLOC == 256`）最高寄存器 `R253` 边界**：`R254:R255` 为硬件 Trap 寄存器，在 `Cave 2/5` 增加 `SR_REGALLOC - 3 >= 253` 显式谓词保护。（**勘误 2026-11-25**：对普通内核 `SR_REGALLOC` 等于寄存器数，`−3` 导致漏存最高寄存器，见 [`SM120_V2_PHASE3_DEFECT_LEDGER_ZH.md`](SM120_V2_PHASE3_DEFECT_LEDGER_ZH.md) DEF-20。）
 5. **100% GDDR7 VRAM 控制面 + 纯 Copy Engine DMA（`v2.2.0`）**：消除 PCIe Zero-Copy 原子风暴与大网格 4.3× 膨胀，且严禁在抢占路径调用 Compute Engine 的 `cuMemsetD32Async`。
 6. **BAR0 `0x00424684` D10 法则**：写入 `0x80001c01` 后仅读取非 PRI `NV_PTIMER_TIME_0 (0x00009400)` 刷新首个 Posted Write 再写 `0x00001c01`。
 7. **SMEM `+0x400` 硬件 4 KiB 分配量子（`v2.2.1`）**：硬件先加 `0x400 B` 驱动保留区再按 4 KiB 对齐，因此 `smem_area = AlignUp(total_user_smem + 0x400, 4096)`（消除 `CUB Onesweep` `36,352 B -> 40,960 B` 末槽越界）。

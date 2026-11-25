@@ -7,6 +7,15 @@
 
 ---
 
+## 〇、2026-11-25 Phase 3 测试更新（优先阅读）
+
+本文档以下内容反映 `v2.2.1` 时的判断。2026-11-25 的生产算子与真实负载测试发现并定位了新的缺陷，完整记录见：
+
+- [`SM120_V2_PHASE3_DEFECT_LEDGER_ZH.md`](SM120_V2_PHASE3_DEFECT_LEDGER_ZH.md)：缺陷台账与调查全记录（DEF-14..22、OBS-1..12、测试方法问题、环境问题、调查时间线）
+- [`SM120_V2_PHASE3_PRODUCTION_OPS_GROUNDED_TESTS_ZH.md`](SM120_V2_PHASE3_PRODUCTION_OPS_GROUNDED_TESTS_ZH.md)：Suite 7 生产算子与 Suite 8 真实模型服务测试
+
+要点：**DEF-20（P0）Trap 引擎漏存每个内核最高 1–3 个寄存器**是 dtype 转换/CUB/topk 崩溃、Triton RMSNorm 静默错误以及 LIB-08、LLM-07 偶发错误的共同根因，修复已在两卡验证（未提交）；开放项为 DEF-21（恢复波次再抢占）、DEF-19（Cluster+DSMEM）、DEF-17（Guardian 每 CTA 开销）、DEF-22（`CALL.ABS` 漏检）。下文“P0/P1 全部清零”的结论在本次测试中被推翻。
+
 ## 一、项目当前总体状态与里程碑进展
 
 截至 `v2.2.0-sm120`，系统已全面完成 **Stage 1（v2 极简重构）→ Stage 2（双机跨驱动基线）→ Stage 3（真实商业库/框架全方位评测）→ Stage 4（Phase 1–2 生产级性能优化与 `DEF-01..08` 全部清零）**：

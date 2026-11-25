@@ -1,0 +1,124 @@
+# Level-3 trace excerpts (XSCHED_SM120_TRACE_LAUNCH=1), RTX 5060, before the DEF-20 fix
+
+## sort_r5
+sm120_guardian: instrumented func=0x359b8b00 orig_ep=0x7f63316f8300 -> ep_inst=0x7f632a800000 regs=24->24 bars=1 lmem=0(cap=4096,calls=1) static_smem=0 bin=3200B name=_ZN2at6native46_GLOBAL__N__e17e1519_13_SortStable_cu_f7bb90a127fill_reverse_indices_kernelEPliNS_4cuda6detail10IntDivide
+sm120_guardian: instrumented func=0x35d99770 orig_ep=0x7f63316fa200 -> ep_inst=0x7f632a801180 regs=40->40 bars=1 lmem=0(cap=0,calls=0) static_smem=4096 bin=13440B name=_ZN14at_cuda_detail3cub30DeviceRadixSortHistogramKernelINS0_21DeviceRadixSortPolicyIfN2at4cuda3cub6detail10OpaqueTypeILi
+sm120_guardian: instrumented func=0x35dd5a80 orig_ep=0x7f63316fdf00 -> ep_inst=0x7f632a804b00 regs=37->37 bars=1 lmem=0(cap=0,calls=0) static_smem=2336 bin=2432B name=_ZN14at_cuda_detail3cub33DeviceRadixSortExclusiveSumKernelINS0_21DeviceRadixSortPolicyIfN2at4cuda3cub6detail10OpaqueType
+sm120_guardian: instrumented func=0x35d90c80 orig_ep=0x7f63316ff100 -> ep_inst=0x7f632a805980 regs=79->79 bars=1 lmem=0(cap=0,calls=0) static_smem=45056 bin=39936B name=_ZN14at_cuda_detail3cub29DeviceRadixSortOnesweepKernelINS0_21DeviceRadixSortPolicyIfN2at4cuda3cub6detail10OpaqueTypeILi8
+sm120_guardian: instrumented func=0x39f242b0 orig_ep=0x7f633172cb00 -> ep_inst=0x7f632a80fa80 regs=22->22 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=1792B name=_ZN2at6native29vectorized_elementwise_kernelILi2ENS0_11FillFunctorIlEESt5arrayIPcLm1EEEEviT0_T1_
+sm120_guardian: instrumented func=0x36cca4c0 orig_ep=0x7f6331709600 -> ep_inst=0x7f632a810680 regs=40->40 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=4224B name=_ZN2at6native29vectorized_elementwise_kernelILi4ENS0_13BinaryFunctorIffbNS0_51_GLOBAL__N__28ce311f_18_CompareEQKernel_cu
+sm120_guardian: instrumented func=0x34b3a9b0 orig_ep=0x7f633172db00 -> ep_inst=0x7f632a811c00 regs=33->33 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=30080B name=_ZN2at6native27unrolled_elementwise_kernelIZZZNS0_23direct_copy_kernel_cudaERNS_18TensorIteratorBaseEENKUlvE1_clEvENKUlv
+sm120_guardian: instrumented func=0x3a454230 orig_ep=0x7f6331735900 -> ep_inst=0x7f632a819680 regs=39->39 bars=1 lmem=0(cap=0,calls=0) static_smem=16 bin=60288B name=_ZN2at6native13reduce_kernelILi512ELi1ENS0_8ReduceOpIlNS0_14func_wrapper_tIlZNS0_11sum_functorIlllEclERNS_14TensorIterat
+sm120_guardian: instrumented func=0x3aea50d0 orig_ep=0x7f6331744d00 -> ep_inst=0x7f632a828700 regs=40->40 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=4352B name=_ZN2at6native29vectorized_elementwise_kernelILi2ENS0_15CUDAFunctor_addIlEESt5arrayIPcLm3EEEEviT0_T1_
+sm120_trace: reactivate cmd=5 evicted=0 restored=0 drained=14837 m1exit=0 restore_wave=0 active_idx=1510 preempted=1 log=[1509M 1510K ]
+sm120_trace: reactivate cmd=5 evicted=49 restored=0 drained=2280 m1exit=0 restore_wave=0 active_idx=1554 preempted=1 log=[1553M 1554K ]
+cuda error 700: an illegal memory access was encountered @ <repo>/xsched/platforms/cuda/hal/src/level1/cuda_queue.cpp:52
+
+## l3_transpose_copy
+sm120_guardian: instrumented func=0x3b77ffd0 orig_ep=0x7eed6f6f8300 -> ep_inst=0x7eed69000000 regs=20->20 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=20352B name=_ZN2at6native18elementwise_kernelILi128ELi4EZNS0_22gpu_kernel_impl_nocastIZZZNS0_23direct_copy_kernel_cudaERNS_18TensorI
+sm120_guardian: instrumented func=0x3fe428e0 orig_ep=0x7eed6f721800 -> ep_inst=0x7eed69005480 regs=22->22 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=1792B name=_ZN2at6native29vectorized_elementwise_kernelILi2ENS0_11FillFunctorIlEESt5arrayIPcLm1EEEEviT0_T1_
+sm120_guardian: instrumented func=0x3c996ff0 orig_ep=0x7eed6f6fdb00 -> ep_inst=0x7eed69006080 regs=40->40 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=6272B name=_ZN2at6native29vectorized_elementwise_kernelILi4ENS0_13BinaryFunctorIN3c108BFloat16ES4_bNS0_51_GLOBAL__N__28ce311f_18_Co
+sm120_guardian: instrumented func=0x3b956220 orig_ep=0x7eed6f722800 -> ep_inst=0x7eed69007e00 regs=33->33 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=30080B name=_ZN2at6native27unrolled_elementwise_kernelIZZZNS0_23direct_copy_kernel_cudaERNS_18TensorIteratorBaseEENKUlvE1_clEvENKUlv
+sm120_guardian: instrumented func=0x40373300 orig_ep=0x7eed6f72a600 -> ep_inst=0x7eed6900f880 regs=39->39 bars=1 lmem=0(cap=0,calls=0) static_smem=16 bin=60288B name=_ZN2at6native13reduce_kernelILi512ELi1ENS0_8ReduceOpIlNS0_14func_wrapper_tIlZNS0_11sum_functorIlllEclERNS_14TensorIterat
+sm120_guardian: instrumented func=0x40dc4250 orig_ep=0x7eed6f739a00 -> ep_inst=0x7eed6901e900 regs=40->40 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=4352B name=_ZN2at6native29vectorized_elementwise_kernelILi2ENS0_15CUDAFunctor_addIlEESt5arrayIPcLm3EEEEviT0_T1_
+sm120_trace: reactivate cmd=5 evicted=16 restored=0 drained=5804 m1exit=0 restore_wave=0 active_idx=466 preempted=1 log=[461M 462K 463K 464K 465K 466K ]
+cuda error 700: an illegal memory access was encountered @ <repo>/xsched/platforms/cuda/hal/src/level1/cuda_queue.cpp:52
+
+## l3_embedding
+sm120_guardian: instrumented func=0x10d10d20 orig_ep=0x735a376fac00 -> ep_inst=0x735988000000 regs=24->24 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=1280B name=_ZN2at6native24vectorized_gather_kernelILi16ElEEvPcS2_PT0_illllb
+sm120_guardian: instrumented func=0x14b5d3c0 orig_ep=0x735a3771f700 -> ep_inst=0x735988000a00 regs=22->22 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=1792B name=_ZN2at6native29vectorized_elementwise_kernelILi2ENS0_11FillFunctorIlEESt5arrayIPcLm1EEEEviT0_T1_
+sm120_guardian: instrumented func=0x116aebd0 orig_ep=0x735a376fba00 -> ep_inst=0x735988001600 regs=40->40 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=6272B name=_ZN2at6native29vectorized_elementwise_kernelILi4ENS0_13BinaryFunctorIN3c108BFloat16ES4_bNS0_51_GLOBAL__N__28ce311f_18_Co
+sm120_guardian: instrumented func=0xfe2d940 orig_ep=0x735a37720700 -> ep_inst=0x735988003380 regs=33->33 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=30080B name=_ZN2at6native27unrolled_elementwise_kernelIZZZNS0_23direct_copy_kernel_cudaERNS_18TensorIteratorBaseEENKUlvE1_clEvENKUlv
+sm120_guardian: instrumented func=0x1508c090 orig_ep=0x735a37728500 -> ep_inst=0x73598800ae00 regs=39->39 bars=1 lmem=0(cap=0,calls=0) static_smem=16 bin=60288B name=_ZN2at6native13reduce_kernelILi512ELi1ENS0_8ReduceOpIlNS0_14func_wrapper_tIlZNS0_11sum_functorIlllEclERNS_14TensorIterat
+sm120_guardian: instrumented func=0x15adcd70 orig_ep=0x735a37737900 -> ep_inst=0x735988019e80 regs=40->40 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=4352B name=_ZN2at6native29vectorized_elementwise_kernelILi2ENS0_15CUDAFunctor_addIlEESt5arrayIPcLm3EEEEviT0_T1_
+sm120_trace: reactivate cmd=5 evicted=0 restored=0 drained=6013 m1exit=0 restore_wave=0 active_idx=3717 preempted=1 log=[3714M 3715K 3716K 3717K 3718K 3719K ]
+sm120_trace: reactivate cmd=5 evicted=94 restored=0 drained=6321 m1exit=0 restore_wave=0 active_idx=3959 preempted=1 log=[3954M 3955K 3956K 3957K 3958K 3959K ]
+cuda error 700: an illegal memory access was encountered @ <repo>/xsched/platforms/cuda/hal/src/common/cuda_command.cpp:31
+
+## l3_topk_sampling
+sm120_guardian: instrumented func=0x1dc13a50 orig_ep=0x7e67c76f8300 -> ep_inst=0x7e67c0800000 regs=12->16 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=512B name=_ZN2at6native6mbtopk4fillIjjEEvPT_S3_T0_
+sm120_guardian: instrumented func=0x1da03110 orig_ep=0x7e67c76f8e00 -> ep_inst=0x7e67c0800700 regs=21->21 bars=1 lmem=0(cap=0,calls=0) static_smem=1024 bin=4224B name=_ZN2at6native6mbtopk23computeBlockDigitCountsIfjjLi2EEEvNS_4cuda6detail10TensorInfoIKT_T0_EEjPjjS8_iijT1_PSB_Ps
+sm120_guardian: instrumented func=0x1dc1c150 orig_ep=0x7e67c76fa700 -> ep_inst=0x7e67c0801c80 regs=40->40 bars=1 lmem=0(cap=0,calls=0) static_smem=1184 bin=6400B name=_ZN2at6native6mbtopk18computeDigitCumSumEPsPjj
+sm120_guardian: instrumented func=0x1da14b60 orig_ep=0x7e67c76fc900 -> ep_inst=0x7e67c0803a80 regs=18->18 bars=1 lmem=0(cap=0,calls=0) static_smem=36 bin=3456B name=_ZN2at6native6mbtopk29computeBlockwiseWithinKCountsIjfEEvPT_PsPjS6_jibS6_PT0_S6_S4_j
+sm120_guardian: instrumented func=0x1dbf9e50 orig_ep=0x7e67c76fdf00 -> ep_inst=0x7e67c0804d00 regs=34->34 bars=1 lmem=0(cap=4096,calls=1) static_smem=0 bin=4608B name=_ZN2at6native6mbtopk25computeBlockwiseKthCountsIjEEvPT_PsjjPj
+sm120_guardian: instrumented func=0x1d6a5c10 orig_ep=0x7e67c7700400 -> ep_inst=0x7e67c0806400 regs=14->16 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=896B name=_ZN14at_cuda_detail3cub25DeviceScanByKeyInitKernelINS0_24ReduceByKeyScanTileStateIjiLb1EEENS0_22TransformInputIteratorIj
+sm120_guardian: instrumented func=0x1d69d210 orig_ep=0x7e67c7701000 -> ep_inst=0x7e67c0806c80 regs=56->56 bars=1 lmem=0(cap=0,calls=0) static_smem=16144 bin=41728B name=_ZN14at_cuda_detail3cub21DeviceScanByKeyKernelINS0_21DeviceScanByKeyPolicyINS0_22TransformInputIteratorIjN2at6native6mbt
+sm120_guardian: instrumented func=0x1d9fa200 orig_ep=0x7e67c770bc00 -> ep_inst=0x7e67c0811480 regs=40->40 bars=1 lmem=0(cap=0,calls=0) static_smem=1184 bin=7168B name=_ZN2at6native6mbtopk10gatherTopKIfjLi2EEEvNS_4cuda6detail10TensorInfoIKT_T0_EES8_S8_bjS8_NS5_IS6_S8_EES8_NS5_IlS8_EES8_j
+sm120_guardian: instrumented func=0x1e553990 orig_ep=0x7e67c770e100 -> ep_inst=0x7e67c0813580 regs=53->53 bars=1 lmem=0(cap=0,calls=0) static_smem=1184 bin=16128B name=_ZN2at6native18radixSortKVInPlaceILi2ELin1ELi32ELi4EfljEEvNS_4cuda6detail10TensorInfoIT3_T5_EES6_S6_S6_NS4_IT4_S6_EES6_b
+sm120_guardian: instrumented func=0x22ab96e0 orig_ep=0x7e67c7735e00 -> ep_inst=0x7e67c0817980 regs=22->22 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=1792B name=_ZN2at6native29vectorized_elementwise_kernelILi2ENS0_11FillFunctorIlEESt5arrayIPcLm1EEEEviT0_T1_
+sm120_guardian: instrumented func=0x1f8574a0 orig_ep=0x7e67c7712900 -> ep_inst=0x7e67c0818580 regs=40->40 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=4224B name=_ZN2at6native29vectorized_elementwise_kernelILi4ENS0_13BinaryFunctorIffbNS0_51_GLOBAL__N__28ce311f_18_CompareEQKernel_cu
+sm120_guardian: instrumented func=0x1cc6de80 orig_ep=0x7e67c7736e00 -> ep_inst=0x7e67c0819b00 regs=33->33 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=30080B name=_ZN2at6native27unrolled_elementwise_kernelIZZZNS0_23direct_copy_kernel_cudaERNS_18TensorIteratorBaseEENKUlvE1_clEvENKUlv
+sm120_guardian: instrumented func=0x22fe7240 orig_ep=0x7e67c773ec00 -> ep_inst=0x7e67c0821580 regs=39->39 bars=1 lmem=0(cap=0,calls=0) static_smem=16 bin=60288B name=_ZN2at6native13reduce_kernelILi512ELi1ENS0_8ReduceOpIlNS0_14func_wrapper_tIlZNS0_11sum_functorIlllEclERNS_14TensorIterat
+sm120_guardian: instrumented func=0x23a37e20 orig_ep=0x7e67c774e000 -> ep_inst=0x7e67c0830600 regs=40->40 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=4352B name=_ZN2at6native29vectorized_elementwise_kernelILi2ENS0_15CUDAFunctor_addIlEESt5arrayIPcLm3EEEEviT0_T1_
+sm120_trace: reactivate cmd=5 evicted=109 restored=0 drained=1745 m1exit=0 restore_wave=0 active_idx=4125 preempted=1 log=[4120K 4121K 4122K 4123K 4124K 4125K 4126K 4127K 4128K 4129K 4130K 4131K 4132K 4133K 4134K 4135K ]
+cuda error 717: operation not supported on global/shared address space @ <repo>/xsched/platforms/cuda/hal/src/common/cuda_command.cpp:31
+
+## l3_conv1x1_nchw_fp32
+sm120_guardian: instrumented func=0xf812f70 orig_ep=0x7cab9b6f9700 -> ep_inst=0x7cab7ee00000 regs=234->234 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=39936B name=_ZN7cutlass7Kernel2I52cutlass_80_tensorop_s1688gemm_128x128_32x3_nn_align4EEvNT_6ParamsE
+sm120_guardian: instrumented func=0x13492ab0 orig_ep=0x7cab9b727100 -> ep_inst=0x7cab7ee0a100 regs=22->22 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=1792B name=_ZN2at6native29vectorized_elementwise_kernelILi2ENS0_11FillFunctorIlEESt5arrayIPcLm1EEEEviT0_T1_
+sm120_guardian: instrumented func=0x106962b0 orig_ep=0x7cab9b703c00 -> ep_inst=0x7cab7ee0ad00 regs=40->40 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=4224B name=_ZN2at6native29vectorized_elementwise_kernelILi4ENS0_13BinaryFunctorIffbNS0_51_GLOBAL__N__28ce311f_18_CompareEQKernel_cu
+sm120_guardian: instrumented func=0xc43b470 orig_ep=0x7cab9b728100 -> ep_inst=0x7cab7ee0c280 regs=33->33 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=30080B name=_ZN2at6native27unrolled_elementwise_kernelIZZZNS0_23direct_copy_kernel_cudaERNS_18TensorIteratorBaseEENKUlvE1_clEvENKUlv
+sm120_guardian: instrumented func=0x139c7950 orig_ep=0x7cab9b72ff00 -> ep_inst=0x7cab7ee13d00 regs=39->39 bars=1 lmem=0(cap=0,calls=0) static_smem=16 bin=60288B name=_ZN2at6native13reduce_kernelILi512ELi1ENS0_8ReduceOpIlNS0_14func_wrapper_tIlZNS0_11sum_functorIlllEclERNS_14TensorIterat
+sm120_guardian: instrumented func=0x1441ace0 orig_ep=0x7cab9b73f300 -> ep_inst=0x7cab7ee22d80 regs=40->40 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=4352B name=_ZN2at6native29vectorized_elementwise_kernelILi2ENS0_15CUDAFunctor_addIlEESt5arrayIPcLm3EEEEviT0_T1_
+sm120_trace: reactivate cmd=5 evicted=30 restored=0 drained=1774 m1exit=0 restore_wave=0 active_idx=826 preempted=1 log=[823M 824K 825K 826K 827K 828K ]
+sm120_trace: reactivate cmd=5 evicted=26 restored=0 drained=119 m1exit=0 restore_wave=0 active_idx=874 preempted=1 log=[871M 872K 873K 874K 875K 876K ]
+sm120_trace: reactivate cmd=5 evicted=0 restored=0 drained=195 m1exit=0 restore_wave=0 active_idx=926 preempted=1 log=[925M 926K 927K 928K 929K 930K ]
+sm120_trace: reactivate cmd=5 evicted=27 restored=0 drained=1018 m1exit=0 restore_wave=0 active_idx=1037 preempted=1 log=[1034M 1035K 1036K 1037K 1038K 1039K ]
+sm120_trace: reactivate cmd=5 evicted=90 restored=0 drained=3115 m1exit=0 restore_wave=0 active_idx=1086 preempted=1 log=[1082M 1083K 1084K 1085K 1086K 1087K ]
+sm120_trace: reactivate cmd=5 evicted=30 restored=0 drained=1534 m1exit=0 restore_wave=0 active_idx=1139 preempted=1 log=[1136M 1137K 1138K 1139K 1140K 1141K ]
+sm120_trace: reactivate cmd=5 evicted=30 restored=0 drained=1877 m1exit=0 restore_wave=0 active_idx=1248 preempted=1 log=[1245M 1246K 1247K 1248K 1249K 1250K ]
+sm120_trace: reactivate cmd=5 evicted=30 restored=0 drained=1089 m1exit=0 restore_wave=0 active_idx=1296 preempted=1 log=[1293M 1294K 1295K 1296K 1297K 1298K ]
+sm120_trace: reactivate cmd=5 evicted=85 restored=0 drained=39414 m1exit=0 restore_wave=0 active_idx=1346 preempted=1 log=[1341M 1342K 1343K 1344K 1345K 1346K ]
+cuda error 700: an illegal memory access was encountered @ <repo>/xsched/platforms/cuda/hal/src/level1/cuda_queue.cpp:52
+
+## tri2
+sm120_guardian: instrumented func=0x241cd220 orig_ep=0x7b083b6f8300 -> ep_inst=0x7b07fc000000 regs=35->35 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=3328B name=_rmsnorm_kernel
+sm120_guardian: instrumented func=0x27eb66b0 orig_ep=0x7b083b71d600 -> ep_inst=0x7b07fc001200 regs=10->16 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=2688B name=_ZN2at6native29vectorized_elementwise_kernelILi4ENS0_11FillFunctorIbEESt5arrayIPcLm1EEEEviT0_T1_
+sm120_guardian: instrumented func=0x24ba5430 orig_ep=0x7b083b6f9900 -> ep_inst=0x7b07fc002180 regs=40->40 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=6272B name=_ZN2at6native29vectorized_elementwise_kernelILi4ENS0_13BinaryFunctorIN3c108BFloat16ES4_bNS0_51_GLOBAL__N__28ce311f_18_Co
+sm120_guardian: instrumented func=0x2523fc70 orig_ep=0x7b083b71e900 -> ep_inst=0x7b07fc003f00 regs=35->35 bars=1 lmem=0(cap=0,calls=0) static_smem=16 bin=61312B name=_ZN2at6native13reduce_kernelILi512ELi1ENS0_8ReduceOpIbNS0_14func_wrapper_tIbZZZNS0_14or_kernel_cudaERNS_14TensorIterator
+sm120_guardian: instrumented func=0x28cd23c0 orig_ep=0x7b083b72e100 -> ep_inst=0x7b07fc013380 regs=38->38 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=4096B name=_ZN2at6native29vectorized_elementwise_kernelILi4ENS0_13BinaryFunctorIbbbZZZNS0_22logical_or_kernel_cudaERNS_14TensorIter
+sm120_trace: reactivate cmd=5 evicted=2 restored=0 drained=5496 m1exit=0 restore_wave=0 active_idx=3174 preempted=1 log=[3171M 3172K 3173K 3174K 3175K ]
+sm120_dump: active-kernel layout stride=88960 thr_off=0xb80 thr_stride=320 smem_off=0x14b80 smem_area=4096 (regs=35 static_smem=0 dyn_smem=32 thr=256)
+sm120_dump: hdr(last DMA) cmd=5 evicted=2 drained=5496 active=3174 arena=0x7b07f0000000 stride=42496 max_slots=424 thr_off=0x600 thr_stride=320 smem_off=0xa600 | states: 0=2693 1=0 2=5497 5=2 other=0
+sm120_dump: cta=2663 slot=0 warp_mask=0xff entry_dec=0 pcs=[w0.0:+0x710 w0.31:+0x710 w1.0:+0x710 w1.31:+0x710 w2.0:+0x710 w2.31:+0x710 w3.0:+0x710 w3.31:+0x710 w4.0:+0x6d0 w4.31:+0x6d0 w5.0:+0x700 w5.31:+0x700 w6.0:+0x6f0 w6.31:+0x6f0 w7.0:+0x6d0 w7.31:+0x6d0 ]
+sm120_dump: cta=2692 slot=1 warp_mask=0xff entry_dec=0 pcs=[w0.0:+0x650 w0.31:+0x650 w1.0:+0x650 w1.31:+0x650 w2.0:+0x650 w2.31:+0x650 w3.0:+0x670 w3.31:+0x670 w4.0:+0x670 w4.31:+0x670 w5.0:+0x670 w5.31:+0x670 w6.0:+0x650 w6.31:+0x650 w7.0:+0x650 w7.31:+0x650 ]
+sm120_trace: reactivate cmd=5 evicted=0 restored=0 drained=32404 m1exit=0 restore_wave=0 active_idx=3370 preempted=1 log=[3366M 3367K 3368K 3369K 3370K ]
+sm120_trace: reactivate cmd=5 evicted=37 restored=0 drained=32028 m1exit=0 restore_wave=0 active_idx=3570 preempted=1 log=[3566M 3567K 3568K 3569K 3570K ]
+sm120_dump: active-kernel layout stride=42496 thr_off=0x600 thr_stride=320 smem_off=0xa600 smem_area=0 (regs=40 static_smem=0 dyn_smem=0 thr=128)
+sm120_dump: hdr(last DMA) cmd=5 evicted=37 drained=32028 active=3570 arena=0x7b07f0000000 stride=42496 max_slots=424 thr_off=0x600 thr_stride=320 smem_off=0xa600 | states: 0=703 1=0 2=32028 5=37 other=0
+sm120_dump: cta=596 slot=4 warp_mask=0xa entry_dec=0 pcs=[w0:dead w1.0:+0x1270 w1.31:+0x1270 w2:dead w3.0:+0x1270 w3.31:+0x1270 ]
+sm120_dump: cta=603 slot=24 warp_mask=0xf entry_dec=0 pcs=[w0.0:+0x1270 w0.31:+0x1270 w1.0:+0x1270 w1.31:+0x1270 w2.0:+0x1270 w2.31:+0x1270 w3.0:+0x1270 w3.31:+0x1270 ]
+sm120_dump: cta=611 slot=2 warp_mask=0xa entry_dec=0 pcs=[w0:dead w1.0:+0x12b0 w1.31:+0x12b0 w2:dead w3.0:+0x12b0 w3.31:+0x12b0 ]
+sm120_dump: cta=617 slot=13 warp_mask=0xa entry_dec=0 pcs=[w0:dead w1.0:+0x1290 w1.31:+0x1290 w2:dead w3.0:+0x1290 w3.31:+0x1290 ]
+sm120_trace: reactivate cmd=5 evicted=71 restored=0 drained=9770 m1exit=0 restore_wave=0 active_idx=3991 preempted=1 log=[3987M 3988K 3989K 3990K 3991K ]
+sm120_dump: active-kernel layout stride=42496 thr_off=0x600 thr_stride=320 smem_off=0xa600 smem_area=0 (regs=40 static_smem=0 dyn_smem=0 thr=128)
+sm120_dump: hdr(last DMA) cmd=5 evicted=71 drained=9770 active=3991 arena=0x7b07f0000000 stride=42496 max_slots=424 thr_off=0x600 thr_stride=320 smem_off=0xa600 | states: 0=22924 1=0 2=9773 5=71 other=0
+sm120_dump: cta=22804 slot=24 warp_mask=0x5 entry_dec=0 pcs=[w0.0:+0x12b0 w0.31:+0x12b0 w1:dead w2.0:+0x12b0 w2.31:+0x12b0 w3:dead ]
+sm120_dump: cta=22807 slot=70 warp_mask=0xf entry_dec=0 pcs=[w0.0:+0x12b0 w0.31:+0x12b0 w1.0:+0x1290 w1.31:+0x1290 w2.0:+0x12b0 w2.31:+0x12b0 w3.0:+0x1290 w3.31:+0x1290 ]
+sm120_dump: cta=22811 slot=10 warp_mask=0xa entry_dec=0 pcs=[w0:dead w1.0:+0x1270 w1.31:+0x1270 w2:dead w3.0:+0x1270 w3.31:+0x1270 ]
+sm120_dump: cta=22813 slot=19 warp_mask=0x5 entry_dec=0 pcs=[w0.0:+0x1290 w0.31:+0x1290 w1:dead w2.0:+0x1290 w2.31:+0x1290 w3:dead ]
+sm120_trace: reactivate cmd=5 evicted=95 restored=0 drained=4855 m1exit=0 restore_wave=0 active_idx=4191 preempted=1 log=[4187M 4188K 4189K 4190K 4191K ]
+sm120_dump: active-kernel layout stride=42496 thr_off=0x600 thr_stride=320 smem_off=0xa600 smem_area=0 (regs=40 static_smem=0 dyn_smem=0 thr=128)
+sm120_dump: hdr(last DMA) cmd=5 evicted=95 drained=4855 active=4191 arena=0x7b07f0000000 stride=42496 max_slots=424 thr_off=0x600 thr_stride=320 smem_off=0xa600 | states: 0=27818 1=0 2=4855 5=95 other=0
+sm120_dump: cta=27723 slot=35 warp_mask=0xf entry_dec=0 pcs=[w0.0:+0x1270 w0.31:+0x1270 w1.0:+0x1270 w1.31:+0x1270 w2.0:+0x1270 w2.31:+0x1270 w3.0:+0x1270 w3.31:+0x1270 ]
+sm120_dump: cta=27724 slot=28 warp_mask=0xf entry_dec=0 pcs=[w0.0:+0x1270 w0.31:+0x1270 w1.0:+0x1270 w1.31:+0x1270 w2.0:+0x1270 w2.31:+0x1270 w3.0:+0x1270 w3.31:+0x1270 ]
+sm120_dump: cta=27725 slot=62 warp_mask=0xf entry_dec=0 pcs=[w0.0:+0x1290 w0.31:+0x1290 w1.0:+0x1290 w1.31:+0x1290 w2.0:+0x1290 w2.31:+0x1290 w3.0:+0x1290 w3.31:+0x1290 ]
+sm120_dump: cta=27726 slot=37 warp_mask=0xa entry_dec=0 pcs=[w0:dead w1.0:+0x1290 w1.31:+0x1290 w2:dead w3.0:+0x1290 w3.31:+0x1290 ]
+sm120_trace: reactivate cmd=5 evicted=1 restored=0 drained=24767 m1exit=0 restore_wave=0 active_idx=4391 preempted=1 log=[4387M 4388K 4389K 4390K 4391K ]
+sm120_dump: active-kernel layout stride=42496 thr_off=0x600 thr_stride=320 smem_off=0xa600 smem_area=0 (regs=40 static_smem=0 dyn_smem=0 thr=128)
+sm120_dump: hdr(last DMA) cmd=5 evicted=1 drained=24767 active=4391 arena=0x7b07f0000000 stride=42496 max_slots=424 thr_off=0x600 thr_stride=320 smem_off=0xa600 | states: 0=7999 1=0 2=24768 5=1 other=0
+sm120_dump: cta=7998 slot=0 warp_mask=0x4 entry_dec=0 pcs=[w0:dead w1:dead w2.0:+0x1690 w2.31:+0x1690 w3:dead ]
+sm120_trace: reactivate cmd=5 evicted=17 restored=0 drained=1685 m1exit=0 restore_wave=0 active_idx=4811 preempted=1 log=[4808M 4809K 4810K 4811K 4812K ]
+sm120_dump: active-kernel layout stride=88960 thr_off=0xb80 thr_stride=320 smem_off=0x14b80 smem_area=4096 (regs=35 static_smem=0 dyn_smem=32 thr=256)
+sm120_dump: hdr(last DMA) cmd=5 evicted=17 drained=1685 active=4811 arena=0x7b07f0000000 stride=42496 max_slots=424 thr_off=0x600 thr_stride=320 smem_off=0xa600 | states: 0=6489 1=0 2=1686 5=17 other=0
+sm120_dump: cta=6466 slot=8 warp_mask=0xff entry_dec=0 pcs=[w0.0:+0x540 w0.31:+0x540 w1.0:+0x540 w1.31:+0x540 w2.0:+0x540 w2.31:+0x540 w3.0:+0x540 w3.31:+0x540 w4.0:+0x460 w4.31:+0x460 w5.0:+0x540 w5.31:+0x540 w6.0:+0x540 w6.31:+0x540 w7.0:+0x540 w7.31:+0x540 ]
+
+## r3_1
+sm120_guardian: instrumented func=0x60ea3192ca90 orig_ep=0x7855eb6f4000 -> ep_inst=0x7855e6c00000 regs=55->55 bars=1 lmem=0(cap=0,calls=0) static_smem=0 bin=2816B name=_Z6k_regsILi48EEvPji
+sm120_trace: reactivate cmd=5 evicted=60 restored=0 drained=0 m1exit=0 restore_wave=0 active_idx=1 preempted=1 log=[1K ]
+sm120_dump: active-kernel layout stride=101248 thr_off=0xb80 thr_stride=384 smem_off=0x18b80 smem_area=0 (regs=55 static_smem=0 dyn_smem=0 thr=256)
+sm120_dump: hdr(last DMA) cmd=5 evicted=60 drained=0 active=1 arena=0x7855e8e00000 stride=101248 max_slots=60 thr_off=0xb80 thr_stride=384 smem_off=0x18b80 | states: 0=0 1=0 2=0 5=60 other=0
+sm120_dump: cta=0 slot=19 warp_mask=0xff entry_dec=0 pcs=[w0.0:+0x5a0 w0.31:+0x5a0 w1.0:+0x7f0 w1.31:+0x7f0 w2.0:+0x790 w2.31:+0x790 w3.0:+0x730 w3.31:+0x730 w4.0:+0x5a0 w4.31:+0x5a0 w5.0:+0x690 w5.31:+0x690 w6.0:+0x550 w6.31:+0x550 w7.0:+0x780 w7.31:+0x780 ]
+sm120_dump: cta=1 slot=44 warp_mask=0xff entry_dec=0 pcs=[w0.0:+0x7f0 w0.31:+0x7f0 w1.0:+0x630 w1.31:+0x630 w2.0:+0x7c0 w2.31:+0x7c0 w3.0:+0x6c0 w3.31:+0x6c0 w4.0:+0x650 w4.31:+0x650 w5.0:+0x720 w5.31:+0x720 w6.0:+0x6c0 w6.31:+0x6c0 w7.0:+0x4d0 w7.31:+0x4d0 ]
+sm120_dump: cta=2 slot=45 warp_mask=0xff entry_dec=0 pcs=[w0.0:+0x5e0 w0.31:+0x5e0 w1.0:+0x500 w1.31:+0x500 w2.0:+0x790 w2.31:+0x790 w3.0:+0x810 w3.31:+0x810 w4.0:+0x670 w4.31:+0x670 w5.0:+0x6a0 w5.31:+0x6a0 w6.0:+0x670 w6.31:+0x670 w7.0:+0x790 w7.31:+0x790 ]
+sm120_dump: cta=3 slot=25 warp_mask=0xff entry_dec=0 pcs=[w0.0:+0x500 w0.31:+0x500 w1.0:+0x7e0 w1.31:+0x7e0 w2.0:+0x790 w2.31:+0x790 w3.0:+0x520 w3.31:+0x520 w4.0:+0x660 w4.31:+0x660 w5.0:+0x800 w5.31:+0x800 w6.0:+0x640 w6.31:+0x640 w7.0:+0x750 w7.31:+0x750 ]

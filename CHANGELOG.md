@@ -2,6 +2,33 @@
 
 All notable changes to the Blackwell (`sm_120`) Level-3 transparent preemption and scheduling system are documented in this file.
 
+## [Unreleased] - 2026-11-25 — Phase 3 production-operator & grounded real-model testing, DEF-20 fix
+
+Summary & roadmap: `doc/SM120_V2_PHASE3_SUMMARY_AND_ROADMAP_ZH.md`.
+
+### Added
+- **Suite 7 `bench_prod_ops_p3.py`**: 29 production operators (cuBLAS BF16/FP8/INT8, MoE bmm, FlashAttention SDPA prefill/decode, RoPE, RMSNorm/LayerNorm/Softmax/SwiGLU/GELU/CE, Triton RMSNorm, cuDNN conv/BN, CUB reduce/scan/sort, topk, embedding, int32 atomics, dtype cast, transpose, fused AdamW, linear backward with grad accumulation) x {native, shim, lv1, lv3}, one process per (op, mode), per-call on-GPU bit-exact checks, golden SHA-256 digests, native high-priority-stream co-run baseline.
+- **Suite 8 `bench_real_serving_p3.py`**: real `Qwen2.5-0.5B-Instruct` weights; online chat requests (Poisson, greedy decode + KV cache, TTFT/TPOT) co-located with offline perplexity / prefill evaluation on the same weights; exact-token and bit-exact LP checks.
+- **`test_partial_exit_p3.cu`**: synthetic Mode 5 evict/restore of partially exited, divergent and reconverging warps (5/5 PASS on RTX 5060).
+- **Diagnostics**: exported `XSm120GetRouteStats()` (adaptive-router counters); `XSCHED_SM120_TRACE_LAUNCH=1` (per-launch kernel name/geometry, reactivate telemetry, evicted-CTA trap PCs as original-SASS offsets via `Sm120StreamContext::DebugDumpEvicted`); `XSCHED_SM120_DUMP_DIR` (dump original SASS for `nvdisasm -b SM120`); kernel name + binary size in the instrumentation log.
+
+### Fixed (working tree, not yet committed) — see `doc/SM120_V2_PHASE3_DEFECT_LEDGER_ZH.md`
+- **DEF-20 (P0, root cause of DEF-14/15/16, LIB-08 and LLM-07 m5 intermittents)**: the Cave 2/5 register cascade used `SR_REGALLOC - 3`, but `SR_REGALLOC` equals the kernel's exact register count (measured with a binary-patched `S2R SR_REGALLOC` probe), so the top 1-3 live registers were never saved/restored (R14/R15 entirely for 14-16-register kernels). Fix: `SR_REGALLOC - 1` in `sm120_trap_engine.cpp` + round the instrumented register count up to even (`<255`) in `sm120_guardian.cpp` so 64-bit register pairs never straddle the allocation. Validation: Suite 7 Lv3 29/29 on both GPUs and both builds; RTX 5080 LIB-08 60/60, LLM-07 m5 10/10, Suites 1/4/5/6 all pass (with DEF-12 kept).
+- Added `test_convbar_p3.cu` (nested-divergence, register-pressure and per-accumulator attribution cases) and `test/sm120_v2/eval/repro/` (SR_REGALLOC probe, minimal cast repro, in-process drift check).
+
+### Still open
+- **DEF-21 (P1)** preemption while a restore wave is in flight: HEAD logic loses CTAs (DNN-06, real-model serving LP), the working-tree DEF-12 logic fails the synthetic 2-preemption C1 case on RTX 5060.
+- **DEF-19 (P2)** CTA cluster + DSMEM (HW-06) intermittent after the fix (WT 9/10, VAR 6/10).
+- **DEF-22 (P2, latent)** `BinaryHasDeviceCalls` misses `CALL.ABS.NOINC` (opcode `0x343`).
+- **DEF-18 revised**: the LIB-08 regression signal disappeared after the DEF-20 fix; keep the DEF-12 change.
+
+### Found (open, see `doc/SM120_V2_PHASE3_PRODUCTION_OPS_GROUNDED_TESTS_ZH.md` §5)
+- **DEF-14 (P0)** Mode 5 restore crash (700/717) on PyTorch `unrolled_elementwise_kernel<direct_copy_kernel_cuda>` (all dtype casts) after the first State-B eviction; both GPUs; also on committed HEAD.
+- **DEF-15 (P0)** Restore crashes on CUB onesweep sort / CUB integer scan / `mbtopk` (and `LIB-08` NP=2, `LLM-07 m5` intermittently).
+- **DEF-16 (P0, silent)** Triton fused RMSNorm returns wrong results under Lv3 preemption without any error.
+- **DEF-17 (P1)** Entry Guardian per-CTA cost: up to +101% steady-state overhead for short-CTA memory-bound kernels (median +1.7%).
+- **DEF-18 (P1)** The uncommitted DEF-12 restore-path change raises `LIB-08` NP=2 failure rate from 15% (HEAD, 6/40) to 38% (19/50), Fisher p = 0.019; keep HEAD behaviour until root-caused.
+
 ## [v2.2.1-sm120] - 2026-11-24
 
 ### Dual-GPU Closed-Loop Verification (`RTX 5080 GB203` + `RTX 5060 GB206`)

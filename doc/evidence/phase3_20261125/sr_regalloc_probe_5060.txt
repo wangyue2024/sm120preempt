@@ -1,0 +1,10 @@
+# SR_REGALLOC probe (RTX 5060). Columns: N live values, CU_FUNC_ATTRIBUTE_NUM_REGS, hardware SR_REGALLOC, highest register the ORIGINAL cascade (SR_REGALLOC-3) saves
+## plain context
+N      REG(attr) SR_REGALLOC cascade_top    frame_regs   engine_reg_ceil verdict
+8      16        16          R-1            R31          32              MISSES TOP REGS
+12     20        20          R17            R47          48              MISSES TOP REGS
+20     25        25          R23            R47          48              MISSES TOP REGS
+40     45        45          R43            R63          64              MISSES TOP REGS
+64     69        69          R67            R95          96              MISSES TOP REGS
+120    125       125         R123           R143         144             MISSES TOP REGS
+200    206       206         R203           R223         224             MISSES TOP REGS

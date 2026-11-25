@@ -1,5 +1,8 @@
 # XSched Blackwell (`sm_120`) Level-3 Hardware Trap Preemption (v2)
 
+> **📌 当前状态（2026-11-25，Phase 3 生产负载测试）**：在 29 个 PyTorch 生产算子、真实模型服务与新增合成 Trap 测试中发现 **DEF-20（P0）：`v2.2.1` 的 Trap 引擎漏存每个内核最高 1–3 个寄存器**（下文“`R0..R253` 全量寄存器级联”在 `v2.2.1` 中并不成立），它是 dtype 转换/CUB/topk 恢复崩溃、Triton RMSNorm 静默错误及 LIB-08/LLM-07 偶发错误的共同根因；修复已随本次提交合入并在两卡验证（Suite 7 Lv3 29/29）。开放项：DEF-21（恢复中途再抢占）、DEF-19（Cluster+DSMEM）、DEF-17（Guardian 每 CTA 开销）。
+> 请先阅读：[阶段总结与规划](doc/SM120_V2_PHASE3_SUMMARY_AND_ROADMAP_ZH.md) · [缺陷台账](doc/SM120_V2_PHASE3_DEFECT_LEDGER_ZH.md) · [Phase 3 测试报告](doc/SM120_V2_PHASE3_PRODUCTION_OPS_GROUNDED_TESTS_ZH.md)
+
 面向 **NVIDIA Blackwell (`sm_120`)** 架构的用户端透明细粒度硬件抢占与调度系统（基于上海交通大学 IPADS 实验室 [XSched](xsched/docs/xsched-osdi25.pdf) 框架扩展，仅用于学术研究）。
 
 本仓库已全面完成 **v2 极简通用架构重构**，在**不修改任何 CUDA 内核源码**、**不依赖幂等性假设**的前提下，实现了跨 `RTX 5080`（`GB203`, 84 SMs, Driver `580.95.05`, CUDA 12.9）与 `RTX 5060`（`GB206`, 30 SMs, Driver `595.99.02`）的硬件 Trap 级空间抢占、零脉冲原位状态恢复与 Context 级 CILP 抢占。
