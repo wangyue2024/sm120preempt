@@ -2,6 +2,28 @@
 
 All notable changes to the Blackwell (`sm_120`) Level-3 transparent preemption and scheduling system are documented in this file.
 
+## [Unreleased] - 2026-11-25 (evening) — Phase 3.2 correctness close-out & Phase 3.3 performance
+
+Report: `doc/SM120_V2_PHASE3_2_3_3_REPORT_ZH.md`; evidence: `doc/evidence/phase3_2_3_3_20261125/`.
+Full regression after all changes (`regress_p3.py --suites full`): **RTX 5060 184/184, RTX 5080 184/184**
+(synthetic 5, Suite 1 25, Suite 4 6, Suite 5 8, Suite 6 8, Suite 7 116 = 29 ops x 4 modes, Suite 8 16).
+
+### Fixed
+- **DEF-21 closed**: the synthetic "DEF-12 logic fails C1 on RTX 5060" result was a test-harness race (pageable `cudaMemcpy` H2D vs. a non-blocking stream, T-11). With `H2D()` (copy + device sync): 36 processes, 0 failures; stress (multi-wave grids, 4-6 queued kernels, 300 us-1 ms gaps, 8-10 preemptions per round) ~3,000 preemptions all bit-exact, about half hitting a restore wave.
+- **DEF-22**: `BinaryHasDeviceCalls` also matches `CALL.ABS.NOINC` (`0x343`); `XSCHED_SM120_DETECT_CALL_ABS=0` disables it.
+- **DEF-23 (new)**: the LMEM save area is static local size, plus `CU_LIMIT_STACK_SIZE` for kernels with device calls (was a fixed 4 KiB/thread); LayerNorm arena 231 -> 103 MiB. `XSCHED_SM120_LMEM_CAP_BYTES` overrides.
+- **DEF-19 mitigated**: kernels with `ClusterSize > 1` route to Level-1 by default (`XSCHED_SM120_CLUSTER_MODE5=1` restores single-wave Mode 5).
+
+### Performance
+- **DEF-17 Entry Guardian**: the default guardian no longer re-reads `cmd` at slot 28 (hot control-header L2 line). RTX 5080 Lv3 batch overhead: `rope_apply` +101% -> +56.5%, `transpose_copy` +82% -> +53.9%, `embedding` +22.8% -> +1.9%, `gelu_tanh` +18.3% -> +0.3%, `sort_16m` +24.9% -> +15.7%; RTX 5060 `transpose_copy` +28.5% -> +18.1%. All anchors unchanged.
+- **Experimental guardian v2** (`XSCHED_SM120_GUARDIAN_V2=1`, sub-switches `_V2_SERIAL_HDR` / `_V2_SERIAL_SREG`): asynchronous control-header and `S2R/LDC` issue on scoreboards SB2-SB5. Not default: LLM-08 (two Lv3 queues + HP) failed 11/61 vs. 0/78 with serialized issue on RTX 5080. `XSCHED_SM120_GUARDIAN_V1=1` restores the exact original guardian.
+- **XQueue bounded spin** (`xqueue/spin.h`, `XSCHED_SPIN_US`, default 30, 0 disables): the worker and `XCommand::WaitUntil` spin before blocking on condition variables; Lv3 single-call latency -3 to -5 us.
+- SASS helpers `with_ctl()` / `with_extra_wait()` in `sm120_sass.h`.
+
+### Added
+- Suite 8 scheduling policies `--policy request|prefill|token|slo`, `--tpot-slo-ms`; suspension time is counted in TTFT/TPOT.
+- Regression pipeline: `regress_p3.py` (plan / summarize), `build_regress_bins.sh`, `regress_env.example.sh`; `test_convbar_p3.cu` stress knobs `GRID_MULT/CHAIN/GAP_US/TARGET_MS`, `NP_LIST`, `MISMATCH_DETAIL`.
+
 ## [Unreleased] - 2026-11-25 — Phase 3 production-operator & grounded real-model testing, DEF-20 fix
 
 Summary & roadmap: `doc/SM120_V2_PHASE3_SUMMARY_AND_ROADMAP_ZH.md`.

@@ -264,7 +264,7 @@ Entry Guardian 被精确划分为 **5 个硬件地址区间**（与 Cave 0 的�
 | **Slots 4–11** | `0x040..0x0b0` | **3D 坐标线性化** | 读取 `SR_CTAID.{Z,Y,X}` 与 `gridDim.{Y,X}`，计算 `R3 = (ctaZ * gridY + ctaY) * gridX + ctaX`；再以 `IMAD.WIDE.U32` 计算 `R6:R7 = u_control_va + 16 * cta_id`（指向 `cta[b]`，注意访存时加偏移 `0x50` 即为 `Sm120ControlHeader` 之后的 `Sm120CtaEntry[b]`）。 |
 | **Slots 12–14** | `0x0c0..0x0e0` | **波次不变路由门** | 读取 `R1 = u_ctrl->is_restore_wave (+0x1c)`。若 `!= 0`，**全体 Warp 无条件一致跳转至 `restore_path` (`+0x2c0`)**！因为 `is_restore_wave` 在整个恢复波次内绝不被 `Preempt #2` 清除，从根源上消灭了 `cmd: 6 -> 5` 瞬间同一 CTA 内部分 Warp 走 `restore_path`、部分走 `norm_gate` 的共享 `BAR.SYNC 0` 死锁（FIX-5）。 |
 | **Slots 15–23** | `0x0f0..0x170` | **正常/驱逐 FIFO 隔离门** | 读 `cmd (+0x00)`；若 `cmd == 0` 跳 `norm_gate`；若 `cmd != 0`，读 `active_kernel_idx (+0x08)`，经单指令 `lop3_or3_p0(10, 11, RZ)` 判断 `active != 0` 且 `my_idx != active` 时立即 `@P0 EXIT`——确保后续排队内核 `K2` 绝不污染正在被抢占的 `K1` 的 `cta[]` 状态表。 |
-| **Slots 24–39** | `0x180..0x270` | **`norm_gate` 无分支共识 + Slot 39 `BAR.SYNC 0`** | 全程无分支：算 3D `tid`，`P0 = (tid == 0 && cmd != 0)`；若 `cmd == 1` 置 `R2 = 1`（Mode 1 重放），否则置 `R2 = 2`（Mode 5 `State C`）；`@P0` 写入 `cta[b].state = R2`、`cta[b].entry_dec = R2`、**`u_ctrl->active_kernel_idx = my_idx`（`v2.2.1` 补齐纯 Drain 内核归属）** 并 `drained_cnt++`；**Slot 39 (`0x270 = kGuardianBarOff`) 执行 `BAR.SYNC 0`** 达成全 CTA 一致性栅栏。 |
+| **Slots 24–39** | `0x180..0x270` | **`norm_gate` 无分支共识 + Slot 39 `BAR.SYNC 0`** | 全程无分支：算 3D `tid`，`P0 = (tid == 0 && cmd != 0)`；若 `cmd == 1` 置 `R2 = 1`（Mode 1 重放），否则置 `R2 = 2`（Mode 5 `State C`）；`@P0` 写入 `cta[b].state = R2`、`cta[b].entry_dec = R2`、**`u_ctrl->active_kernel_idx = my_idx`（`v2.2.1` 补齐纯 Drain 内核归属）** 并 `drained_cnt++`；**Slot 39 (`0x270 = kGuardianBarOff`) 执行 `BAR.SYNC 0`** 达成全 CTA 一致性栅栏。**（勘误 2026-11-25：默认 Guardian 不再在 slot 28 重读 `cmd`，复用 slot 15 读到的值，去掉一次热点 L2 往返；实验性异步发射版本见 [`SM120_V2_PHASE3_2_3_3_REPORT_ZH.md`](SM120_V2_PHASE3_2_3_3_REPORT_ZH.md) §3）** |
 | **Slots 40–43** | `0x280..0x2b0` | **Post-`BAR.SYNC 0` 放行/早退** | 所有 Warp 统一读 `cta[b].entry_dec (+0x54)`：非零则 `EXIT` 干净早退（零用户代码执行，无泄漏 `State C`），为零则 `BRA +0x500` 执行原内核正文。 |
 | **Slots 44–58** | `0x2c0..0x3a0` | **`restore_path` 三态派发** | ① 多内核校验：若 `active != 0 && my_idx != active` 则 `EXIT`；② 读 `R3 = cta[b].state (+0x50)`：若 `state == 0`（**State A 已完成**）立即 `EXIT`；若 `state == 5`（**State B 已换出**）在 **Slot 57 执行用户态 `BPT.TRAP 0x1`** 自陷进入 Cave 1 原位恢复（0 Host 脉冲！）；否则（**State C `state == 1/2`**）保留 `R3` 跳转至 `replay_state_c` (`+0x3b0`)。 |
 | **Slots 59–79** | `0x3b0..0x4f0` | **`replay_state_c` 奇偶二次抢占共识** | 先执行 `BAR.SYNC 0`（Slot 59）确保同 CTA 全部 Warp 已读完 `state`；`tid == 0` 读取 `cmd` 并取最低位 **`cmd & 1`**（**协议巧妙之处：所有 Evict 命令 `1/5` 为奇数，所有 Restore 命令 `2/6` 为偶数！**）：若为偶数（正常恢复）则清零 `cta[b].state = 0, entry_dec = 0`；若为奇数（恢复波次中途遭遇 `Preempt #2`！）则保留 `state`、置 `entry_dec = 2` 并 `drained_cnt++`；**Slot 76 (`0x4c0 = kGuardianReplayBarOff`) 执行共识 `BAR.SYNC 0`**，Slots 77–79 统一读 `entry_dec != 0` 则一致 `EXIT`，否则落入 `+0x500` 首次执行原内核。 |
@@ -394,6 +394,8 @@ Entry Guardian 被精确划分为 **5 个硬件地址区间**（与 Cave 0 的�
          ld.param.u64 %rd1, [p_ctrl];
          mov.u32 %r0, 0;
          st.global.cg.u32 [%rd1 + 28], %r0;   // 无条件清零 is_restore_wave (+0x1c)
+         // 勘误（DEF-12，2026-11-25 提交）：现改为仅在 cmd == 6 || cmd == 2 时与 +0x00..+0x1f 一并清零，
+         // 恢复中途被再次抢占（cmd 已翻为 5/1）时保留 is_restore_wave 与 active_kernel_idx
          ld.global.cg.u32 %r1, [%rd1];        // 读取 cmd (+0x00)
          setp.eq.u32 %p0, %r1, 6;             // kCmdMode5Restore?
          setp.eq.u32 %p1, %r1, 2;             // kCmdMode1Replay?
