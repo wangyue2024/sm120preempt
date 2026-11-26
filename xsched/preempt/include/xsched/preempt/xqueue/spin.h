@@ -23,6 +23,33 @@ inline int64_t SpinBudgetUs()
     return budget;
 }
 
+/// @brief Read a boolean XSched option ("0"/"1"), with a default when unset.
+inline bool XQueueEnvFlag(const char *name, bool def)
+{
+    const char *env = std::getenv(name);
+    if (env == nullptr || env[0] == '\0') return def;
+    return env[0] != '0';
+}
+
+/// @brief Direct submit (Phase 3.3): when nothing is queued ahead of a kernel and the launch worker
+/// is idle and running, the submitting thread launches it itself instead of handing it to the
+/// worker (removes one thread hand-off per call). XSCHED_XQUEUE_DIRECT=0 disables.
+inline bool DirectSubmitEnabled()
+{
+    static const bool on = XQueueEnvFlag("XSCHED_XQUEUE_DIRECT", true);
+    return on;
+}
+
+/// @brief Caller-side WaitAll (Phase 3.3): once every submitted command has been launched, the
+/// waiting thread synchronizes the hardware queue itself instead of waiting for the worker to do
+/// it and wake it up; falls back to the worker path if a suspension happened meanwhile.
+/// XSCHED_XQUEUE_CALLER_SYNC=0 disables.
+inline bool CallerSyncEnabled()
+{
+    static const bool on = XQueueEnvFlag("XSCHED_XQUEUE_CALLER_SYNC", true);
+    return on;
+}
+
 inline void CpuRelax()
 {
 #if defined(__x86_64__) || defined(__i386__)

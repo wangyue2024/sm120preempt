@@ -142,10 +142,17 @@ public:
                        uint32_t dyn_smem_bytes,
                        uint64_t kernel_idx,
                        Sm120PreemptMode mode,
-                       CUstream stream = nullptr);
+                       CUstream stream = nullptr,
+                       const void *launch_handle = nullptr);
 
     /// @brief Zero c[0][0x170..0x187] so an instrumented function bypasses the Guardian cleanly.
+    /// No-op (no driver call) if the window is already zero.
     static void ClearDebuggerParams(CUfunction func);
+
+    /// @brief Whether a function launched through `launch_handle` (the CUkernel / CUfunction passed
+    /// to cuLaunchKernel) may still hold non-zero Mode 5 debugger params. Lets pass-through
+    /// launches skip resolving the CUfunction. Call with the context's LaunchMutex held.
+    static bool MaybeParamsSet(const void *launch_handle);
 
     /// @brief Evict running/queued waves on this stream with 1 single BAR0 pulse.
     bool PreemptStream(Sm120PreemptMode mode);
@@ -199,6 +206,12 @@ private:
     std::vector<CUdeviceptr> retired_ctrls_;
     uint8_t *layout_stage_ = nullptr;
     size_t layout_stage_cursor_ = 0;
+    // Last arena layout enqueued to the control header (Phase 3.3): the 36 B HtoD copy is skipped
+    // when the next launch on the same stream would write identical bytes to the same header.
+    // Device code never writes these header fields; header reallocation changes ctrl_dev_.
+    uint8_t last_layout_[36] = {};
+    CUdeviceptr last_layout_ctrl_ = 0;
+    CUstream last_layout_stream_ = nullptr;
     CUdeviceptr saved_arena_dev_ = 0;
     bool is_restore_cmd_active_ = false;
     CUstream last_stream_ = nullptr;

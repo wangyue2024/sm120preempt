@@ -97,6 +97,7 @@ void LaunchWorker::WorkerLoop()
             auto hw_cmd = std::dynamic_pointer_cast<HwCommand>(xcmd);
             XASSERT(hw_cmd != nullptr, "command type mismatch");
             LaunchHwCommand(hw_cmd);
+            kCmdBuf->WorkerDone();
             break;
         }
 
@@ -113,6 +114,7 @@ void LaunchWorker::WorkerLoop()
             lock.unlock();
 
             cmd->SetState(kCommandStateCompleted);
+            kCmdBuf->WorkerDone();
             break;
         }
 
@@ -168,9 +170,7 @@ void LaunchWorker::LaunchHwCommand(std::shared_ptr<HwCommand> hw_cmd)
     // be deactivated. Otherwise the XPU will become inconsist. So, if a HwCommand is not
     // deactivatable, it should wait until all in-flight deactivatable HwCommands are completed.
     // This is unnecessary under kPreemptLevelBlock.
-    bool wait_deactivatable = level_ >= kPreemptLevelDeactivate &&
-        (kCommandPropertyNone == hw_cmd->GetProps(
-            kCommandPropertyDeactivatable | kCommandPropertyIdempotent));
+    bool wait_deactivatable = NeedWaitDeactivatable(hw_cmd);
 
     hw_cmd->BeforeLaunch();
     std::unique_lock<MutexLock> lock(*mtx_);
@@ -233,6 +233,66 @@ void LaunchWorker::LaunchHwCommand(std::shared_ptr<HwCommand> hw_cmd)
         }
     }
 
+    LaunchLocked(hw_cmd);
+}
+
+bool LaunchWorker::NeedWaitDeactivatable(const std::shared_ptr<HwCommand> &hw_cmd) const
+{
+    return level_ >= kPreemptLevelDeactivate &&
+        (kCommandPropertyNone == hw_cmd->GetProps(
+            kCommandPropertyDeactivatable | kCommandPropertyIdempotent));
+}
+
+bool LaunchWorker::TryLaunchDirect(std::shared_ptr<HwCommand> hw_cmd)
+{
+    const bool wait_deactivatable = NeedWaitDeactivatable(hw_cmd);
+    // The worker holds mtx_ only briefly (it releases it while synchronizing or paused).
+    std::unique_lock<MutexLock> lock(*mtx_);
+    if (state_ != kWorkerStateRunning) return false;
+    // Only the first command after the queue drained goes direct (latency-critical: submit +
+    // synchronize patterns). Bursts keep the worker hand-off, which pipelines the driver launch
+    // cost with the application thread.
+    if (!cmd_log_.empty()) return false;
+    if (wait_deactivatable) {
+        for (auto it = cmd_log_.rbegin(); it != cmd_log_.rend(); ++it) {
+            if ((*it)->GetProps(kCommandPropertyDeactivatable)) return false;
+        }
+    }
+    hw_cmd->BeforeLaunch(); // DirectLaunchable() commands never block here
+    LaunchLocked(hw_cmd);
+    return true;
+}
+
+bool LaunchWorker::SyncLaunchedFromCaller(int64_t target_idx)
+{
+    std::unique_lock<MutexLock> lock(*mtx_);
+    if (state_ != kWorkerStateRunning) return false;
+    if (launched_max_idx_ < target_idx) return false;
+    if (cmd_log_.empty() || cmd_log_.front()->GetIdx() > target_idx) return true; // all completed
+    const int64_t pause_cnt = pause_count_;
+
+    lock.unlock();
+    kHwq->Synchronize();
+    lock.lock();
+
+    // A suspension during the synchronization may have deactivated / interrupted the commands,
+    // so the hardware queue being drained does not mean they are completed.
+    if (pause_cnt != pause_count_ || state_ != kWorkerStateRunning) return false;
+
+    while (!sync_cmd_log_.empty() && sync_cmd_log_.front()->GetIdx() <= target_idx) {
+        sync_cmd_log_.pop_front();
+    }
+    while (!cmd_log_.empty() && cmd_log_.front()->GetIdx() <= target_idx) {
+        cmd_log_.front()->SetState(kCommandStateCompleted);
+        cmd_log_.pop_front();
+    }
+    return true;
+}
+
+void LaunchWorker::LaunchLocked(std::shared_ptr<HwCommand> hw_cmd)
+{
+    if (hw_cmd->GetIdx() > launched_max_idx_) launched_max_idx_ = hw_cmd->GetIdx();
+
     // Check if the HwCommand should be dropped.
     if (hw_cmd->GetIdx() <= drop_idx_) {
         hw_cmd->SetState(kCommandStateCompleted);
@@ -264,6 +324,7 @@ void LaunchWorker::LaunchHwCommand(std::shared_ptr<HwCommand> hw_cmd)
 
 std::unique_lock<MutexLock> LaunchWorker::SyncAllWithLock(std::unique_lock<MutexLock> lock)
 {
+    int64_t last_idx = 0;
     while (true) {
         // Wait if the worker is paused.
         while (true) {
@@ -282,6 +343,9 @@ std::unique_lock<MutexLock> LaunchWorker::SyncAllWithLock(std::unique_lock<Mutex
         if (cmd_log_.size() == 0) return lock;
 
         int64_t current_pause_cnt = pause_count_;
+        // Commands launched while the lock is released (direct submit) are not covered by this
+        // synchronization and must stay in flight.
+        last_idx = cmd_log_.back()->GetIdx();
 
         lock.unlock();
         kHwq->Synchronize();
@@ -291,11 +355,14 @@ std::unique_lock<MutexLock> LaunchWorker::SyncAllWithLock(std::unique_lock<Mutex
         if (current_pause_cnt == pause_count_) break;
     }
 
-    // Pop and delete all in-flight HwCommands.
-    sync_cmd_log_.clear();
-
-    for (auto hw_cmd : cmd_log_) hw_cmd->SetState(kCommandStateCompleted);
-    cmd_log_.clear();
+    // Pop and delete all HwCommands launched before the synchronization.
+    while (!sync_cmd_log_.empty() && sync_cmd_log_.front()->GetIdx() <= last_idx) {
+        sync_cmd_log_.pop_front();
+    }
+    while (!cmd_log_.empty() && cmd_log_.front()->GetIdx() <= last_idx) {
+        cmd_log_.front()->SetState(kCommandStateCompleted);
+        cmd_log_.pop_front();
+    }
 
     return lock;
 }

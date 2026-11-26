@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mutex>
+
 #include <memory>
 #include <atomic>
 
@@ -43,6 +45,9 @@ private:
 
     // The index of HwCommand starts from 1.
     std::atomic<int64_t> next_hw_cmd_idx_ = { 1 };
+    // Serializes index assignment + enqueue / direct launch so that HwCommands reach the hardware
+    // queue in index order even with concurrent submitters (required by direct submit).
+    std::mutex submit_mtx_;
 };
 
 } // namespace xsched::preempt

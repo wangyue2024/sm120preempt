@@ -43,6 +43,8 @@ struct Sm120KernelRecord
     int           clamped_regs = 0;
     int           static_smem_bytes = 0;
     bool          has_hw_mbarrier = false;
+    bool          has_calls = false;
+    bool          loop_free = false;  // no backward / indirect branches (short, bounded CTAs)
 };
 
 /// @brief Permanently instruments each managed CUfunction once on first launch with

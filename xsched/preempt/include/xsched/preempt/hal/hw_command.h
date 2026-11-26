@@ -46,6 +46,12 @@ public:
     /// NOTE: This function will be called without holding the launch worker lock.
     virtual void BeforeLaunch() {}
 
+    /// @brief Whether the HwCommand may be launched directly on the submitting thread (direct
+    /// submit, see AsyncXQueue::Submit()). Only commands whose BeforeLaunch() never blocks and
+    /// whose Launch() is safe on any thread with the command's context current should return
+    /// true. Default: false (always handed to the launch worker).
+    virtual bool DirectLaunchable() const { return false; }
+
     /// @brief Get the handle of the HwCommand.
     /// @return The handle of the HwCommand, which is unique on the system.
     virtual HwCommandHandle GetHandle() {return (uint64_t)this ^ ((uint64_t)GetProcessId() << 48);}

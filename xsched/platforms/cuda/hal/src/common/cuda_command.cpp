@@ -54,8 +54,8 @@ CUresult CudaCommand::LaunchWrapper(CUstream stream)
 CudaKernelCommand::CudaKernelCommand(CUfunction func, void **params, void **extra, bool deep_copy)
     : CudaCommand(preempt::kCommandPropertyDeactivatable)
     // cuXtraKernelGetFunction() will convert func to CUfunction if func is a CUkernel.
-    , kFunc(func), kFuncHandle(cuXtraKernelGetFunction((CUkernel)func))
-    , params_(params), extra_(extra), param_cnt_(cuXtraGetParamCount(kFuncHandle))
+    , kFunc(func), kFuncHandle(deep_copy ? cuXtraKernelGetFunction((CUkernel)func) : nullptr)
+    , params_(params), extra_(extra), param_cnt_(deep_copy ? cuXtraGetParamCount(kFuncHandle) : 0)
 {
     if (!deep_copy) return;
 
@@ -132,15 +132,22 @@ CudaKernelCommand::~CudaKernelCommand()
     if (extra_) free(extra_);
 }
 
+CUfunction CudaKernelCommand::FuncHandle() const
+{
+    if (kFuncHandle != nullptr) return kFuncHandle;
+    if (lazy_func_handle_ == nullptr) lazy_func_handle_ = cuXtraKernelGetFunction((CUkernel)kFunc);
+    return lazy_func_handle_;
+}
+
 bool CudaKernelCommand::EnsureDynamicSmem(unsigned int shm) const
 {
     int max_dyn = 0;
-    if (Driver::FuncGetAttribute(&max_dyn, CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES, kFuncHandle) != CUDA_SUCCESS) {
+    if (Driver::FuncGetAttribute(&max_dyn, CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES, FuncHandle()) != CUDA_SUCCESS) {
         return false;
     }
     if (static_cast<int>(shm) <= max_dyn) return false;
     return Driver::FuncSetAttribute(
-               kFuncHandle, CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES,
+               FuncHandle(), CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES,
                static_cast<int>(shm)) == CUDA_SUCCESS;
 }
 

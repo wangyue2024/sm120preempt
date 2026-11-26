@@ -51,11 +51,20 @@ public:
     virtual unsigned int DynSmemBytes() const = 0;
     virtual bool IsCooperative() const { return false; }
     virtual unsigned int ClusterSize() const { return 1; }
+    // Kernel launches never block in BeforeLaunch() and are issued with the creating thread's
+    // context, so they may be launched on the submitting thread (direct submit).
+    virtual bool DirectLaunchable() const override { return true; }
 
     // After CUDA 12, kFunc could be a CUkernel. We convert CUkernel to CUfunction
     // by calling cuKernelGetFunction, the actual CUfunction is stored in kFuncHandle.
+    // Phase 3.3: the conversion is a costly driver call (~8% of a PyTorch decode step), so it is
+    // done in the constructor only for commands submitted to an XQueue (deep_copy == true).
+    // Pass-through commands (no XQueue) leave kFuncHandle == nullptr; use FuncHandle(), which
+    // resolves on demand.
     const CUfunction kFunc;
     const CUfunction kFuncHandle;
+    CUfunction FuncHandle() const;
+    mutable CUfunction lazy_func_handle_ = nullptr;
 
     bool killable = false;
     CUdeviceptr preempt_buffer = 0;

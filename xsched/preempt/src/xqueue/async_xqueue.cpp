@@ -2,6 +2,7 @@
 #include "xsched/preempt/sched/agent.h"
 #include "xsched/preempt/xqueue/xqueue.h"
 #include "xsched/preempt/xqueue/async_xqueue.h"
+#include "xsched/preempt/xqueue/spin.h"
 
 using namespace xsched::utils;
 using namespace xsched::sched;
@@ -44,9 +45,24 @@ AsyncXQueue::~AsyncXQueue()
 void AsyncXQueue::Submit(std::shared_ptr<HwCommand> hw_cmd)
 {
     hw_cmd->OnSubmit(shared_from_this());
-    hw_cmd->SetIdx(next_hw_cmd_idx_.fetch_add(1));
-    kHwQueue->OnHwCommandSubmit(hw_cmd);
-    cmd_buf_->Enqueue(hw_cmd);
+    {
+        std::lock_guard<std::mutex> submit_lock(submit_mtx_);
+        hw_cmd->SetIdx(next_hw_cmd_idx_.fetch_add(1));
+        kHwQueue->OnHwCommandSubmit(hw_cmd);
+
+        // Direct submit: if every previously submitted command has been launched and the worker
+        // is running, launch on this thread (saves the hand-off to the launch worker). The gate
+        // keeps the worker from dequeuing meanwhile; on any precondition failure the command is
+        // queued in order and launched by the worker as usual.
+        bool direct = false;
+        if (DirectSubmitEnabled() && !terminated_.load(std::memory_order_relaxed) &&
+            hw_cmd->DirectLaunchable() && cmd_buf_->TryBeginDirect(hw_cmd)) {
+            direct = true;
+            const bool launched = launch_worker_->TryLaunchDirect(hw_cmd);
+            cmd_buf_->EndDirect(hw_cmd, launched);
+        }
+        if (!direct) cmd_buf_->Enqueue(hw_cmd);
+    }
     if (hw_cmd->GetProps(kCommandPropertyBlockingSubmit)) hw_cmd->WaitUntil(kCommandStateInFlight);
 }
 
@@ -57,6 +73,15 @@ std::shared_ptr<XQueueWaitAllCommand> AsyncXQueue::SubmitWaitAll()
 
 void AsyncXQueue::WaitAll()
 {
+    // Caller-side WaitAll: when all submitted commands are already launched, synchronize the
+    // hardware queue on this thread instead of waiting to be woken by the launch worker.
+    if (CallerSyncEnabled() && !suspended_.load(std::memory_order_acquire)) {
+        const int64_t target = next_hw_cmd_idx_.load(std::memory_order_acquire) - 1;
+        if (target <= 0) return;
+        // The worker usually finishes launching within a few microseconds: spin briefly for it.
+        SpinUntil([this]() { return cmd_buf_->MaybeAllOrderedLaunched(); });
+        if (cmd_buf_->AllOrderedLaunched() && launch_worker_->SyncLaunchedFromCaller(target)) return;
+    }
     auto sync_command = cmd_buf_->EnqueueXQueueWaitAllCommand();
     sync_command->Wait();
 }

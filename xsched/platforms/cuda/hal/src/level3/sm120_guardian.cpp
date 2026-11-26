@@ -57,11 +57,39 @@ bool BinaryHasDeviceCalls(const uint8_t *bin, size_t bytes)
             const char *e = getenv("XSCHED_SM120_DETECT_CALL_ABS");
             return !(e != nullptr && e[0] == '0');
         }();
-        if (op12 == 0x943U || op12 == 0x944U || (detect_abs && op12 == 0x343U)) {
+        // DEF-24: 0x344 = CALL.REL.NOINC Rx (indirect call through a function pointer); 0x950 =
+        // RET (callee code is part of this image, so something calls it).
+        if (op12 == 0x943U || op12 == 0x944U || op12 == 0x344U || op12 == 0x950U ||
+            (detect_abs && op12 == 0x343U)) {
             return true;
         }
     }
     return false;
+}
+
+bool BinaryIsLoopFree(const uint8_t *bin, size_t bytes)
+{
+    // DEF-17 router: a kernel image without backward branches (and without indirect branches,
+    // whose targets are unknown) executes each instruction at most once per thread, so its CTAs
+    // are short and bounded. The trailing "BRA self" padding after EXIT (offset -16) is ignored.
+    if (!bin || bytes < 16) return false;
+    const size_t n_ins = bytes / 16;
+    for (size_t i = 0; i < n_ins; ++i) {
+        uint64_t w0 = 0, w1 = 0;
+        memcpy(&w0, bin + i * 16, sizeof(w0));
+        memcpy(&w1, bin + i * 16 + 8, sizeof(w1));
+        const uint32_t op12 = static_cast<uint32_t>(w0 & 0xfffU);
+        if (op12 == 0x949U) return false;           // BRX (indirect branch)
+        if (op12 != 0x947U) continue;               // BRA / BRA.U
+        // Relative offset in 4-byte units, relative to the next instruction:
+        // bits [16,24) of w0 = low 8 bits, bits [34,74) of the 128-bit word = high 40 bits.
+        const uint64_t lo = (w0 >> 16) & 0xffULL;
+        const uint64_t hi = ((w0 >> 34) | (w1 << 30)) & ((1ULL << 40) - 1);
+        int64_t units = static_cast<int64_t>(lo | (hi << 8));
+        if (units & (1LL << 47)) units -= (1LL << 48);
+        if (units * 4 < -16) return false;          // backward branch -> loop
+    }
+    return true;
 }
 
 bool BinaryHasHwMbarrier(const uint8_t *bin, size_t bytes)
@@ -386,6 +414,8 @@ const Sm120KernelRecord *Sm120GuardianRegistry::EnsureInstrumented(CUfunction fu
     }
 
     const bool has_calls = BinaryHasDeviceCalls(static_cast<const uint8_t *>(orig_bin), orig_bin_sz);
+    const bool loop_free = !has_calls &&
+        BinaryIsLoopFree(static_cast<const uint8_t *>(orig_bin), orig_bin_sz);
     const uint32_t lmem_static = AlignUp16(static_cast<uint32_t>(std::max(local_bytes, 0)));
     size_t stack_limit = 1024;
     if (Driver::CtxGetLimit(&stack_limit, CU_LIMIT_STACK_SIZE) != CUDA_SUCCESS) stack_limit = 4096;
@@ -436,6 +466,8 @@ const Sm120KernelRecord *Sm120GuardianRegistry::EnsureInstrumented(CUfunction fu
     rec.raw_num_regs      = raw_regs;
     rec.clamped_regs      = clamped_regs;
     rec.static_smem_bytes = static_smem;
+    rec.has_calls         = has_calls;
+    rec.loop_free         = loop_free;
 
     auto [ins_it, inserted] = records_.emplace(func, rec);
     (void)inserted;
@@ -461,12 +493,12 @@ const Sm120KernelRecord *Sm120GuardianRegistry::EnsureInstrumented(CUfunction fu
         }
     }
     XINFO("sm120_guardian: instrumented func=%p orig_ep=%#llx -> ep_inst=%#llx "
-          "regs=%d->%d bars=%u lmem=%u(cap=%u,calls=%d) static_smem=%d bin=%zuB name=%.120s",
+          "regs=%d->%d bars=%u lmem=%u(cap=%u,calls=%d) loop_free=%d static_smem=%d bin=%zuB name=%.120s",
           static_cast<void *>(func),
           static_cast<unsigned long long>(ep_orig),
           static_cast<unsigned long long>(ep_inst),
           raw_regs, clamped_regs, clamped_bars, lmem_static, lmem_cap,
-          has_calls ? 1 : 0, static_smem, orig_bin_sz, fname ? fname : "?");
+          has_calls ? 1 : 0, loop_free ? 1 : 0, static_smem, orig_bin_sz, fname ? fname : "?");
     return &ins_it->second;
 }
 

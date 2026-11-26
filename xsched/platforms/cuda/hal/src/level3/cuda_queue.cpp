@@ -23,6 +23,7 @@ enum Sm120RouteStat : int {
     kRouteLv1Cluster,       // multi-wave thread block cluster -> Level-1 boundary
     kRouteLv1Graph,         // CUDA graph launch -> Level-1 graph boundary
     kRouteLv1Uninstrumentable, // Entry Guardian instrumentation failed -> Level-1 boundary
+    kRouteLv1ShortCta,      // DEF-17: loop-free multi-wave kernel (short CTAs) -> Level-1 boundary
     kRouteStatCount,
 };
 std::atomic<uint64_t> g_sm120_route_stats[kRouteStatCount] = {};
@@ -35,8 +36,8 @@ inline void CountRoute(Sm120RouteStat s)
 
 /// @brief Read (and optionally reset) SM120 adaptive-router counters.
 /// @param out   array of at least `n` uint64: [lv3_killable, lv1_mbarrier, lv1_cooperative,
-///              lv1_cluster, lv1_graph, lv1_uninstrumentable]
-/// @param n     number of entries to copy (clamped to 6)
+///              lv1_cluster, lv1_graph, lv1_uninstrumentable, lv1_short_cta]
+/// @param n     number of entries to copy (clamped to 7)
 /// @param reset non-zero to atomically reset the copied counters to zero
 /// @return number of entries written
 EXPORT_C_FUNC int XSm120GetRouteStats(uint64_t *out, int n, int reset)
@@ -116,7 +117,7 @@ void CudaQueueLv3Trap::Launch(std::shared_ptr<HwCommand> hw_cmd)
                 XASSERT(sm120_stream_->PrepareLaunch(
                             kernel->kFuncHandle, kernel->BlockCnt(),
                             kernel->ThreadCnt(), kernel->DynSmemBytes(),
-                            kidx, mode, kStream),
+                            kidx, mode, kStream, kernel->kFunc),
                         "sm120 PrepareLaunch failed");
             } else {
                 sm120::Sm120StreamContext::ClearDebuggerParams(kernel->kFuncHandle);
@@ -374,6 +375,32 @@ void CudaQueueLv3Trap::OnHwCommandSubmit(std::shared_ptr<preempt::HwCommand> hw_
                           "routing cleanly to level-1 boundary");
                 }
                 return;
+            }
+            // DEF-17 (Phase 3.3): a loop-free kernel (no backward / indirect branches, no calls)
+            // with many waves of CTAs pays the Entry Guardian's fixed per-CTA cost on every very
+            // short CTA (up to +50-100% on RTX 5080), while a Level-1 boundary preempts it within
+            // the kernel's own short duration. Bounded by a wave cap so long grids keep Mode 5.
+            // XSCHED_SM120_SHORT_CTA_LV1=0 disables; _MIN_WAVES / _MAX_WAVES tune the window.
+            static const bool short_cta_lv1 = GetEnvOption("XSCHED_SM120_SHORT_CTA_LV1", true);
+            if (short_cta_lv1 && rec->loop_free && sm_count_ > 0) {
+                static const int64_t min_waves = []() {
+                    int64_t v = 2; GetEnvInt64("XSCHED_SM120_SHORT_CTA_MIN_WAVES", v); return v; }();
+                static const int64_t max_waves = []() {
+                    int64_t v = 1024; GetEnvInt64("XSCHED_SM120_SHORT_CTA_MAX_WAVES", v); return v; }();
+                int blocks_per_sm = 0;
+                if (Driver::OccupancyMaxActiveBlocksPerMultiprocessor(
+                        &blocks_per_sm, kernel->kFuncHandle, static_cast<int>(kernel->ThreadCnt()),
+                        kernel->DynSmemBytes()) != CUDA_SUCCESS || blocks_per_sm <= 0) {
+                    blocks_per_sm = 1;
+                }
+                const int64_t capacity = static_cast<int64_t>(sm_count_) * blocks_per_sm;
+                const int64_t ctas = static_cast<int64_t>(kernel->BlockCnt());
+                if (ctas >= min_waves * capacity && ctas <= max_waves * capacity) {
+                    CountRoute(kRouteLv1ShortCta);
+                    kernel->killable = false;
+                    kernel->ClearProps(kCommandPropertyDeactivatable);
+                    return;
+                }
             }
             CountRoute(kRouteLv3Killable);
             kernel->killable = true;

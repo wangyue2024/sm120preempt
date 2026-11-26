@@ -81,7 +81,7 @@ CUresult InstrumentContext::Launch(std::shared_ptr<CudaKernelCommand> kernel,
         if (getenv("XSCHED_CUDA_LOG_LAUNCH"))
             XINFO("instr launch(orig): idx=%ld locking", (long)kernel->GetIdx());
         launch_mtx_.lock();
-        cuXtraSetDebuggerParams(kernel->kFuncHandle, args_buf, sizeof(args_buf));
+        cuXtraSetDebuggerParams(kernel->FuncHandle(), args_buf, sizeof(args_buf));
         CUresult ret = kernel->LaunchWrapper(stream);
         if (getenv("XSCHED_CUDA_LOG_LAUNCH"))
             XINFO("instr launch(orig): idx=%ld launched ret=%d",
@@ -101,13 +101,13 @@ CUresult InstrumentContext::Launch(std::shared_ptr<CudaKernelCommand> kernel,
     if (getenv("XSCHED_CUDA_LOG_LAUNCH"))
         XINFO("instr launch: idx=%ld type=%d locking", (long)kernel->GetIdx(), (int)type);
     launch_mtx_.lock();
-    cuXtraSetDebuggerParams(kernel->kFuncHandle, args_buf, sizeof(args_buf));
-    cuXtraSetEntryPoint(kernel->kFuncHandle, entry_point);
+    cuXtraSetDebuggerParams(kernel->FuncHandle(), args_buf, sizeof(args_buf));
+    cuXtraSetEntryPoint(kernel->FuncHandle(), entry_point);
     CUresult ret = kernel->LaunchWrapper(stream);
     if (getenv("XSCHED_CUDA_LOG_LAUNCH"))
         XINFO("instr launch: idx=%ld type=%d launched ret=%d",
               (long)kernel->GetIdx(), (int)type, (int)ret);
-    cuXtraSetEntryPoint(kernel->kFuncHandle, kernel->entry_point_original);
+    cuXtraSetEntryPoint(kernel->FuncHandle(), kernel->entry_point_original);
     launch_mtx_.unlock();
 
     return ret;
@@ -121,7 +121,7 @@ void InstrumentContext::NotifyTrapInstrumented()
 
 void InstrumentContext::Instrument(std::shared_ptr<CudaKernelCommand> kernel)
 {
-    CUfunction func = kernel->kFuncHandle;
+    CUfunction func = kernel->FuncHandle();
 
     {
         std::lock_guard<std::mutex> lock(instrument_mtx_);

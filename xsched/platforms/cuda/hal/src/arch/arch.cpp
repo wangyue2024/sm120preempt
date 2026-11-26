@@ -149,17 +149,30 @@ std::shared_ptr<HwQueue> xsched::cuda::CudaQueueCreate(CUstream stream)
 
 CUresult xsched::cuda::DirectLaunch(std::shared_ptr<CudaKernelCommand> kernel, CUstream stream)
 {
-    CUdevice dev;
-    CUcontext stream_ctx;
     CUcontext current_ctx;
-    CUDA_ASSERT(Driver::StreamGetCtx(stream, &stream_ctx));
     CUDA_ASSERT(Driver::CtxGetCurrent(&current_ctx));
-    XASSERT(current_ctx == stream_ctx,
-            "direct launch kernel failed: current context (%p) does not match stream context (%p)",
-            current_ctx, stream_ctx);
-    CUDA_ASSERT(Driver::CtxGetDevice(&dev));
-
-    const int32_t arch = GetArch(dev);
+    // Per-thread cache of the (stream, context) check and the device architecture: pass-through
+    // launches of unmanaged (e.g. high-priority) streams are on the latency-critical path, and
+    // these lookups cost several driver calls per launch (Phase 3.3).
+    thread_local CUstream cached_stream = nullptr;
+    thread_local CUcontext cached_ctx = nullptr;
+    thread_local int32_t cached_arch = -1;
+    int32_t arch;
+    if (cached_arch >= 0 && stream == cached_stream && current_ctx == cached_ctx) {
+        arch = cached_arch;
+    } else {
+        CUdevice dev;
+        CUcontext stream_ctx;
+        CUDA_ASSERT(Driver::StreamGetCtx(stream, &stream_ctx));
+        XASSERT(current_ctx == stream_ctx,
+                "direct launch kernel failed: current context (%p) does not match stream context (%p)",
+                current_ctx, stream_ctx);
+        CUDA_ASSERT(Driver::CtxGetDevice(&dev));
+        arch = GetArch(dev);
+        cached_stream = stream;
+        cached_ctx = current_ctx;
+        cached_arch = arch;
+    }
 
 #if defined(_WIN32)
     // Windows: sm120 uses the level-2 direct path so that an already
@@ -182,8 +195,12 @@ CUresult xsched::cuda::DirectLaunch(std::shared_ptr<CudaKernelCommand> kernel, C
     case 86:
         return CudaQueueLv3Trap::DirectLaunch(kernel, current_ctx, stream);
     case 120: {
+        // Under the LaunchMutex an LP Mode 5 launch cannot set the params between this check and
+        // the launch. Resolve the CUfunction only if this launch handle may have params set.
         std::lock_guard<std::mutex> lock(sm120::Sm120TrapEngine::LaunchMutex(current_ctx));
-        sm120::Sm120StreamContext::ClearDebuggerParams(kernel->kFuncHandle);
+        if (sm120::Sm120StreamContext::MaybeParamsSet(kernel->kFunc)) {
+            sm120::Sm120StreamContext::ClearDebuggerParams(kernel->FuncHandle());
+        }
         return kernel->LaunchWrapper(stream);
     }
     // NEW_CUDA_ARCH: New CUDA architecture support goes here

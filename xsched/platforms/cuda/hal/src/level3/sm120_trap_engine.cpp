@@ -5,6 +5,10 @@
 #include <cstring>
 #include <map>
 #include <thread>
+#include <unordered_set>
+#include <unordered_map>
+#include <atomic>
+#include <mutex>
 #include <vector>
 
 #include <cuxtra/cuxtra.h>
@@ -12,6 +16,7 @@
 #include "xsched/cuda/hal/common/cuda_assert.h"
 #include "xsched/cuda/hal/common/driver.h"
 #include "xsched/cuda/hal/level3/sm120_sass.h"
+#include "xsched/utils/env.h"
 #include "xsched/utils/log.h"
 
 namespace xsched::cuda::sm120
@@ -1362,10 +1367,44 @@ bool Sm120StreamContext::EnsureArenaPool(size_t required_bytes)
     return true;
 }
 
+namespace
+{
+// Functions whose debugger-params window currently holds a non-zero (Mode 5) value. Written only
+// by PrepareLaunch(); ClearDebuggerParams() skips the driver call for every other function
+// (never instrumented, or already cleared). Both callers hold the context's LaunchMutex, so an
+// LP Mode 5 launch cannot interleave between a clear and the following pass-through launch.
+// g_params_set maps each such CUfunction to the launch handle it was launched with (CUkernel or
+// CUfunction as passed to cuLaunchKernel); g_orig_cnt counts entries per launch handle so that
+// pass-through launches can decide without resolving the CUfunction (MaybeParamsSet()).
+std::mutex g_params_mtx;
+std::unordered_map<CUfunction, const void *> g_params_set;
+std::unordered_map<const void *, int> g_orig_cnt;
+std::atomic<size_t> g_params_cnt{0};
+} // namespace
+
 void Sm120StreamContext::ClearDebuggerParams(CUfunction func)
 {
+    static const bool always = GetEnvOption("XSCHED_SM120_ALWAYS_CLEAR_PARAMS", false);
+    if (!always) {
+        std::lock_guard<std::mutex> lk(g_params_mtx);
+        auto it = g_params_set.find(func);
+        if (it == g_params_set.end()) return;   // already zero
+        auto oc = g_orig_cnt.find(it->second);
+        if (oc != g_orig_cnt.end() && --oc->second <= 0) g_orig_cnt.erase(oc);
+        g_params_set.erase(it);
+        g_params_cnt.store(g_params_set.size(), std::memory_order_release);
+    }
     uint8_t zeros[24] = {};
     cuXtraSetDebuggerParams(func, zeros, sizeof(zeros));
+}
+
+bool Sm120StreamContext::MaybeParamsSet(const void *launch_handle)
+{
+    static const bool always = GetEnvOption("XSCHED_SM120_ALWAYS_CLEAR_PARAMS", false);
+    if (always) return true;
+    if (g_params_cnt.load(std::memory_order_acquire) == 0) return false;
+    std::lock_guard<std::mutex> lk(g_params_mtx);
+    return g_orig_cnt.count(launch_handle) != 0;
 }
 
 bool Sm120StreamContext::PrepareLaunch(CUfunction func,
@@ -1374,8 +1413,10 @@ bool Sm120StreamContext::PrepareLaunch(CUfunction func,
                                        uint32_t dyn_smem_bytes,
                                        uint64_t kernel_idx,
                                        Sm120PreemptMode mode,
-                                       CUstream stream)
+                                       CUstream stream,
+                                       const void *launch_handle)
 {
+    if (launch_handle == nullptr) launch_handle = func;
     std::lock_guard<std::mutex> lock(mu_);
     if (!engine_->IsReady() && !engine_->Init()) return false;
 
@@ -1455,7 +1496,14 @@ bool Sm120StreamContext::PrepareLaunch(CUfunction func,
         };
         static_assert(sizeof(Layout36) == 36, "Layout36 size mismatch");
 
-        if (stream != nullptr && layout_stage_ != nullptr) {
+        static const bool layout_cache = GetEnvOption("XSCHED_SM120_LAYOUT_CACHE", true);
+        if (layout_cache && stream != nullptr && stream == last_layout_stream_ &&
+            ctrl_dev_ == last_layout_ctrl_ && memcmp(last_layout_, &layout, sizeof(layout)) == 0) {
+            // Identical layout already enqueued on this stream (stream-ordered before this kernel).
+        } else if (stream != nullptr && layout_stage_ != nullptr) {
+            memcpy(last_layout_, &layout, sizeof(layout));
+            last_layout_ctrl_ = ctrl_dev_;
+            last_layout_stream_ = stream;
             // Destination ctrl_dev_ is in GPU GDDR7 VRAM: single strictly-async HtoD DMA on stream!
             const size_t slot_off = (layout_stage_cursor_ % kLayoutStageSlots) * 64u;
             ++layout_stage_cursor_;
@@ -1466,6 +1514,8 @@ bool Sm120StreamContext::PrepareLaunch(CUfunction func,
                 host_slot, sizeof(layout), stream);
         } else {
             WriteHeaderSliceLocked(offsetof(Sm120ControlHeader, arena_va), &layout, sizeof(layout));
+            last_layout_ctrl_ = 0;  // synchronous write: no stream-ordered cache entry
+            last_layout_stream_ = nullptr;
         }
     }
 
@@ -1480,6 +1530,19 @@ bool Sm120StreamContext::PrepareLaunch(CUfunction func,
         kernel_idx
     };
     static_assert(sizeof(dbg) == 24, "DebuggerParams window size must be 24B");
+    {
+        std::lock_guard<std::mutex> lk(g_params_mtx);
+        auto [it, inserted] = g_params_set.emplace(func, launch_handle);
+        if (inserted) {
+            g_orig_cnt[launch_handle]++;
+        } else if (it->second != launch_handle) {
+            auto oc = g_orig_cnt.find(it->second);
+            if (oc != g_orig_cnt.end() && --oc->second <= 0) g_orig_cnt.erase(oc);
+            it->second = launch_handle;
+            g_orig_cnt[launch_handle]++;
+        }
+        g_params_cnt.store(g_params_set.size(), std::memory_order_release);
+    }
     cuXtraSetDebuggerParams(func, &dbg, sizeof(dbg));
     return true;
 }

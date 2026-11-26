@@ -45,6 +45,18 @@ public:
     /// @param hw_cmd The Synchronizable HwCommand to synchronize.
     void SyncCmd(std::shared_ptr<HwCommand> hw_cmd);
 
+    /// @brief Direct submit: launch hw_cmd on the calling thread if the worker is running and no
+    /// HwCommand is in flight (first command after the queue drained). Never blocks on the
+    /// hardware. The caller must hold the CommandBuffer direct gate.
+    /// @return true if launched (or dropped), false if it must go through the worker.
+    bool TryLaunchDirect(std::shared_ptr<HwCommand> hw_cmd);
+
+    /// @brief Caller-side WaitAll: if every HwCommand with idx <= target_idx has been launched and
+    /// the worker is running, synchronize the HwQueue on the calling thread and complete them.
+    /// @return false if not all are launched yet, the worker is paused, or a suspension happened
+    /// during the synchronization (the caller must then fall back to the worker path).
+    bool SyncLaunchedFromCaller(int64_t target_idx);
+
     void SetPreemptLevel(XPreemptLevel level) { level_ = level; }
     void SetLaunchConfig(int64_t threshold, int64_t batch_size)
     { threshold_ = threshold; batch_size_ = batch_size; }
@@ -75,12 +87,16 @@ private:
     std::unique_ptr<utils::MutexLock> mtx_ = nullptr;
 
     int64_t drop_idx_ = -1;
+    int64_t launched_max_idx_ = 0; // highest HwCommand idx launched or dropped (idx order)
     int64_t pause_count_ = 0;
     WorkerState state_ = kWorkerStateRunning;
     std::unique_ptr<std::thread> worker_thread_ = nullptr;
 
     void WorkerLoop();
     void LaunchHwCommand(std::shared_ptr<HwCommand> hw_cmd);
+    /// Launch with mtx_ held; all preconditions have been checked.
+    void LaunchLocked(std::shared_ptr<HwCommand> hw_cmd);
+    bool NeedWaitDeactivatable(const std::shared_ptr<HwCommand> &hw_cmd) const;
 
     std::unique_lock<utils::MutexLock> SyncAllWithLock(std::unique_lock<utils::MutexLock> lock);
     std::unique_lock<utils::MutexLock> SyncCmdWithLock(std::unique_lock<utils::MutexLock> lock,
