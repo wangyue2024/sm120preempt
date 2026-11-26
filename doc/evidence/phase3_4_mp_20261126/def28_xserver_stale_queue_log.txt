@@ -1,0 +1,5 @@
+=== 2026-11-26 08:22:21 mode=glb-lv1 lp=ppl
+[XSCHED INFO @ T 310065 @ 08:22:21.852292] scheduler created with policy HPF
+[IPC WARN @ T 310065 @ 08:22:21.852335] MessageQueue CPPIPC-1 (key: 0x1) already exists, deleting @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/3rdparty/ipc/src/msgq/msgq.cpp:152
+[IPC ERRO @ T 310065 @ 08:22:21.852342] Assertion failed: failed to delete MessageQueue (key: 0x1) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/3rdparty/ipc/src/msgq/msgq.cpp:158
+[IPC ERRO @ T 310065 @ 08:22:21.852345] Error code: 1, Error message: Operation not permitted @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/3rdparty/ipc/src/msgq/msgq.cpp:158

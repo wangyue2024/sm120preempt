@@ -103,7 +103,7 @@ root 路径的脉冲代码同样被改写（共享 `FireBar0Pulse()`、直接 / 
 
 ## 4. 局限
 
-- **组成员身份等同于调度特权**：脉冲是整块 GPU 的广播。此前的跨进程实测（另一进程发 60 次脉冲期间，不使用 XSched 的旁观进程持续发射内核）未见错误或变慢（[`SM120_V2_COMPREHENSIVE_EVALUATION_ZH.md`](SM120_V2_COMPREHENSIVE_EVALUATION_ZH.md)），但组成员仍可在限流允许的频率内让 GPU 反复进入 Trap。共享 GPU 上应只授予作业由同一调度器管理的用户。
+- **组成员身份等同于调度特权**：脉冲是整块 GPU 的广播。此前的跨进程实测（另一进程发 60 次脉冲期间，不使用 XSched 的旁观进程持续发射内核）未见错误或变慢（[`SM120_V2_COMPREHENSIVE_EVALUATION_ZH.md`](SM120_V2_COMPREHENSIVE_EVALUATION_ZH.md)）；但在同时驱动桌面的 RTX 5060 上，有两次多波次压测开始时桌面图形进程出现 Xid 31 MMU 故障（进程未崩溃，OBS-8，见 [`SM120_V2_PHASE3_4_MULTIPROCESS_ZH.md`](SM120_V2_PHASE3_4_MULTIPROCESS_ZH.md) §2.4），建议 Lv3 使用无显示的 GPU。此外组成员仍可在限流允许的频率内让 GPU 反复进入 Trap。共享 GPU 上应只授予作业由同一调度器管理的用户。
 - 每次脉冲多一次 socket 往返（4.5–17 µs）。字符设备内核模块可以把它降到一次系统调用，但需要在共享服务器上加载自定义内核模块，风险与维护成本都更高，暂不采用。
 - 代理不验证“调用者确实有被 XSched 插桩的内核在运行”；限流只限制频率。
 - 每块 GPU 一个守护进程实例（`--bdf`）；多 GPU 主机用 systemd 模板单元。

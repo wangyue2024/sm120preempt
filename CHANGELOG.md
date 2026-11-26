@@ -2,6 +2,28 @@
 
 All notable changes to the Blackwell (`sm_120`) Level-3 transparent preemption and scheduling system are documented in this file.
 
+## [Unreleased] - 2026-11-26 — Phase 3.4-2: multi-process serving, DEF-26 / DEF-27 / DEF-28
+
+Doc: `doc/SM120_V2_PHASE3_4_MULTIPROCESS_ZH.md`.
+
+### Fixed
+- **DEF-28**: `xserver` removed its IPC message queue (SysV key 0x1) only on SIGINT / SIGQUIT. After a root run ended with SIGTERM, a server started by another user could not replace the stale queue and clients blocked sending into it (cross-process runs hung). The server now handles SIGTERM; the multi-process harness stops it with SIGINT and refuses to start over a stale queue owned by another user.
+- **DEF-26**: the local / global schedulers suspend and resume queues on their executor thread, which has no CUDA context; Level-3 `Reactivate()` failed (`sm120 PrepareLaunch failed`). `CudaQueueLv3Trap::{Deactivate, Interrupt, Reactivate}` push the queue's context when needed.
+
+### Changed
+- **DEF-27 mitigation**: with `XSCHED_SCHEDULER=GLB`, SM120 kernels use the Level-1 boundary (route `lv1_glb_sched`; `XSCHED_SM120_GLB_LV3=1` overrides). Under cross-process transparent scheduling the high-priority process keeps launching while the low-priority one is being trapped; a GPU time-slice context switch that arrives while warps are in the trap handler times out (Xid 109 `CTX SWITCH TIMEOUT`, about once per ~300 suspends) and the recovery fails both processes' contexts.
+
+### Added
+- `test/sm120_v2/eval/bench_mp_serving_p34.py`: HP and LP in separate processes (solo / native / req-lv1 / req-lv3 / glb-lv1 / glb-lv3). Request-level suspend: HP TPOT P50 1.00x of solo on both GPUs (single process: 1.02-1.07x, confirming the GIL explanation of OBS-7); transparent cross-process scheduling: LP 71-78%, TPOT P50 0.94-1.02x.
+- `test_xqueue_idle_p34.py` (Idle within 50 ms after every synchronize; measured ~21 us); regression suites `SYN-xq-idle` and Suite 9 (`S9-*`, multi-process).
+
+### Withdrawn
+- DEF-25 (caller-side `WaitAll` "never reports Idle") was a measurement error: the launch worker makes the transition ~21 us after the synchronize returns. The caller-side transition added for it broke the command buffer's invariant (an Idle queue's last command is a completed `WaitAll`) and made `HW-05` assert; it was reverted before release.
+- OBS-8 recorded: on the RTX 5060 that drives the desktop, two Level-3 stress runs coincided with Xid 31 MMU faults in desktop graphics processes (no crash).
+
+### Validation
+- 两卡全量回归（最终构建，含 Suite 9 与 SYN-xq-idle）288/288 + 288/288.
+
 ## [Unreleased] - 2026-11-26 — Phase 3.4-1: DEF-10 non-root Level-3 preemption
 
 Doc: `doc/SM120_V2_PHASE3_4_DEF10_BAR0_PROXY_ZH.md`; deployment: `xsched/platforms/cuda/bar0d/README.md`.

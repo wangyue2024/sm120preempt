@@ -1,0 +1,8 @@
+2026-11-25T20:14:05+01:00 WY kernel: NVRM: Xid (PCI:0000:01:00): 31, pid=7001, name=ghostty, channel 0x00000008, intr 00000000. MMU Fault: ENGINE GRAPHICS GPC2 GPCCLIENT_GCC faulted @ 0x0_00000000. Fa
+2026-11-25T20:14:05+01:00 WY kernel: NVRM: Xid (PCI:0000:01:00): 31, pid=4908, name=gnome-shell, channel 0x00000004, intr 00000000. MMU Fault: ENGINE GRAPHICS GPC2 GPCCLIENT_GCC faulted @ 0x0_00000000
+2026-11-26T00:31:23+01:00 WY kernel: NVRM: Xid (PCI:0000:01:00): 31, pid=7001, name=ghostty, channel 0x00000002, intr 00000000. MMU Fault: ENGINE GRAPHICS GPC2 GPCCLIENT_GCC faulted @ 0x0_00000000. Fa
+2026-11-26T06:15:39+01:00 WY kernel: NVRM: Xid (PCI:0000:01:00): 31, pid=4908, name=gnome-shell, channel 0x00000003, intr 00000000. MMU Fault: ENGINE GRAPHICS GPC2 GPCCLIENT_GCC faulted @ 0x0_00000000
+2026-11-26T06:55:54+01:00 WY kernel: NVRM: Xid (PCI:0000:01:00): 109, pid=272299, name=python, channel 0x00000004, errorString CTX SWITCH TIMEOUT, Info 0x6c005
+2026-11-26T06:59:50+01:00 WY kernel: NVRM: Xid (PCI:0000:01:00): 109, pid=273582, name=python, channel 0x00000004, errorString CTX SWITCH TIMEOUT, Info 0x6c005
+2026-11-26T07:04:56+01:00 WY kernel: NVRM: Xid (PCI:0000:01:00): 109, pid=275349, name=python, channel 0x00000004, errorString CTX SWITCH TIMEOUT, Info 0x6c005
+2026-11-26T07:07:18+01:00 WY kernel: NVRM: Xid (PCI:0000:01:00): 109, pid=275823, name=python, channel 0x00000004, errorString CTX SWITCH TIMEOUT, Info 0x6c005

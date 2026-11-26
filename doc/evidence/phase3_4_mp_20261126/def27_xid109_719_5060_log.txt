@@ -1,0 +1,78 @@
+[XSCHED INFO @ T 275823 @ 07:07:02.022656] using global scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 21545.45it/s]
+[XSCHED INFO @ T 275823 @ 07:07:04.988392] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 275823 @ 07:07:05.024208] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 275823 @ 07:07:05.024763] sm120_arena: trap pulses via BAR0 proxy /run/xsched/bar0-0000:01:00.0.sock (0000:01:00.0, non-root, DEF-10)
+[XSCHED INFO @ T 275879 @ 07:07:05.102989] using global scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 20131.22it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 275879 @ 07:07:10.604581] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 275937 @ 07:07:10.625887] sm120_guardian: instrumented func=0x3af7e330 orig_ep=0x795b1b6f3600 -> ep_inst=0x795a26a00000 regs=24->24 bars=1 lmem=0(cap=1024,calls=1) loop_free=0 static_smem=0 bin=1280B name=_ZN2at6native24vectorized_gather_kernelILi16ElEEvPcS2_PT0_illllb
+[XSCHED INFO @ T 275937 @ 07:07:10.645117] sm120_guardian: instrumented func=0x3b326900 orig_ep=0x795b1b6f4400 -> ep_inst=0x795a26a00a00 regs=12->16 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=512B name=_ZN50_GLOBAL__N__fa15d16e_17_RangeFactories_cu_38772b0829elementwise_kernel_with_indexIiZZZN2at6native15arange_cuda_outE
+[XSCHED INFO @ T 275937 @ 07:07:10.664072] sm120_guardian: instrumented func=0x3cd57370 orig_ep=0x795b1b6f4f00 -> ep_inst=0x795a26a01100 regs=40->40 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=3456B name=_ZN2at6native29vectorized_elementwise_kernelILi2ENS0_21CUDAFunctorOnSelf_addIlEESt5arrayIPcLm2EEEEviT0_T1_
+[XSCHED INFO @ T 275937 @ 07:07:10.683196] sm120_guardian: instrumented func=0x3e3acd70 orig_ep=0x795b1b6f6500 -> ep_inst=0x795a26a02380 regs=31->32 bars=1 lmem=0(cap=1024,calls=1) loop_free=0 static_smem=0 bin=29184B name=_ZN2at6native27unrolled_elementwise_kernelIZZZNS0_23direct_copy_kernel_cudaERNS_18TensorIteratorBaseEENKUlvE1_clEvENKUlv
+[XSCHED INFO @ T 275937 @ 07:07:10.702150] sm120_guardian: instrumented func=0x3f937fc0 orig_ep=0x795b1b6fe000 -> ep_inst=0x795a26a09a80 regs=22->22 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=12160B name=_ZN2at6native18elementwise_kernelILi128ELi2EZNS0_22gpu_kernel_impl_nocastINS0_13BinaryFunctorIfffNS0_15binary_internal10
+[XSCHED INFO @ T 275937 @ 07:07:10.721156] sm120_guardian: instrumented func=0x40913960 orig_ep=0x795b1b701800 -> ep_inst=0x795a26a0cf00 regs=26->26 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=1664B name=_ZN2at6native40_GLOBAL__N__0f1a8107_8_Shape_cu_49f7391c30CatArrayBatchedCopy_vectorizedINS1_10OpaqueTypeILj4EEEjLi3ELi12
+[XSCHED INFO @ T 275937 @ 07:07:10.740214] sm120_guardian: instrumented func=0x40e36010 orig_ep=0x795b1b702700 -> ep_inst=0x795a26a0da80 regs=36->36 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=36864B name=_ZN2at6native29vectorized_elementwise_kernelILi4EZZZNS0_15cos_kernel_cudaERNS_18TensorIteratorBaseEENKUlvE0_clEvENKUlvE0
+[XSCHED INFO @ T 275937 @ 07:07:10.759504] sm120_guardian: instrumented func=0x3f915b40 orig_ep=0x795b1b70c000 -> ep_inst=0x795a26a16f80 regs=36->36 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=2688B name=_ZN2at6native29vectorized_elementwise_kernelILi4ENS0_13AUnaryFunctorIfffNS0_15binary_internal10MulFunctorIfEEEESt5arrayI
+[XSCHED INFO @ T 275937 @ 07:07:10.778471] sm120_guardian: instrumented func=0x411da990 orig_ep=0x795b1b70d300 -> ep_inst=0x795a26a17f00 regs=36->36 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=36608B name=_ZN2at6native29vectorized_elementwise_kernelILi4EZZZNS0_15sin_kernel_cudaERNS_18TensorIteratorBaseEENKUlvE0_clEvENKUlvE0
+[XSCHED INFO @ T 275937 @ 07:07:10.797587] sm120_guardian: instrumented func=0x3eabe5b0 orig_ep=0x795b1b716b00 -> ep_inst=0x795a26a21300 regs=40->40 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=2816B name=_ZN2at6native29vectorized_elementwise_kernelILi4EZNS0_25bfloat16_copy_kernel_cudaERNS_18TensorIteratorBaseEEUlfE_St5arra
+[XSCHED INFO @ T 275937 @ 07:07:10.817146] sm120_guardian: instrumented func=0x41b469b0 orig_ep=0x795b1b717f00 -> ep_inst=0x795a26a22300 regs=36->36 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=2688B name=_ZN2at6native29vectorized_elementwise_kernelILi4EZNS0_51_GLOBAL__N__b1108092_12_PowKernel_cu_70c0f2ac_2135529pow_tensor_
+[XSCHED INFO @ T 275937 @ 07:07:10.836067] sm120_guardian: instrumented func=0x436ca7f0 orig_ep=0x795b1b719200 -> ep_inst=0x795a26a23280 regs=34->34 bars=1 lmem=0(cap=1024,calls=1) loop_free=0 static_smem=16 bin=59264B name=_ZN2at6native13reduce_kernelILi512ELi1ENS0_8ReduceOpIfNS0_7MeanOpsIffffEEjfLi4ELi4EEEEEvT1_
+[XSCHED INFO @ T 275937 @ 07:07:10.855029] sm120_guardian: instrumented func=0x3cbf8dd0 orig_ep=0x795b1b728200 -> ep_inst=0x795a26a31f00 regs=36->36 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=2688B name=_ZN2at6native29vectorized_elementwise_kernelILi4ENS0_21CUDAFunctorOnSelf_addIfEESt5arrayIPcLm2EEEEviT0_T1_
+[XSCHED INFO @ T 275937 @ 07:07:10.874034] sm120_guardian: instrumented func=0x45f2e150 orig_ep=0x795b1b729500 -> ep_inst=0x795a26a32e80 regs=32->32 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=3968B name=_ZN2at6native29vectorized_elementwise_kernelILi4EZZZNS0_17rsqrt_kernel_cudaERNS_18TensorIteratorBaseEENKUlvE0_clEvENKUlv
+[XSCHED INFO @ T 275937 @ 07:07:10.892973] sm120_guardian: instrumented func=0x3f7587f0 orig_ep=0x795b1b72ad00 -> ep_inst=0x795a26a34300 regs=22->22 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=24192B name=_ZN2at6native18elementwise_kernelILi128ELi4EZNS0_22gpu_kernel_impl_nocastINS0_13BinaryFunctorIN3c108BFloat16ES5_S5_NS0_1
+[XSCHED INFO @ T 275937 @ 07:07:10.912268] sm120_guardian: instrumented func=0x500d4490 orig_ep=0x795b1b731400 -> ep_inst=0x795a26a3a680 regs=88->88 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=25600B name=_ZN7cutlass7Kernel2I66cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8EEvNT_6ParamsE
+[XSCHED INFO @ T 275937 @ 07:07:10.931326] sm120_guardian: instrumented func=0x50307ca0 orig_ep=0x795b1b738100 -> ep_inst=0x795a26a40f80 regs=56->56 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=8960B name=_ZN7cutlass7Kernel2I67cutlass_80_wmma_tensorop_bf16_s161616gemm_bf16_32x32_64x1_tn_align8EEvNT_6ParamsE
+[XSCHED INFO @ T 275937 @ 07:07:10.950368] sm120_guardian: instrumented func=0x51b07c40 orig_ep=0x795b1b73ad00 -> ep_inst=0x795a26a43780 regs=20->20 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=20480B name=_ZN2at6native18elementwise_kernelILi128ELi4EZNS0_22gpu_kernel_impl_nocastIZZZNS0_15neg_kernel_cudaERNS_18TensorIteratorB
+[XSCHED INFO @ T 275937 @ 07:07:10.969343] sm120_guardian: instrumented func=0x405dbe40 orig_ep=0x795b1b740600 -> ep_inst=0x795a26a48c80 regs=36->36 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3200B name=_ZN2at6native40_GLOBAL__N__0f1a8107_8_Shape_cu_49f7391c19CatArrayBatchedCopyINS1_10OpaqueTypeILj2EEEjLi4ELi64ELi64EEEvPT
+[XSCHED INFO @ T 275937 @ 07:07:10.988367] sm120_guardian: instrumented func=0x3c8d42c0 orig_ep=0x795b1b741b00 -> ep_inst=0x795a26a49e00 regs=22->22 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=24192B name=_ZN2at6native18elementwise_kernelILi128ELi4EZNS0_22gpu_kernel_impl_nocastINS0_15CUDAFunctor_addIN3c108BFloat16EEEEEvRNS_
+[XSCHED INFO @ T 275937 @ 07:07:11.007567] sm120_guardian: instrumented func=0x52292de0 orig_ep=0x795b1b748200 -> ep_inst=0x795a26a50180 regs=255->255 bars=1 lmem=80(cap=1104,calls=1) loop_free=0 static_smem=0 bin=76544B name=_ZN13pytorch_flash16flash_fwd_kernelI23Flash_fwd_kernel_traitsILi64ELi128ELi128ELi4ELb0ELb0EN7cutlass10bfloat16_tE19Flas
+[XSCHED INFO @ T 275937 @ 07:07:11.026701] sm120_guardian: instrumented func=0x5036da40 orig_ep=0x795b1b75b600 -> ep_inst=0x795a26a63180 regs=47->48 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=8064B name=_ZN7cutlass7Kernel2I67cutlass_80_wmma_tensorop_bf16_s161616gemm_bf16_32x32_32x1_tn_align8EEvNT_6ParamsE
+[XSCHED INFO @ T 275937 @ 07:07:11.045722] sm120_guardian: instrumented func=0x3c8edba0 orig_ep=0x795b1b75de00 -> ep_inst=0x795a26a65600 regs=40->40 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=4480B name=_ZN2at6native29vectorized_elementwise_kernelILi4ENS0_15CUDAFunctor_addIN3c108BFloat16EEESt5arrayIPcLm3EEEEviT0_T1_
+[XSCHED INFO @ T 275937 @ 07:07:11.064833] sm120_guardian: instrumented func=0x4ff5e330 orig_ep=0x795b1b75f800 -> ep_inst=0x795a26a66c80 regs=230->230 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=68736B name=_ZN7cutlass7Kernel2I67cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x256_32x4_tn_align8EEvNT_6ParamsE
+[XSCHED INFO @ T 275937 @ 07:07:11.083820] sm120_guardian: instrumented func=0x52e1fb70 orig_ep=0x795b1b770d00 -> ep_inst=0x795a26a77e00 regs=38->38 bars=1 lmem=0(cap=1024,calls=1) loop_free=0 static_smem=0 bin=11136B name=_ZN2at6native29vectorized_elementwise_kernelILi4EZZZNS0_62_GLOBAL__N__7d4ed096_23_ActivationSiluKernel_cu_70c0f2ac_15602
+[XSCHED INFO @ T 275937 @ 07:07:11.103072] sm120_guardian: instrumented func=0x3f7720d0 orig_ep=0x795b1b774100 -> ep_inst=0x795a26a7ae80 regs=46->46 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=4352B name=_ZN2at6native29vectorized_elementwise_kernelILi4ENS0_13BinaryFunctorIN3c108BFloat16ES4_S4_NS0_15binary_internal10MulFunc
+[XSCHED INFO @ T 275937 @ 07:07:11.131858] sm120_guardian: instrumented func=0x5017de50 orig_ep=0x795b1b775b00 -> ep_inst=0x795a26a7c480 regs=232->232 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=68096B name=_ZN7cutlass7Kernel2I68cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_256x128_32x3_tn_align8EEvNT_6ParamsE
+[XSCHED INFO @ T 275937 @ 07:07:11.151027] sm120_guardian: instrumented func=0x53b788b0 orig_ep=0x795b1b786e00 -> ep_inst=0x795a26a8d380 regs=22->22 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=1792B name=_ZN2at6native29vectorized_elementwise_kernelILi2ENS0_11FillFunctorIlEESt5arrayIPcLm1EEEEviT0_T1_
+[XSCHED INFO @ T 275937 @ 07:07:11.170118] sm120_guardian: instrumented func=0x3e468ca0 orig_ep=0x795b1b787e00 -> ep_inst=0x795a26a8df80 regs=20->20 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=10368B name=_ZN2at6native18elementwise_kernelILi128ELi2EZNS0_22gpu_kernel_impl_nocastIZZZNS0_23direct_copy_kernel_cudaERNS_18TensorI
+[XSCHED INFO @ T 275937 @ 07:07:11.189223] sm120_guardian: instrumented func=0x56613c80 orig_ep=0x795b1b78af00 -> ep_inst=0x795a26a90d00 regs=40->40 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=8320B name=_ZN2at6native43_GLOBAL__N__b6de9c8c_10_SoftMax_cu_9f978f6319cunn_SoftMaxForwardILi4EfffNS1_25LogSoftMaxForwardEpilogueEE
+[XSCHED INFO @ T 275937 @ 07:07:11.208344] sm120_guardian: instrumented func=0x570a1330 orig_ep=0x795b1b78d800 -> ep_inst=0x795a26a93280 regs=30->30 bars=1 lmem=0(cap=1024,calls=1) loop_free=0 static_smem=0 bin=4864B name=_ZN2at6native39_GLOBAL__N__5cd812b1_7_Loss_cu_5b0651e138nll_loss_forward_reduce_cuda_kernel_2dIfflEEvPT_S4_PKS3_PKT1_S6_
+[XSCHED ERRO @ T 275878 @ 07:07:18.726075] cuda error 719: unspecified launch failure @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level1/cuda_queue.cpp:52
+[XSCHED ERRO @ T 275824 @ 07:07:18.726082] cuda error 719: unspecified launch failure @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level1/cuda_queue.cpp:52
+[XSCHED WARN @ T 275823 @ 07:09:20.761973] XQueue with handle 0x356f00005960ba20 does not exist @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/preempt/src/xqueue/xqueue.cpp:56
+[XSCHED WARN @ T 275823 @ 07:09:20.761989] HwQueue (0x3ab8e3a0) is still associated with XQueue (0x356f00005960ba20), please first destroy the XQueue using XQueueDestroy() @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/preempt/src/hal/hw_queue.cpp:41
+terminate called after throwing an instance of 'c10::Error'
+  what():  invalid device pointer: 0x795a77dd6600
+Exception raised from free at /pytorch/c10/cuda/CUDACachingAllocator.cpp:3985 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x795e4197105d in ~/.venv_sm120/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: c10::detail::torchCheckFail(char const*, char const*, unsigned int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) + 0xc3 (0x795e419056fd in ~/.venv_sm120/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x1e333 (0x795e42d85333 in ~/.venv_sm120/lib/python3.12/site-packages/torch/lib/libc10_cuda.so)
+frame #3: <unknown function> + 0x7f8e4 (0x795e419528e4 in ~/.venv_sm120/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #4: c10::TensorImpl::~TensorImpl() + 0x9 (0x795e4194c279 in ~/.venv_sm120/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #5: <unknown function> + 0x869d55 (0x795daba69d55 in ~/.venv_sm120/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #6: <unknown function> + 0x869df1 (0x795daba69df1 in ~/.venv_sm120/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #7: ~/.venv_sm120/bin/python() [0x1630a2c]
+frame #8: ~/.venv_sm120/bin/python() [0x160168b]
+frame #9: _PyEval_EvalFrameDefault + 0xa64 (0x161667c in ~/.venv_sm120/bin/python)
+frame #10: PyEval_EvalCode + 0xde (0x167741e in ~/.venv_sm120/bin/python)
+frame #11: ~/.venv_sm120/bin/python() [0x16b1597]
+frame #12: ~/.venv_sm120/bin/python() [0x1834fc5]
+frame #13: _PyRun_SimpleFileObject + 0x10e (0x183480e in ~/.venv_sm120/bin/python)
+frame #14: _PyRun_AnyFileObject + 0x4a (0x183460a in ~/.venv_sm120/bin/python)
+frame #15: ~/.venv_sm120/bin/python() [0x1834595]
+frame #16: ~/.venv_sm120/bin/python() [0x183449d]
+frame #17: ~/.venv_sm120/bin/python() [0x18dc165]
+frame #18: ~/.venv_sm120/bin/python() [0x178f2cf]
+frame #19: ~/.venv_sm120/bin/python() [0x178f138]
+frame #20: <unknown function> + 0x2a601 (0x795e7682a601 in /usr/lib/x86_64-linux-gnu/libc.so.6)
+frame #21: __libc_start_main + 0x88 (0x795e7682a718 in /usr/lib/x86_64-linux-gnu/libc.so.6)
+frame #22: _start + 0x29 (0x17c1429 in ~/.venv_sm120/bin/python)
+
+[S8-MP glb-lv3 ppl] PASS | TPOT p50 8.39 p99 9.74 (solo 8.87) ms | TTFT p50 9.54 | susp p50 - ms | LP 22% | HP duty 72% | exact HP 20/20 LP bad 0 | 

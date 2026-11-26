@@ -345,3 +345,12 @@
 - 修复：`xsched-bar0d` 代理。root 启动，只映射 Trap 寄存器与刷新寄存器所在的两页 BAR0，建 `root:<group> 0660` 的 `SOCK_SEQPACKET` socket 后降权为 `nobody`（`CapEff=0`、`NoNewPrivs=1`）；只接受 `PULSE` / `HELLO`，每连接令牌桶限流，单线程串行保证多进程脉冲不交错。客户端（`Sm120Arena`）先尝试直接映射，失败再连代理，`HELLO` 校验 PCI BDF，断线后自动重连。
 - 验证：非 root 5060 37/37、5080 50/50（`LLM-08` 24/24、双进程并发、压测、库与硬件特性、8 个生产算子比特一致）；故障注入（无代理、无权限、限流、接错 GPU、路径过长、运行中杀掉并重启代理）均按预期退化或恢复。开销：往返 4.5–12 µs，同会话 A/B 挂起延迟 +2–15 µs。
 - 详见 [`SM120_V2_PHASE3_4_DEF10_BAR0_PROXY_ZH.md`](SM120_V2_PHASE3_4_DEF10_BAR0_PROXY_ZH.md)。
+
+### 10.10 Phase 3.4-2 多进程测试（2026-11-26）
+- **OBS-7 证实**：HP / LP 分为两个进程后，按请求挂起的 HP TPOT 两卡均为 solo 的 1.00×（单进程 1.02–1.07×），残余膨胀来自 GIL。
+- **DEF-25（撤回）**：曾因同步后立即查询仍为 Ready 而判定“调用方 `WaitAll` 快速路径漏报 Idle”。实际由发射线程在约 21 µs（最大 41 µs）后完成转换。为它加的“调用线程直接置 Idle”打破了命令缓冲区“Idle 时最后命令是已完成 `WaitAll`”的约定，导致 `HW-05` 断言失败（两卡），5080 `S8-ppl-lv3-prefill` 还出现 1 次 LP 不一致；已回退，`HW-05` 与该 S8 配置复测通过（T-22）。回归保留 `SYN-xq-idle`（检查 50 ms 内变为 Idle）。
+- **DEF-28（已修复）**：`xserver` 只在 SIGINT / SIGQUIT 时删除 IPC 消息队列（SysV 键 0x1）。root 回归运行后残留的队列使普通用户的 `xserver` 无法启动通道，客户端向满队列发送时阻塞，跨进程测试挂起。修复：处理 SIGTERM；测试脚本用 SIGINT 结束服务并预检残留队列（T-23）。
+- **DEF-26（已修复）**：全局 / 本地调度器在其执行线程上挂起 / 恢复队列，该线程无 CUDA 上下文；Lv3 `Reactivate()` 重新发射内核时 `PrepareLaunch` 断言失败。修复：Lv3 的 `Deactivate/Interrupt/Reactivate` 临时压入队列上下文。
+- **DEF-27（已缓解，开放）**：跨进程透明调度下 HP 在 LP 被驱逐期间继续发射，GPU 时间片切换若在 LP 线程束处于 Trap 处理程序时到达会超时（Xid 109 `CTX SWITCH TIMEOUT`，约 0.3%/次挂起），驱动恢复使两个进程都报 719。应用层“等驱逐确认再发射”（`req-lv3`）不触发。缓解：`XSCHED_SCHEDULER=GLB` 时默认走 Level-1（`XSCHED_SM120_GLB_LV3=1` 覆盖）。
+- **OBS-8**：RTX 5060 同时驱动桌面，两次 Lv3 多波次压测开始后约 1 s 内桌面图形进程（`ghostty` / `gnome-shell`）出现 Xid 31 MMU 故障，进程未崩溃；早先的旁观测试只覆盖计算上下文。
+- 详见 [`SM120_V2_PHASE3_4_MULTIPROCESS_ZH.md`](SM120_V2_PHASE3_4_MULTIPROCESS_ZH.md)。
