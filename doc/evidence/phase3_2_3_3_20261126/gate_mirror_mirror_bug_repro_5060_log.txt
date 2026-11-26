@@ -1,0 +1,232 @@
+=== guarded run start 2026-11-26T05:26:01+01:00 host=<host> plan=<scratch>/remote/rq_5060.plan ===
+NVIDIA GeForce RTX 5060, 595.99.02, 265 MiB, 3 %, 46
+>>> [RQ-on-r1] 05:26:01
+[XSCHED INFO @ T 213699 @ 05:26:01.249461] using app-managed scheduler
+[XSCHED INFO @ T 213699 @ 05:26:01.530650] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 213699 @ 05:26:01.574927] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 213699 @ 05:26:01.611612] sm120_guardian: instrumented func=0x5d40da81a7c0 orig_ep=0x7a3be36f4100 -> ep_inst=0x7a3bdcc00000 regs=11->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=640B name=_Z9k_shallowPji
+[XSCHED INFO @ T 213699 @ 05:26:01.728390] sm120_guardian: instrumented func=0x5d40da812120 orig_ep=0x7a3be36f4c00 -> ep_inst=0x7a3bdcc00780 regs=15->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3840B name=_Z6k_deepPji
+[XSCHED INFO @ T 213699 @ 05:26:01.847008] sm120_guardian: instrumented func=0x5d40da801380 orig_ep=0x7a3be36f6400 -> ep_inst=0x7a3bdcc01b80 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=2944B name=_Z7k_depthILi1EEvPji
+[XSCHED INFO @ T 213699 @ 05:26:01.929160] sm120_guardian: instrumented func=0x5d40da7f8ce0 orig_ep=0x7a3be36f7800 -> ep_inst=0x7a3bdcc02c00 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=2688B name=_Z7k_depthILi2EEvPji
+[XSCHED INFO @ T 213699 @ 05:26:02.037317] sm120_guardian: instrumented func=0x5d40da7f0640 orig_ep=0x7a3be36f8b00 -> ep_inst=0x7a3bdcc03b80 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=2944B name=_Z7k_depthILi3EEvPji
+[XSCHED INFO @ T 213699 @ 05:26:02.159212] sm120_guardian: instrumented func=0x5d40da7e7fa0 orig_ep=0x7a3be36f9f00 -> ep_inst=0x7a3bdcc04c00 regs=11->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3072B name=_Z7k_depthILi4EEvPji
+[XSCHED INFO @ T 213699 @ 05:26:02.287702] sm120_guardian: instrumented func=0x5d40da7df900 orig_ep=0x7a3be36fb400 -> ep_inst=0x7a3bdcc05d00 regs=12->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3328B name=_Z7k_depthILi5EEvPji
+[XSCHED INFO @ T 213699 @ 05:26:02.431794] sm120_guardian: instrumented func=0x5d40da7d72a0 orig_ep=0x7a3be36fca00 -> ep_inst=0x7a3bdcc06f00 regs=13->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3456B name=_Z7k_depthILi6EEvPji
+[XSCHED INFO @ T 213699 @ 05:26:02.552971] sm120_guardian: instrumented func=0x5d40da7cecf0 orig_ep=0x7a3be36fe000 -> ep_inst=0x7a3bdcc08180 regs=12->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=768B name=_Z6k_regsILi1EEvPji
+[XSCHED INFO @ T 213699 @ 05:26:02.677065] sm120_guardian: instrumented func=0x5d40da7c6820 orig_ep=0x7a3be36fec00 -> ep_inst=0x7a3bdcc08980 regs=16->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=896B name=_Z6k_regsILi4EEvPji
+[XSCHED ERRO @ T 213707 @ 05:26:02.752914] cuda error 715: an illegal instruction was encountered @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/common/cuda_command.cpp:31
+[P3-CONVBAR C0 shallow] PASS | runs=3 ok=3 np=10 outer=514 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR C1 deep] PASS | runs=3 ok=3 np=10 outer=11 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D1 depth1] PASS | runs=3 ok=3 np=10 outer=7319 blocks=240 thr=256 chain=6 gap_us=1000
+  run 1 (np=10): mismatched=32/61440
+[P3-CONVBAR D2 depth2] FAIL | runs=3 ok=2 np=10 outer=2657 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D3 depth3] PASS | runs=3 ok=3 np=10 outer=748 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D4 depth4] PASS | runs=3 ok=3 np=10 outer=193 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D5 depth5] PASS | runs=3 ok=3 np=10 outer=49 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D6 depth6] PASS | runs=3 ok=3 np=10 outer=12 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R0 regs+0] PASS | runs=3 ok=3 np=10 outer=889 blocks=240 thr=256 chain=6 gap_us=1000
+<<< [RQ-on-r1] rc=1 wall=1.6s
+>>> [RQ-off-r1] 05:26:02
+[XSCHED INFO @ T 213735 @ 05:26:02.866934] using app-managed scheduler
+[XSCHED INFO @ T 213735 @ 05:26:02.993263] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 213735 @ 05:26:03.029850] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 213735 @ 05:26:03.063847] sm120_guardian: instrumented func=0x642c4b721870 orig_ep=0x74a2eb6f4100 -> ep_inst=0x74a2e6c00000 regs=11->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=640B name=_Z9k_shallowPji
+[XSCHED INFO @ T 213735 @ 05:26:03.179332] sm120_guardian: instrumented func=0x642c4b7191d0 orig_ep=0x74a2eb6f4c00 -> ep_inst=0x74a2e6c00780 regs=15->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3840B name=_Z6k_deepPji
+[XSCHED INFO @ T 213735 @ 05:26:03.290508] sm120_guardian: instrumented func=0x642c4b708430 orig_ep=0x74a2eb6f6400 -> ep_inst=0x74a2e6c01b80 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=2944B name=_Z7k_depthILi1EEvPji
+[XSCHED INFO @ T 213735 @ 05:26:03.385847] sm120_guardian: instrumented func=0x642c4b6ffd90 orig_ep=0x74a2eb6f7800 -> ep_inst=0x74a2e6c02c00 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=2688B name=_Z7k_depthILi2EEvPji
+[XSCHED INFO @ T 213735 @ 05:26:03.493143] sm120_guardian: instrumented func=0x642c4b6f76f0 orig_ep=0x74a2eb6f8b00 -> ep_inst=0x74a2e6c03b80 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=2944B name=_Z7k_depthILi3EEvPji
+[XSCHED INFO @ T 213735 @ 05:26:03.614448] sm120_guardian: instrumented func=0x642c4b6ef050 orig_ep=0x74a2eb6f9f00 -> ep_inst=0x74a2e6c04c00 regs=11->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3072B name=_Z7k_depthILi4EEvPji
+[XSCHED INFO @ T 213735 @ 05:26:03.743161] sm120_guardian: instrumented func=0x642c4b6e69b0 orig_ep=0x74a2eb6fb400 -> ep_inst=0x74a2e6c05d00 regs=12->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3328B name=_Z7k_depthILi5EEvPji
+[XSCHED INFO @ T 213735 @ 05:26:03.887474] sm120_guardian: instrumented func=0x642c4b6de350 orig_ep=0x74a2eb6fca00 -> ep_inst=0x74a2e6c06f00 regs=13->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3456B name=_Z7k_depthILi6EEvPji
+[XSCHED INFO @ T 213735 @ 05:26:04.008950] sm120_guardian: instrumented func=0x642c4b6d5da0 orig_ep=0x74a2eb6fe000 -> ep_inst=0x74a2e6c08180 regs=12->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=768B name=_Z6k_regsILi1EEvPji
+[XSCHED INFO @ T 213735 @ 05:26:04.131474] sm120_guardian: instrumented func=0x642c4b6cd8d0 orig_ep=0x74a2eb6fec00 -> ep_inst=0x74a2e6c08980 regs=16->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=896B name=_Z6k_regsILi4EEvPji
+[XSCHED INFO @ T 213735 @ 05:26:04.256469] sm120_guardian: instrumented func=0x642c4b6c5400 orig_ep=0x74a2eb6ff800 -> ep_inst=0x74a2e6c09200 regs=26->26 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=1280B name=_Z6k_regsILi16EEvPji
+[XSCHED INFO @ T 213735 @ 05:26:04.384549] sm120_guardian: instrumented func=0x642c4b6762f0 orig_ep=0x74a2eb700600 -> ep_inst=0x74a2e6c09c00 regs=55->56 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=2816B name=_Z6k_regsILi48EEvPji
+[P3-CONVBAR C0 shallow] PASS | runs=3 ok=3 np=10 outer=560 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR C1 deep] PASS | runs=3 ok=3 np=10 outer=10 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D1 depth1] PASS | runs=3 ok=3 np=10 outer=10869 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D2 depth2] PASS | runs=3 ok=3 np=10 outer=2649 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D3 depth3] PASS | runs=3 ok=3 np=10 outer=742 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D4 depth4] PASS | runs=3 ok=3 np=10 outer=193 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D5 depth5] PASS | runs=3 ok=3 np=10 outer=49 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D6 depth6] PASS | runs=3 ok=3 np=10 outer=12 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R0 regs+0] PASS | runs=3 ok=3 np=10 outer=884 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R1 regs+4] PASS | runs=3 ok=3 np=10 outer=724 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R2 regs+16] PASS | runs=3 ok=3 np=10 outer=267 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R3 regs+48] PASS | runs=3 ok=3 np=10 outer=106 blocks=240 thr=256 chain=6 gap_us=1000
+<<< [RQ-off-r1] rc=0 wall=1.7s
+>>> [RQ-on-r2] 05:26:04
+[XSCHED INFO @ T 213771 @ 05:26:04.589095] using app-managed scheduler
+[XSCHED INFO @ T 213771 @ 05:26:04.714753] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 213771 @ 05:26:04.751049] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 213771 @ 05:26:04.783356] sm120_guardian: instrumented func=0x643e70feb870 orig_ep=0x77677f6f4100 -> ep_inst=0x77677ac00000 regs=11->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=640B name=_Z9k_shallowPji
+[XSCHED INFO @ T 213771 @ 05:26:04.893473] sm120_guardian: instrumented func=0x643e70fe31d0 orig_ep=0x77677f6f4c00 -> ep_inst=0x77677ac00780 regs=15->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3840B name=_Z6k_deepPji
+[XSCHED INFO @ T 213771 @ 05:26:05.005050] sm120_guardian: instrumented func=0x643e70fd2430 orig_ep=0x77677f6f6400 -> ep_inst=0x77677ac01b80 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=2944B name=_Z7k_depthILi1EEvPji
+[XSCHED INFO @ T 213771 @ 05:26:05.098995] sm120_guardian: instrumented func=0x643e70fc9d90 orig_ep=0x77677f6f7800 -> ep_inst=0x77677ac02c00 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=2688B name=_Z7k_depthILi2EEvPji
+[XSCHED INFO @ T 213771 @ 05:26:05.206641] sm120_guardian: instrumented func=0x643e70fc16f0 orig_ep=0x77677f6f8b00 -> ep_inst=0x77677ac03b80 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=2944B name=_Z7k_depthILi3EEvPji
+[XSCHED INFO @ T 213771 @ 05:26:05.327085] sm120_guardian: instrumented func=0x643e70fb9050 orig_ep=0x77677f6f9f00 -> ep_inst=0x77677ac04c00 regs=11->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3072B name=_Z7k_depthILi4EEvPji
+[XSCHED INFO @ T 213771 @ 05:26:05.455887] sm120_guardian: instrumented func=0x643e70fb09b0 orig_ep=0x77677f6fb400 -> ep_inst=0x77677ac05d00 regs=12->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3328B name=_Z7k_depthILi5EEvPji
+[XSCHED INFO @ T 213771 @ 05:26:05.600208] sm120_guardian: instrumented func=0x643e70fa8350 orig_ep=0x77677f6fca00 -> ep_inst=0x77677ac06f00 regs=13->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3456B name=_Z7k_depthILi6EEvPji
+[XSCHED INFO @ T 213771 @ 05:26:05.721180] sm120_guardian: instrumented func=0x643e70f9fda0 orig_ep=0x77677f6fe000 -> ep_inst=0x77677ac08180 regs=12->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=768B name=_Z6k_regsILi1EEvPji
+[XSCHED INFO @ T 213771 @ 05:26:05.844059] sm120_guardian: instrumented func=0x643e70f978d0 orig_ep=0x77677f6fec00 -> ep_inst=0x77677ac08980 regs=16->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=896B name=_Z6k_regsILi4EEvPji
+[XSCHED INFO @ T 213771 @ 05:26:05.969712] sm120_guardian: instrumented func=0x643e70f8f400 orig_ep=0x77677f6ff800 -> ep_inst=0x77677ac09200 regs=26->26 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=1280B name=_Z6k_regsILi16EEvPji
+[XSCHED ERRO @ T 213780 @ 05:26:06.005857] cuda error 715: an illegal instruction was encountered @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/common/cuda_command.cpp:31
+[P3-CONVBAR C0 shallow] PASS | runs=3 ok=3 np=10 outer=483 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR C1 deep] PASS | runs=3 ok=3 np=10 outer=10 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D1 depth1] PASS | runs=3 ok=3 np=10 outer=10752 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D2 depth2] PASS | runs=3 ok=3 np=10 outer=2591 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D3 depth3] PASS | runs=3 ok=3 np=10 outer=739 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D4 depth4] PASS | runs=3 ok=3 np=10 outer=193 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D5 depth5] PASS | runs=3 ok=3 np=10 outer=49 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D6 depth6] PASS | runs=3 ok=3 np=10 outer=12 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R0 regs+0] PASS | runs=3 ok=3 np=10 outer=864 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R1 regs+4] PASS | runs=3 ok=3 np=10 outer=738 blocks=240 thr=256 chain=6 gap_us=1000
+<<< [RQ-on-r2] rc=1 wall=1.5s
+>>> [RQ-off-r2] 05:26:06
+[XSCHED INFO @ T 213807 @ 05:26:06.110894] using app-managed scheduler
+[XSCHED INFO @ T 213807 @ 05:26:06.244571] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 213807 @ 05:26:06.280996] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 213807 @ 05:26:06.314949] sm120_guardian: instrumented func=0x58f7de704720 orig_ep=0x7fbd176f4100 -> ep_inst=0x7fbd12c00000 regs=11->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=640B name=_Z9k_shallowPji
+[XSCHED INFO @ T 213807 @ 05:26:06.429472] sm120_guardian: instrumented func=0x58f7de6fc080 orig_ep=0x7fbd176f4c00 -> ep_inst=0x7fbd12c00780 regs=15->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3840B name=_Z6k_deepPji
+[XSCHED INFO @ T 213807 @ 05:26:06.536467] sm120_guardian: instrumented func=0x58f7de6eb2e0 orig_ep=0x7fbd176f6400 -> ep_inst=0x7fbd12c01b80 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=2944B name=_Z7k_depthILi1EEvPji
+[XSCHED INFO @ T 213807 @ 05:26:06.618200] sm120_guardian: instrumented func=0x58f7de6e2c40 orig_ep=0x7fbd176f7800 -> ep_inst=0x7fbd12c02c00 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=2688B name=_Z7k_depthILi2EEvPji
+[XSCHED INFO @ T 213807 @ 05:26:06.727948] sm120_guardian: instrumented func=0x58f7de6da5a0 orig_ep=0x7fbd176f8b00 -> ep_inst=0x7fbd12c03b80 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=2944B name=_Z7k_depthILi3EEvPji
+[XSCHED INFO @ T 213807 @ 05:26:06.848934] sm120_guardian: instrumented func=0x58f7de6d1f00 orig_ep=0x7fbd176f9f00 -> ep_inst=0x7fbd12c04c00 regs=11->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3072B name=_Z7k_depthILi4EEvPji
+[XSCHED INFO @ T 213807 @ 05:26:06.976708] sm120_guardian: instrumented func=0x58f7de6c9860 orig_ep=0x7fbd176fb400 -> ep_inst=0x7fbd12c05d00 regs=12->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3328B name=_Z7k_depthILi5EEvPji
+[XSCHED INFO @ T 213807 @ 05:26:07.121294] sm120_guardian: instrumented func=0x58f7de6c1200 orig_ep=0x7fbd176fca00 -> ep_inst=0x7fbd12c06f00 regs=13->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3456B name=_Z7k_depthILi6EEvPji
+[XSCHED INFO @ T 213807 @ 05:26:07.242582] sm120_guardian: instrumented func=0x58f7de6b8c50 orig_ep=0x7fbd176fe000 -> ep_inst=0x7fbd12c08180 regs=12->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=768B name=_Z6k_regsILi1EEvPji
+[XSCHED INFO @ T 213807 @ 05:26:07.367095] sm120_guardian: instrumented func=0x58f7de6b0780 orig_ep=0x7fbd176fec00 -> ep_inst=0x7fbd12c08980 regs=16->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=896B name=_Z6k_regsILi4EEvPji
+[XSCHED INFO @ T 213807 @ 05:26:07.489774] sm120_guardian: instrumented func=0x58f7de6a82b0 orig_ep=0x7fbd176ff800 -> ep_inst=0x7fbd12c09200 regs=26->26 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=1280B name=_Z6k_regsILi16EEvPji
+[XSCHED INFO @ T 213807 @ 05:26:07.619310] sm120_guardian: instrumented func=0x58f7de6591a0 orig_ep=0x7fbd17700600 -> ep_inst=0x7fbd12c09c00 regs=55->56 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=2816B name=_Z6k_regsILi48EEvPji
+[P3-CONVBAR C0 shallow] PASS | runs=3 ok=3 np=10 outer=553 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR C1 deep] PASS | runs=3 ok=3 np=10 outer=10 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D1 depth1] PASS | runs=3 ok=3 np=10 outer=7252 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D2 depth2] PASS | runs=3 ok=3 np=10 outer=2688 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D3 depth3] PASS | runs=3 ok=3 np=10 outer=745 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D4 depth4] PASS | runs=3 ok=3 np=10 outer=191 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D5 depth5] PASS | runs=3 ok=3 np=10 outer=49 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D6 depth6] PASS | runs=3 ok=3 np=10 outer=12 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R0 regs+0] PASS | runs=3 ok=3 np=10 outer=895 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R1 regs+4] PASS | runs=3 ok=3 np=10 outer=716 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R2 regs+16] PASS | runs=3 ok=3 np=10 outer=269 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R3 regs+48] PASS | runs=3 ok=3 np=10 outer=106 blocks=240 thr=256 chain=6 gap_us=1000
+<<< [RQ-off-r2] rc=0 wall=1.7s
+>>> [RQ-on-r3] 05:26:07
+[XSCHED INFO @ T 213844 @ 05:26:07.814501] using app-managed scheduler
+[XSCHED INFO @ T 213844 @ 05:26:07.942504] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 213844 @ 05:26:07.979044] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 213844 @ 05:26:08.013428] sm120_guardian: instrumented func=0x63081910b800 orig_ep=0x7779f76f4100 -> ep_inst=0x7779f2c00000 regs=11->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=640B name=_Z9k_shallowPji
+[XSCHED INFO @ T 213844 @ 05:26:08.126954] sm120_guardian: instrumented func=0x630819103160 orig_ep=0x7779f76f4c00 -> ep_inst=0x7779f2c00780 regs=15->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3840B name=_Z6k_deepPji
+[XSCHED INFO @ T 213844 @ 05:26:08.232147] sm120_guardian: instrumented func=0x6308190f23c0 orig_ep=0x7779f76f6400 -> ep_inst=0x7779f2c01b80 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=2944B name=_Z7k_depthILi1EEvPji
+[XSCHED INFO @ T 213844 @ 05:26:08.311421] sm120_guardian: instrumented func=0x6308190e9d20 orig_ep=0x7779f76f7800 -> ep_inst=0x7779f2c02c00 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=2688B name=_Z7k_depthILi2EEvPji
+[XSCHED INFO @ T 213844 @ 05:26:08.418867] sm120_guardian: instrumented func=0x6308190e1680 orig_ep=0x7779f76f8b00 -> ep_inst=0x7779f2c03b80 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=2944B name=_Z7k_depthILi3EEvPji
+[XSCHED INFO @ T 213844 @ 05:26:08.539983] sm120_guardian: instrumented func=0x6308190d8fe0 orig_ep=0x7779f76f9f00 -> ep_inst=0x7779f2c04c00 regs=11->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3072B name=_Z7k_depthILi4EEvPji
+[XSCHED INFO @ T 213844 @ 05:26:08.668499] sm120_guardian: instrumented func=0x6308190d0940 orig_ep=0x7779f76fb400 -> ep_inst=0x7779f2c05d00 regs=12->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3328B name=_Z7k_depthILi5EEvPji
+[XSCHED INFO @ T 213844 @ 05:26:08.811779] sm120_guardian: instrumented func=0x6308190c82e0 orig_ep=0x7779f76fca00 -> ep_inst=0x7779f2c06f00 regs=13->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3456B name=_Z7k_depthILi6EEvPji
+[XSCHED INFO @ T 213844 @ 05:26:08.932674] sm120_guardian: instrumented func=0x6308190bfd30 orig_ep=0x7779f76fe000 -> ep_inst=0x7779f2c08180 regs=12->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=768B name=_Z6k_regsILi1EEvPji
+[XSCHED INFO @ T 213844 @ 05:26:09.056403] sm120_guardian: instrumented func=0x6308190b7860 orig_ep=0x7779f76fec00 -> ep_inst=0x7779f2c08980 regs=16->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=896B name=_Z6k_regsILi4EEvPji
+[XSCHED INFO @ T 213844 @ 05:26:09.180925] sm120_guardian: instrumented func=0x6308190af390 orig_ep=0x7779f76ff800 -> ep_inst=0x7779f2c09200 regs=26->26 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=1280B name=_Z6k_regsILi16EEvPji
+[XSCHED INFO @ T 213844 @ 05:26:09.310704] sm120_guardian: instrumented func=0x630819060280 orig_ep=0x7779f7700600 -> ep_inst=0x7779f2c09c00 regs=55->56 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=2816B name=_Z6k_regsILi48EEvPji
+[XSCHED ERRO @ T 213844 @ 05:26:09.377280] cuda error 715: an illegal instruction was encountered @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level1/cuda_queue.cpp:52
+[XSCHED ERRO @ T 213852 @ 05:26:09.377281] cuda error 715: an illegal instruction was encountered @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/common/cuda_command.cpp:31
+[P3-CONVBAR C0 shallow] PASS | runs=3 ok=3 np=10 outer=548 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR C1 deep] PASS | runs=3 ok=3 np=10 outer=10 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D1 depth1] PASS | runs=3 ok=3 np=10 outer=6728 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D2 depth2] PASS | runs=3 ok=3 np=10 outer=2611 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D3 depth3] PASS | runs=3 ok=3 np=10 outer=742 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D4 depth4] PASS | runs=3 ok=3 np=10 outer=192 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D5 depth5] PASS | runs=3 ok=3 np=10 outer=49 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D6 depth6] PASS | runs=3 ok=3 np=10 outer=12 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R0 regs+0] PASS | runs=3 ok=3 np=10 outer=866 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R1 regs+4] PASS | runs=3 ok=3 np=10 outer=716 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R2 regs+16] PASS | runs=3 ok=3 np=10 outer=269 blocks=240 thr=256 chain=6 gap_us=1000
+<<< [RQ-on-r3] rc=1 wall=1.7s
+>>> [RQ-off-r3] 05:26:09
+[XSCHED INFO @ T 213880 @ 05:26:09.487381] using app-managed scheduler
+[XSCHED INFO @ T 213880 @ 05:26:09.620178] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 213880 @ 05:26:09.657520] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 213880 @ 05:26:09.692551] sm120_guardian: instrumented func=0x57cc98e72680 orig_ep=0x7d3ea36f4100 -> ep_inst=0x7d3e9ec00000 regs=11->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=640B name=_Z9k_shallowPji
+[XSCHED INFO @ T 213880 @ 05:26:09.806621] sm120_guardian: instrumented func=0x57cc98e69fe0 orig_ep=0x7d3ea36f4c00 -> ep_inst=0x7d3e9ec00780 regs=15->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3840B name=_Z6k_deepPji
+[XSCHED INFO @ T 213880 @ 05:26:09.917174] sm120_guardian: instrumented func=0x57cc98e59240 orig_ep=0x7d3ea36f6400 -> ep_inst=0x7d3e9ec01b80 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=2944B name=_Z7k_depthILi1EEvPji
+[XSCHED INFO @ T 213880 @ 05:26:10.010186] sm120_guardian: instrumented func=0x57cc98e50ba0 orig_ep=0x7d3ea36f7800 -> ep_inst=0x7d3e9ec02c00 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=2688B name=_Z7k_depthILi2EEvPji
+[XSCHED INFO @ T 213880 @ 05:26:10.118654] sm120_guardian: instrumented func=0x57cc98e48500 orig_ep=0x7d3ea36f8b00 -> ep_inst=0x7d3e9ec03b80 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=2944B name=_Z7k_depthILi3EEvPji
+[XSCHED INFO @ T 213880 @ 05:26:10.240407] sm120_guardian: instrumented func=0x57cc98e3fe60 orig_ep=0x7d3ea36f9f00 -> ep_inst=0x7d3e9ec04c00 regs=11->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3072B name=_Z7k_depthILi4EEvPji
+[XSCHED INFO @ T 213880 @ 05:26:10.368551] sm120_guardian: instrumented func=0x57cc98e377c0 orig_ep=0x7d3ea36fb400 -> ep_inst=0x7d3e9ec05d00 regs=12->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3328B name=_Z7k_depthILi5EEvPji
+[XSCHED INFO @ T 213880 @ 05:26:10.513481] sm120_guardian: instrumented func=0x57cc98e2f160 orig_ep=0x7d3ea36fca00 -> ep_inst=0x7d3e9ec06f00 regs=13->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3456B name=_Z7k_depthILi6EEvPji
+[XSCHED INFO @ T 213880 @ 05:26:10.634183] sm120_guardian: instrumented func=0x57cc98e26bb0 orig_ep=0x7d3ea36fe000 -> ep_inst=0x7d3e9ec08180 regs=12->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=768B name=_Z6k_regsILi1EEvPji
+[XSCHED INFO @ T 213880 @ 05:26:10.758049] sm120_guardian: instrumented func=0x57cc98e1e6e0 orig_ep=0x7d3ea36fec00 -> ep_inst=0x7d3e9ec08980 regs=16->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=896B name=_Z6k_regsILi4EEvPji
+[XSCHED INFO @ T 213880 @ 05:26:10.882601] sm120_guardian: instrumented func=0x57cc98e16210 orig_ep=0x7d3ea36ff800 -> ep_inst=0x7d3e9ec09200 regs=26->26 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=1280B name=_Z6k_regsILi16EEvPji
+[XSCHED INFO @ T 213880 @ 05:26:11.011551] sm120_guardian: instrumented func=0x57cc98dc7100 orig_ep=0x7d3ea3700600 -> ep_inst=0x7d3e9ec09c00 regs=55->56 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=2816B name=_Z6k_regsILi48EEvPji
+[P3-CONVBAR C0 shallow] PASS | runs=3 ok=3 np=10 outer=548 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR C1 deep] PASS | runs=3 ok=3 np=10 outer=10 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D1 depth1] PASS | runs=3 ok=3 np=10 outer=10256 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D2 depth2] PASS | runs=3 ok=3 np=10 outer=2641 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D3 depth3] PASS | runs=3 ok=3 np=10 outer=739 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D4 depth4] PASS | runs=3 ok=3 np=10 outer=192 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D5 depth5] PASS | runs=3 ok=3 np=10 outer=49 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D6 depth6] PASS | runs=3 ok=3 np=10 outer=12 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R0 regs+0] PASS | runs=3 ok=3 np=10 outer=891 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R1 regs+4] PASS | runs=3 ok=3 np=10 outer=716 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R2 regs+16] PASS | runs=3 ok=3 np=10 outer=268 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R3 regs+48] PASS | runs=3 ok=3 np=10 outer=105 blocks=240 thr=256 chain=6 gap_us=1000
+<<< [RQ-off-r3] rc=0 wall=1.7s
+>>> [RQ-on-r4] 05:26:11
+[XSCHED INFO @ T 213917 @ 05:26:11.215676] using app-managed scheduler
+[XSCHED INFO @ T 213917 @ 05:26:11.344248] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 213917 @ 05:26:11.381616] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 213917 @ 05:26:11.415118] sm120_guardian: instrumented func=0x5fbf69f93870 orig_ep=0x717baf6f4100 -> ep_inst=0x717baac00000 regs=11->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=640B name=_Z9k_shallowPji
+[XSCHED INFO @ T 213917 @ 05:26:11.530228] sm120_guardian: instrumented func=0x5fbf69f8b1d0 orig_ep=0x717baf6f4c00 -> ep_inst=0x717baac00780 regs=15->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3840B name=_Z6k_deepPji
+[XSCHED INFO @ T 213917 @ 05:26:11.637194] sm120_guardian: instrumented func=0x5fbf69f7a430 orig_ep=0x717baf6f6400 -> ep_inst=0x717baac01b80 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=2944B name=_Z7k_depthILi1EEvPji
+[XSCHED INFO @ T 213917 @ 05:26:11.720835] sm120_guardian: instrumented func=0x5fbf69f71d90 orig_ep=0x717baf6f7800 -> ep_inst=0x717baac02c00 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=2688B name=_Z7k_depthILi2EEvPji
+[XSCHED INFO @ T 213917 @ 05:26:11.829425] sm120_guardian: instrumented func=0x5fbf69f696f0 orig_ep=0x717baf6f8b00 -> ep_inst=0x717baac03b80 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=2944B name=_Z7k_depthILi3EEvPji
+[XSCHED INFO @ T 213917 @ 05:26:11.950284] sm120_guardian: instrumented func=0x5fbf69f61050 orig_ep=0x717baf6f9f00 -> ep_inst=0x717baac04c00 regs=11->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3072B name=_Z7k_depthILi4EEvPji
+[XSCHED INFO @ T 213917 @ 05:26:12.079028] sm120_guardian: instrumented func=0x5fbf69f589b0 orig_ep=0x717baf6fb400 -> ep_inst=0x717baac05d00 regs=12->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3328B name=_Z7k_depthILi5EEvPji
+[XSCHED INFO @ T 213917 @ 05:26:12.223285] sm120_guardian: instrumented func=0x5fbf69f50350 orig_ep=0x717baf6fca00 -> ep_inst=0x717baac06f00 regs=13->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3456B name=_Z7k_depthILi6EEvPji
+[XSCHED INFO @ T 213917 @ 05:26:12.345721] sm120_guardian: instrumented func=0x5fbf69f47da0 orig_ep=0x717baf6fe000 -> ep_inst=0x717baac08180 regs=12->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=768B name=_Z6k_regsILi1EEvPji
+[XSCHED INFO @ T 213917 @ 05:26:12.469901] sm120_guardian: instrumented func=0x5fbf69f3f8d0 orig_ep=0x717baf6fec00 -> ep_inst=0x717baac08980 regs=16->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=896B name=_Z6k_regsILi4EEvPji
+[XSCHED INFO @ T 213917 @ 05:26:12.594202] sm120_guardian: instrumented func=0x5fbf69f37400 orig_ep=0x717baf6ff800 -> ep_inst=0x717baac09200 regs=26->26 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=1280B name=_Z6k_regsILi16EEvPji
+[XSCHED INFO @ T 213917 @ 05:26:12.723180] sm120_guardian: instrumented func=0x5fbf69ee82f0 orig_ep=0x717baf700600 -> ep_inst=0x717baac09c00 regs=55->56 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=2816B name=_Z6k_regsILi48EEvPji
+[P3-CONVBAR C0 shallow] PASS | runs=3 ok=3 np=10 outer=547 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR C1 deep] PASS | runs=3 ok=3 np=10 outer=10 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D1 depth1] PASS | runs=3 ok=3 np=10 outer=7525 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D2 depth2] PASS | runs=3 ok=3 np=10 outer=2676 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D3 depth3] PASS | runs=3 ok=3 np=10 outer=736 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D4 depth4] PASS | runs=3 ok=3 np=10 outer=193 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D5 depth5] PASS | runs=3 ok=3 np=10 outer=49 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D6 depth6] PASS | runs=3 ok=3 np=10 outer=12 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R0 regs+0] PASS | runs=3 ok=3 np=10 outer=895 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R1 regs+4] PASS | runs=3 ok=3 np=10 outer=724 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R2 regs+16] PASS | runs=3 ok=3 np=10 outer=269 blocks=240 thr=256 chain=6 gap_us=1000
+  run 0 (np=10): mismatched=30720/61440
+[P3-CONVBAR R3 regs+48] FAIL | runs=3 ok=2 np=10 outer=106 blocks=240 thr=256 chain=6 gap_us=1000
+<<< [RQ-on-r4] rc=1 wall=1.7s
+>>> [RQ-off-r4] 05:26:12
+[XSCHED INFO @ T 213953 @ 05:26:12.918711] using app-managed scheduler
+[XSCHED INFO @ T 213953 @ 05:26:13.046125] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 213953 @ 05:26:13.083472] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 213953 @ 05:26:13.116776] sm120_guardian: instrumented func=0x60ae69bed870 orig_ep=0x758eaf6f4100 -> ep_inst=0x758eaac00000 regs=11->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=640B name=_Z9k_shallowPji
+[XSCHED INFO @ T 213953 @ 05:26:13.231190] sm120_guardian: instrumented func=0x60ae69be51d0 orig_ep=0x758eaf6f4c00 -> ep_inst=0x758eaac00780 regs=15->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3840B name=_Z6k_deepPji
+[XSCHED INFO @ T 213953 @ 05:26:13.343660] sm120_guardian: instrumented func=0x60ae69bd4430 orig_ep=0x758eaf6f6400 -> ep_inst=0x758eaac01b80 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=2944B name=_Z7k_depthILi1EEvPji
+[XSCHED INFO @ T 213953 @ 05:26:13.438549] sm120_guardian: instrumented func=0x60ae69bcbd90 orig_ep=0x758eaf6f7800 -> ep_inst=0x758eaac02c00 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=2688B name=_Z7k_depthILi2EEvPji
+[XSCHED INFO @ T 213953 @ 05:26:13.547269] sm120_guardian: instrumented func=0x60ae69bc36f0 orig_ep=0x758eaf6f8b00 -> ep_inst=0x758eaac03b80 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=2944B name=_Z7k_depthILi3EEvPji
+[XSCHED INFO @ T 213953 @ 05:26:13.668643] sm120_guardian: instrumented func=0x60ae69bbb050 orig_ep=0x758eaf6f9f00 -> ep_inst=0x758eaac04c00 regs=11->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3072B name=_Z7k_depthILi4EEvPji
+[XSCHED INFO @ T 213953 @ 05:26:13.797084] sm120_guardian: instrumented func=0x60ae69bb29b0 orig_ep=0x758eaf6fb400 -> ep_inst=0x758eaac05d00 regs=12->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3328B name=_Z7k_depthILi5EEvPji
+[XSCHED INFO @ T 213953 @ 05:26:13.941394] sm120_guardian: instrumented func=0x60ae69baa350 orig_ep=0x758eaf6fca00 -> ep_inst=0x758eaac06f00 regs=13->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3456B name=_Z7k_depthILi6EEvPji
+[XSCHED INFO @ T 213953 @ 05:26:14.062166] sm120_guardian: instrumented func=0x60ae69ba1da0 orig_ep=0x758eaf6fe000 -> ep_inst=0x758eaac08180 regs=12->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=768B name=_Z6k_regsILi1EEvPji
+[XSCHED INFO @ T 213953 @ 05:26:14.185104] sm120_guardian: instrumented func=0x60ae69b998d0 orig_ep=0x758eaf6fec00 -> ep_inst=0x758eaac08980 regs=16->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=896B name=_Z6k_regsILi4EEvPji
+[XSCHED INFO @ T 213953 @ 05:26:14.308384] sm120_guardian: instrumented func=0x60ae69b91400 orig_ep=0x758eaf6ff800 -> ep_inst=0x758eaac09200 regs=26->26 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=1280B name=_Z6k_regsILi16EEvPji
+[XSCHED INFO @ T 213953 @ 05:26:14.436153] sm120_guardian: instrumented func=0x60ae69b422f0 orig_ep=0x758eaf700600 -> ep_inst=0x758eaac09c00 regs=55->56 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=2816B name=_Z6k_regsILi48EEvPji
+[P3-CONVBAR C0 shallow] PASS | runs=3 ok=3 np=10 outer=528 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR C1 deep] PASS | runs=3 ok=3 np=10 outer=10 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D1 depth1] PASS | runs=3 ok=3 np=10 outer=10810 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D2 depth2] PASS | runs=3 ok=3 np=10 outer=2620 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D3 depth3] PASS | runs=3 ok=3 np=10 outer=743 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D4 depth4] PASS | runs=3 ok=3 np=10 outer=190 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D5 depth5] PASS | runs=3 ok=3 np=10 outer=49 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D6 depth6] PASS | runs=3 ok=3 np=10 outer=12 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R0 regs+0] PASS | runs=3 ok=3 np=10 outer=885 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R1 regs+4] PASS | runs=3 ok=3 np=10 outer=712 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R2 regs+16] PASS | runs=3 ok=3 np=10 outer=267 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R3 regs+48] PASS | runs=3 ok=3 np=10 outer=106 blocks=240 thr=256 chain=6 gap_us=1000
+<<< [RQ-off-r4] rc=0 wall=1.7s
+=== guarded run done 2026-11-26T05:26:14+01:00 ===

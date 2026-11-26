@@ -1,0 +1,16 @@
+[XSCHED INFO @ T 215880 @ 05:31:10.410087] using app-managed scheduler
+[XSCHED INFO @ T 215880 @ 05:31:10.534896] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 215880 @ 05:31:10.571172] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 215880 @ 05:31:10.605107] sm120_guardian: instrumented func=0x5a817014b800 orig_ep=0x73375b6f4100 -> ep_inst=0x733756c00000 regs=11->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=640B name=_Z9k_shallowPji
+[XSCHED WARN @ T 215880 @ 05:31:10.609132] sm120_gate_mirror MISMATCH: 256 lines, first line 0 = {cmd 5, rw 1} vs header {cmd 5, rw 0} @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_trap_engine.cpp:1313
+[XSCHED WARN @ T 215880 @ 05:31:10.609293] sm120_gate_mirror MISMATCH: 256 lines, first line 0 = {cmd 5, rw 1} vs header {cmd 5, rw 0} @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_trap_engine.cpp:1313
+[XSCHED WARN @ T 215880 @ 05:31:10.609309] sm120_gate_mirror MISMATCH: 256 lines, first line 0 = {cmd 5, rw 1} vs header {cmd 5, rw 0} @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_trap_engine.cpp:1313
+[XSCHED WARN @ T 215880 @ 05:31:10.611948] sm120_gate_mirror MISMATCH: 256 lines, first line 0 = {cmd 5, rw 1} vs header {cmd 5, rw 0} @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_trap_engine.cpp:1313
+[XSCHED WARN @ T 215880 @ 05:31:10.612111] sm120_gate_mirror MISMATCH: 256 lines, first line 0 = {cmd 5, rw 1} vs header {cmd 5, rw 0} @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_trap_engine.cpp:1313
+[XSCHED WARN @ T 215880 @ 05:31:10.612127] sm120_gate_mirror MISMATCH: 256 lines, first line 0 = {cmd 5, rw 1} vs header {cmd 5, rw 0} @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_trap_engine.cpp:1313
+[XSCHED INFO @ T 215880 @ 05:31:10.721430] sm120_guardian: instrumented func=0x5a8170143160 orig_ep=0x73375b6f4c00 -> ep_inst=0x733756c00780 regs=15->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=3840B name=_Z6k_deepPji
+[XSCHED INFO @ T 215880 @ 05:31:10.833715] sm120_guardian: instrumented func=0x5a81701323c0 orig_ep=0x73375b6f6400 -> ep_inst=0x733756c01b80 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=1 static_smem=0 bin=2944B name=_Z7k_depthILi1EEvPji
+[XSCHED ERRO @ T 215889 @ 05:31:10.909919] cuda error 715: an illegal instruction was encountered @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level1/cuda_queue.cpp:52
+[P3-CONVBAR C0 shallow] PASS | runs=3 ok=3 np=10 outer=560 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR C1 deep] PASS | runs=3 ok=3 np=10 outer=10 blocks=240 thr=256 chain=6 gap_us=1000
+[XSCHED ERRO @ T 215880 @ 05:31:10.910083] cuda error 4:  @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level1/cuda_queue.cpp:52
