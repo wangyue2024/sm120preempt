@@ -36,6 +36,9 @@ int main(int argc, char *argv[])
     XASSERT(signal(SIGINT, ExitSignal) != SIG_ERR, "failed to set SIGINT handler");
 #if defined(__linux__)
     XASSERT(signal(SIGQUIT, ExitSignal) != SIG_ERR, "failed to set SIGQUIT handler");
+    // SIGTERM (kill / systemd / subprocess.terminate) must also remove the IPC message queues;
+    // otherwise a stale queue owned by this user blocks the next server started by another user.
+    XASSERT(signal(SIGTERM, ExitSignal) != SIG_ERR, "failed to set SIGTERM handler");
 #endif
 
     server = std::make_unique<Server>(policy_name, port);

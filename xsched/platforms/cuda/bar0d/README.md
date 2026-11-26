@@ -18,8 +18,11 @@ that performs only that pulse on behalf of authorized processes.
 | Wrong GPU | Clients send `HELLO` and refuse a proxy that serves a different PCI device |
 
 The pulse is a GPU-wide broadcast. An earlier cross-process test (60 pulses while an unrelated
-process without XSched ran kernels) saw no errors and no slowdown in that process, but a group
-member can still make the GPU take trap entries as often as the rate limit allows. Treat group
+compute process without XSched ran kernels) saw no errors and no slowdown in that process. On an
+RTX 5060 that also drives the desktop, however, two multi-wave stress runs coincided with MMU
+faults (Xid 31) in desktop graphics processes, which recovered (OBS-8 in
+`doc/SM120_V2_PHASE3_4_MULTIPROCESS_ZH.md`); prefer GPUs without a display for Level-3. And a group
+member can make the GPU take trap entries as often as the rate limit allows. Treat group
 membership as a scheduling privilege: on a shared GPU, grant it only to users whose jobs are
 scheduled together.
 

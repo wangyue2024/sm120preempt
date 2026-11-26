@@ -14,6 +14,27 @@ using namespace xsched::preempt;
 
 namespace
 {
+
+/// Suspend / resume may be called from a thread without the queue's context: the scheduler
+/// executor thread of the local / global schedulers (XSCHED_SCHEDULER=LCL / GLB) has none.
+/// Reactivate() relaunches kernels and the trap engine allocates / writes control memory, so
+/// make the queue's context current for the duration of the call (DEF-26).
+struct CtxScope
+{
+    bool pushed = false;
+    explicit CtxScope(CUcontext ctx)
+    {
+        CUcontext cur = nullptr;
+        if (ctx != nullptr && (Driver::CtxGetCurrent(&cur) != CUDA_SUCCESS || cur != ctx)) {
+            pushed = Driver::CtxPushCurrent_v2(ctx) == CUDA_SUCCESS;
+        }
+    }
+    ~CtxScope()
+    {
+        CUcontext popped = nullptr;
+        if (pushed) (void)Driver::CtxPopCurrent_v2(&popped);
+    }
+};
 // Process-wide SM120 adaptive-router telemetry (relaxed counters, test/eval observability only).
 // Counts every kernel/graph submitted to a Level>=2 SM120 trap queue by routing decision.
 enum Sm120RouteStat : int {
@@ -24,6 +45,7 @@ enum Sm120RouteStat : int {
     kRouteLv1Graph,         // CUDA graph launch -> Level-1 graph boundary
     kRouteLv1Uninstrumentable, // Entry Guardian instrumentation failed -> Level-1 boundary
     kRouteLv1ShortCta,      // DEF-17: loop-free multi-wave kernel (short CTAs) -> Level-1 boundary
+    kRouteLv1GlobalSched,   // DEF-27: cross-process global scheduler (XSCHED_SCHEDULER=GLB) -> Level-1
     kRouteStatCount,
 };
 std::atomic<uint64_t> g_sm120_route_stats[kRouteStatCount] = {};
@@ -36,7 +58,7 @@ inline void CountRoute(Sm120RouteStat s)
 
 /// @brief Read (and optionally reset) SM120 adaptive-router counters.
 /// @param out   array of at least `n` uint64: [lv3_killable, lv1_mbarrier, lv1_cooperative,
-///              lv1_cluster, lv1_graph, lv1_uninstrumentable, lv1_short_cta]
+///              lv1_cluster, lv1_graph, lv1_uninstrumentable, lv1_short_cta, lv1_glb_sched]
 /// @param n     number of entries to copy (clamped to 7)
 /// @param reset non-zero to atomically reset the copied counters to zero
 /// @return number of entries written
@@ -156,6 +178,7 @@ void CudaQueueLv3Trap::Synchronize()
 void CudaQueueLv3Trap::Deactivate()
 {
     XASSERT(level_ >= kPreemptLevelDeactivate, "Deactivate() not supported on level-%d", level_);
+    CtxScope ctx_scope(context_);
     if (is_sm120_) {
         // Suspend() invokes Deactivate() and then Interrupt(). Only trigger Mode 1 early-exit
         // directly when operating strictly at level-2; level-3 triggers once inside Interrupt().
@@ -180,6 +203,7 @@ void CudaQueueLv3Trap::Deactivate()
 void CudaQueueLv3Trap::Interrupt()
 {
     XASSERT(level_ >= kPreemptLevelInterrupt, "Interrupt() not supported on level-%d", level_);
+    CtxScope ctx_scope(context_);
     if (is_sm120_) {
         std::shared_ptr<HwCommand> cur;
         {
@@ -215,6 +239,7 @@ void CudaQueueLv3Trap::Restore(const CommandLog &)
 
 void CudaQueueLv3Trap::Reactivate(const CommandLog &log)
 {
+    CtxScope ctx_scope(context_);
     if (is_sm120_) {
         this->Synchronize();
         const auto t = sm120_stream_->Telemetry();
@@ -337,6 +362,32 @@ void CudaQueueLv3Trap::OnHwCommandSubmit(std::shared_ptr<preempt::HwCommand> hw_
         if (kernel != nullptr) {
             // Adaptive SM120 Preemption Policy Router:
             // Route hardware-incompatible kernels cleanly to Level-1 boundary instead of faulting.
+
+            // DEF-27 (Phase 3.4-2): under the cross-process global scheduler, the high-priority
+            // process keeps launching while this process is being trapped. When the GPU's
+            // time-slice context switch to the other process's context arrives while warps are in
+            // the trap handler, the switch times out (Xid 109 CTX SWITCH TIMEOUT, ~1 per run of
+            // ~300 suspends on RTX 5060) and the driver's recovery fails every context on the GPU.
+            // Kernels therefore use the Level-1 boundary under GLB unless XSCHED_SM120_GLB_LV3=1.
+            // Application-level suspend that waits for the eviction before the other process
+            // launches (bench_mp_serving_p34.py req-lv3) does not hit this.
+            static const bool glb_sched = [] {
+                const char *v = getenv("XSCHED_SCHEDULER");
+                return v != nullptr && std::string(v) == "GLB";
+            }();
+            static const bool glb_lv3 = GetEnvOption("XSCHED_SM120_GLB_LV3", false);
+            if (glb_sched && !glb_lv3) {
+                CountRoute(kRouteLv1GlobalSched);
+                kernel->killable = false;
+                kernel->ClearProps(kCommandPropertyDeactivatable);
+                static bool warned_glb = false;
+                if (!warned_glb) {
+                    warned_glb = true;
+                    XWARN("SM120 Level-3 under the global scheduler can stall GPU context switches "
+                          "(DEF-27), using the level-1 boundary (XSCHED_SM120_GLB_LV3=1 overrides)");
+                }
+                return;
+            }
             if (kernel->IsCooperative()) {
                 CountRoute(kRouteLv1Cooperative);
                 kernel->killable = false;

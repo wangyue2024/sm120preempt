@@ -52,7 +52,7 @@ except Exception:  # pragma: no cover
     HAVE_TRITON = False
 
 ROUTE_NAMES = ["lv3_killable", "lv1_mbarrier", "lv1_cooperative", "lv1_cluster", "lv1_graph",
-               "lv1_uninstrumentable", "lv1_short_cta"]
+               "lv1_uninstrumentable", "lv1_short_cta", "lv1_glb_sched"]
 
 
 # =====================================================================================

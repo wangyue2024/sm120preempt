@@ -36,7 +36,7 @@ LIBS4 = ["LIB-09", "LIB-10", "LIB-11", "LIB-12", "LIB-13", "LIB-14"]
 DNN = ["dnn01", "dnn02", "dnn03", "dnn04", "dnn05", "dnn06", "dnn07", "dnn08"]
 LLM = ["llm01", "llm02", "llm03", "llm04", "llm05", "llm08", "llm06:m5", "llm07:m5"]
 GROUPS = {"quick": ["syn", "s1", "s4", "s7"],
-          "full": ["syn", "s1", "s4", "s5", "s6", "s7full", "s8", "acc"]}
+          "full": ["syn", "s1", "s4", "s5", "s6", "s7full", "s8", "s9", "acc"]}
 
 
 def ops_list():
@@ -80,6 +80,8 @@ def plan(args):
             for m in ("lv1", "lv3"):
                 L(f"SYN-percall-{m}", 120, f"$OUT/test_percall_p3 {m} 2000")
             # Arena trimming exercised under preemption (1 MiB threshold => frequent frees).
+            # Phase 3.4-2 (DEF-25): XQueueQuery must report Idle after every synchronize.
+            L("SYN-xq-idle", 120, "$PY $EVAL/test_xqueue_idle_p34.py")
             L("SYN-stress-trim", 900, f"{M5} XSCHED_SM120_ARENA_TRIM_MIN_MB=1 GRID_MULT=8 CHAIN=6 GAP_US=1000 TARGET_MS=4 $OUT/test_convbar_p3 all 3 10")
         elif g == "acc":
             L("ACC-C1-np2", 600, f"{M5} $OUT/test_convbar_p3 C1 10 2")
@@ -115,6 +117,15 @@ def plan(args):
                     mm = "lv3" if m == "lv3m5" else m
                     out = res.replace("suite7.jsonl", "suite7_m5.jsonl") if m == "lv3m5" else res
                     L(f"S7-{op}-{m}", 300, f"{pre}$PY $EVAL/bench_prod_ops_p3.py run --op {op} --mode {mm} --out {out}")
+        elif g == "s9":
+            # Phase 3.4-2: HP and LP in separate processes (no shared GIL). glb-* run XSched's
+            # cross-process global scheduler (xserver HPF); Lv3 kernels use the Level-1 boundary
+            # there by default (DEF-27).
+            res = os.path.join(out_dir, "suite9_mp.jsonl")
+            L("S9-ppl-solo", 600, f"{nat} HF_HUB_OFFLINE=1 $PY $EVAL/bench_mp_serving_p34.py run --mode solo --lp ppl --out {res}")
+            L("S9-ppl-native", 600, f"{nat} HF_HUB_OFFLINE=1 $PY $EVAL/bench_mp_serving_p34.py run --mode native --lp ppl --out {res}")
+            for m in ("req-lv1", "req-lv3", "glb-lv1", "glb-lv3"):
+                L(f"S9-ppl-{m}", 600, f"HF_HUB_OFFLINE=1 $PY $EVAL/bench_mp_serving_p34.py run --mode {m} --lp ppl --out {res}")
         elif g == "s8":
             res = os.path.join(out_dir, "suite8.jsonl")
             for lpk in ("ppl", "prefill"):
