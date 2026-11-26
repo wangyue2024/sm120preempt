@@ -1,0 +1,15 @@
+PERF-2 evidence, RTX 5060, Qwen2.5-0.5B HP decode (bench_real_serving_p3.py)
+solo_tpot_p50_ms = TPOT measured inside the process before any LP work starts
+
+Before the fix (pass-through launches resolve CUkernel->CUfunction per launch):
+  no XSched (native libcuda)       in-process solo TPOT 8.41 ms, served TPOT p50 9.90 ms
+  XSched shim loaded, no XQueue    in-process solo TPOT 9.77 ms, served TPOT p50 11.16 ms
+
+After the fix (lazy FuncHandle(), params cleared only when possibly set):
+  no XSched, solo, gap 1500 ms               in-process solo TPOT 8.61 ms, served TPOT p50 10.10 ms, LP -
+  XSched Lv1, request policy, gap 1500 ms    in-process solo TPOT 8.76 ms, served TPOT p50 8.83 ms, LP 89.8%
+  XSched Lv3, request policy, gap 1500 ms    in-process solo TPOT 8.72 ms, served TPOT p50 8.78 ms, LP 77.4%
+  XSched shim, solo, gap 300 ms              in-process solo TPOT 8.94 ms, served TPOT p50 10.46 ms, LP -
+
+perf (decode-dominated run, before the fix): cuXtraKernelGetFunction 8.35% of all samples (inclusive),
+CudaKernelLaunchCommand::Launch 12.54%, XLaunchKernelImpl 9.02%, CudaKernelCommand ctor 8.57%.

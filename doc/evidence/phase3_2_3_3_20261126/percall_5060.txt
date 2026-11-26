@@ -1,0 +1,9 @@
+# test_percall_p3 on RTX 5060, final build. 'new' = defaults; 'old' = XSCHED_XQUEUE_DIRECT=0 XSCHED_XQUEUE_CALLER_SYNC=0 XSCHED_SM120_LAYOUT_CACHE=0 (Phase 3.2 bounded-spin path)
+## new
+PASS mode=native sync1_p50=4.56 sync1_p90=4.88 sync4_p50=7.59 sync4_p90=14.02 async_us=1.31 long_p50=274.69 long_p90=275.22 long_us=300 gap_us=50 last=1999
+PASS mode=shim sync1_p50=4.66 sync1_p90=4.85 sync4_p50=8.23 sync4_p90=14.01 async_us=1.46 long_p50=274.81 long_p90=280.19 long_us=300 gap_us=50 last=1999
+PASS mode=lv1 sync1_p50=6.16 sync1_p90=7.29 sync4_p50=11.34 sync4_p90=15.18 async_us=1.86 long_p50=276.48 long_p90=278.51 long_us=300 gap_us=50 last=1999
+PASS mode=lv3 sync1_p50=7.66 sync1_p90=8.16 sync4_p50=12.77 sync4_p90=16.83 async_us=2.09 long_p50=277.66 long_p90=277.94 long_us=300 gap_us=50 last=1999
+## old
+PASS mode=lv1 sync1_p50=7.29 sync1_p90=7.96 sync4_p50=11.48 sync4_p90=15.10 async_us=1.83 long_p50=284.90 long_p90=287.43 long_us=300 gap_us=50 last=1999
+PASS mode=lv3 sync1_p50=7.91 sync1_p90=9.29 sync4_p50=17.20 sync4_p90=20.90 async_us=4.10 long_p50=286.19 long_p90=290.34 long_us=300 gap_us=50 last=1999

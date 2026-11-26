@@ -2,6 +2,28 @@
 
 All notable changes to the Blackwell (`sm_120`) Level-3 transparent preemption and scheduling system are documented in this file.
 
+## [Unreleased] - 2026-11-26 — Phase 3.3 completion: short-CTA routing, per-call submission path, PERF-2, DEF-24
+
+Final build, full regression (`regress_p3.py --suites full`, incl. the Phase 3.2 acceptance group): **RTX 5060 263/263, RTX 5080 263/263**.
+
+Report: `doc/SM120_V2_PHASE3_2_3_3_REPORT_ZH.md` (§3.6, §4, §5, §6, §8); evidence: `doc/evidence/phase3_2_3_3_20261126/`.
+
+### Performance
+- **DEF-17 target met (< 10%)**: loop-free kernels (no backward / indirect branch, no calls; `BinaryIsLoopFree()`, BRA offset encoding fitted on 3,653 branches) with 2-1024 waves of CTAs are routed to the Level-1 boundary (`XSCHED_SM120_SHORT_CTA_LV1`, `_MIN_WAVES`, `_MAX_WAVES`). Final full regression (router off = pure Mode 5 -> default): RTX 5080 `transpose_copy` +53.7% -> +0.1%, `rope_apply` +56.3% -> +3.1%; RTX 5060 +18.0% -> +0.1%, +16.7% -> +0.8%; Lv3 median +0.8% on both GPUs. Trade-off: routed kernels preempt at their own end (RTX 5060 `transpose_copy` HP P50 1.09 -> 2.37 ms).
+- **Per-call submission**: direct submit (the submitting thread launches CUDA kernels itself when the launch worker is asleep; `HwCommand::DirectLaunchable()`, `CommandBuffer` gate, `XSCHED_XQUEUE_DIRECT`), caller-side `WaitAll` (the waiting thread synchronizes the stream itself, falls back on suspension; `XSCHED_XQUEUE_CALLER_SYNC`), spin before background batch sync, control-header layout cache (`XSCHED_SM120_LAYOUT_CACHE`). C++ micro-benchmark (~300 us kernel + host gap): RTX 5060 Lv1/Lv3 +10.2/+11.5 -> +1.8/+3.0 us, RTX 5080 +6.5/+7.8 -> +1.9/+3.0 us; Lv3 launch 4.10 -> 2.1 us.
+
+### Fixed
+- **PERF-2**: every pass-through kernel launch (stream without an XQueue, e.g. the high-priority stream) resolved `CUkernel -> CUfunction` via `cuXtraKernelGetFunction` in the command constructor (8.4% of all CPU samples in a PyTorch decode run) and cleared the Guardian params with a driver call. Now resolved lazily (`CudaKernelCommand::FuncHandle()`), params cleared only for launch handles that may hold Mode 5 params (`Sm120StreamContext::MaybeParamsSet()`, still under the launch mutex; `XSCHED_SM120_ALWAYS_CLEAR_PARAMS=1` restores the old behaviour), and the `DirectLaunch` context/arch checks cached per thread. RTX 5060 in-process decode TPOT with XSched loaded: +16% -> +1.3-3.8% over no XSched.
+- **DEF-24**: indirect calls (`CALL.REL.NOINC Rx`, 0x344) and callee code (`RET`, 0x950) are detected as device calls.
+- `LaunchWorker::SyncAllWithLock` only completes commands launched before the synchronization (previously all in-flight commands).
+- `LIB-06` test: LP workload extended to 4 in-place FFT passes (a single pass ended before the harness could preempt), bitwise comparison; 23 pageable H2D uploads in `test_libs_and_features.cu` now synchronize the device (T-11 race).
+
+### Removed
+- Unreferenced `CudaContextRegistry` (`context_registry.{h,cpp}`, kept in commit 84e10dc).
+
+### Added
+- `test_percall_p3.cu` per-call micro-benchmark; regression `acc` group (C1 x10 np=2/3, 12-kernel chain, HW-06 x20, dnn06 x5), LIB-08 x30, Suite 7 `lv3m5` (router off) column; mechanism suites run with the router off.
+
 ## [Unreleased] - 2026-11-25 (evening) — Phase 3.2 correctness close-out & Phase 3.3 performance
 
 Report: `doc/SM120_V2_PHASE3_2_3_3_REPORT_ZH.md`; evidence: `doc/evidence/phase3_2_3_3_20261125/`.
