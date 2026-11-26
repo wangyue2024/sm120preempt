@@ -1,0 +1,21 @@
+| suite | pass / total | failing tests |
+|---|---:|---|
+| SYN | 9/9 | - |
+| S1 | 45/45 | - |
+| S4 | 6/6 | - |
+| S5 | 8/8 | - |
+| S6 | 9/9 | - |
+| S7 | 140/145 | `S7-conv3x3_nhwc-lv3`(rc=None), `S7-conv1x1_nchw_fp32-lv3m5`(rc=1), `S7-batchnorm_train-shim`(rc=1), `S7-cumsum_64m-lv3`(rc=1), `S7-sort_16m-native`(rc=1) |
+| S8 | 16/16 | - |
+| S9 | 6/6 | - |
+| ACC | 28/28 | - |
+| LL | 16/16 | - |
+| **all** | **283/288** | |
+
+Failure details:
+
+- `S7-conv3x3_nhwc-lv3`: rc=None 
+- `S7-conv1x1_nchw_fp32-lv3m5`: rc=1 Traceback (most recent call last):
+- `S7-batchnorm_train-shim`: rc=1 Traceback (most recent call last):
+- `S7-cumsum_64m-lv3`: rc=1 Traceback (most recent call last):
+- `S7-sort_16m-native`: rc=1 Traceback (most recent call last):

@@ -354,3 +354,12 @@
 - **DEF-27（已缓解，开放）**：跨进程透明调度下 HP 在 LP 被驱逐期间继续发射，GPU 时间片切换若在 LP 线程束处于 Trap 处理程序时到达会超时（Xid 109 `CTX SWITCH TIMEOUT`，约 0.3%/次挂起），驱动恢复使两个进程都报 719。应用层“等驱逐确认再发射”（`req-lv3`）不触发。缓解：`XSCHED_SCHEDULER=GLB` 时默认走 Level-1（`XSCHED_SM120_GLB_LV3=1` 覆盖）。
 - **OBS-8**：RTX 5060 同时驱动桌面，两次 Lv3 多波次压测开始后约 1 s 内桌面图形进程（`ghostty` / `gnome-shell`）出现 Xid 31 MMU 故障，进程未崩溃；早先的旁观测试只覆盖计算上下文。
 - 详见 [`SM120_V2_PHASE3_4_MULTIPROCESS_ZH.md`](SM120_V2_PHASE3_4_MULTIPROCESS_ZH.md)。
+
+### 10.11 DEF-27 根本修复：就绪门控（2026-11-26）
+- 机制：GLB 下客户端为每个 Idle→Ready 转换编号，该命令走发射线程并等待服务端确认；`SchedOperation` 携带 `ready_ack`（服务端已处理的该进程 Ready 数）；`xserver` 每轮先发挂起操作，其中挂起 Level-3 队列的进程等其 `OperationCompleteEvent`（有界 100 ms）后再放行其他进程（Level-1/2 挂起不等待）。Lv3 的挂起返回前已等到驱逐完成，所以 HP 不会在 LP 处于 Trap 时提交工作。
+- 默认：`XSCHED_SCHEDULER=GLB` 时客户端与 `xserver` 默认开启（`XSCHED_GLB_READY_GATE=0` 关闭）；开启时 Lv3 在 GLB 下不再回退到 Level-1。
+- 验证：RTX 5080 无门控 3 次 TPOT P99 3.1–3.5×（P99 19–22 ms），有门控 10 次 P99 1.10–1.29×、0 Xid；RTX 5060 有门控 6 次 0 次 Xid 109（无门控时 4/4 次运行出现）、P99 1.06–1.21×；HP 门控等待均值 160–580 µs，0 次超时，HP 请求 380/380 一致、LP 0 错。RTX 5060 全量 288/288、最终构建 10/10；RTX 5080 全量 283/288（5 项为共享主机环境原因），最终构建复跑 15/15。
+- 对 Level-1 无可测影响（`glb-lv1` 8×8 交替 A/B：P50 0.968× / 0.969×，P99 区间重叠）。
+- OBS-9：暂停的 Level-1 发射线程在命令日志满、等待空位后不再检查暂停，仍会发射一条命令；补做检查的改动经交替 A/B 无收益（`request` 无差别，`glb-lv1` 略差），已回退，记录为观察项。
+- OBS-8 第三、四次：5060 门控测试中 `Xwayland`、`gnome-shell` 各出现一次 Xid 31（进程均未重启）；Lv3 现在在显示 GPU（`KERNEL_EXEC_TIMEOUT`）上启动时告警。
+- 测试安全（T-24）：5080 上另一用户运行着自己的 XSched `xserver`（同一 IPC 键）。root 启动的服务端会删除其队列并占用其端口；多进程测试脚本改为只要键 0x1 的队列属于他人就拒绝启动（包括 root），回归在 GPU 与 IPC 都空闲后才开始。

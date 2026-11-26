@@ -3,8 +3,8 @@
 > 日期：2026-11-26 · 分支 `phase3-def20-production-testing` · 硬件：RTX 5060（本地，同时驱动桌面）、RTX 5080（共享服务器，无显示）
 > 结论：
 > 1. **OBS-7 得到证实**：把 HP 与 LP 放进两个进程后，按请求挂起 LP 时 HP 的 TPOT P50 两卡均为 solo 的 **1.00×**（单进程 Suite 8 为 1.02–1.07×），残余膨胀来自单进程内的 GIL 争用。
-> 2. 新的多进程测试发现：**DEF-26**（调度器执行线程没有 CUDA 上下文，跨进程模式下 Lv3 恢复断言失败，已修复）、**DEF-27**（跨进程透明调度下 Lv3 Trap 与 GPU 时间片上下文切换冲突，触发 Xid 109 `CTX SWITCH TIMEOUT`；已缓解：默认改走 Level-1 边界）、**DEF-28**（`xserver` 收到 SIGTERM 不清理 IPC 消息队列，换用户再启动时客户端阻塞，已修复）。曾登记的 **DEF-25 已撤回**：属于测量误判，为它做的改动引入了新问题，已回退（§2.1）。
-> 3. 另记录 **OBS-8**：在同时驱动桌面的 RTX 5060 上，Lv3 多波次压测开始时两次出现桌面图形进程的 Xid 31 MMU 故障（进程未崩溃）。
+> 2. 新的多进程测试发现：**DEF-26**（调度器执行线程没有 CUDA 上下文，跨进程模式下 Lv3 恢复断言失败，已修复）、**DEF-27**（跨进程透明调度下 Lv3 Trap 与 GPU 时间片上下文切换冲突，触发 Xid 109 `CTX SWITCH TIMEOUT`；**已修复**：新增“就绪门控”，HP 在服务端确认低优先级队列已被驱逐后才发射，§2.3.1）、**DEF-28**（`xserver` 收到 SIGTERM 不清理 IPC 消息队列，换用户再启动时客户端阻塞，已修复）。曾登记的 **DEF-25 已撤回**：属于测量误判，为它做的改动引入了新问题，已回退（§2.1）。
+> 3. 另记录 **OBS-8**：在同时驱动桌面的 RTX 5060 上，Lv3 运行期间三次出现桌面图形进程的 Xid 31 MMU 故障（进程均未崩溃）；Lv3 现在在显示 GPU 上启动时告警一次。
 
 ---
 
@@ -39,13 +39,39 @@ TPOT 比值以同一进程内 LP 空闲时背靠背测得的 solo TPOT 为分母
 
 全局 / 本地调度器在其执行线程上调用 `XQueueSuspend` / `XQueueResume`。该线程没有当前 CUDA 上下文。Level-1 的恢复只唤醒发射线程，不受影响；Level-3 的 `Reactivate()` 要重新发射被中断的内核并准备恢复（分配 / 写控制内存），在该线程上失败：`Assertion failed: sm120 PrepareLaunch failed`，LP 进程退出。修复：`CudaQueueLv3Trap::{Deactivate, Interrupt, Reactivate}` 在调用线程没有队列上下文时临时压入该上下文。
 
-### 2.3 DEF-27：跨进程透明调度下 Lv3 Trap 与上下文切换冲突（Xid 109，已缓解）
+### 2.3 DEF-27：跨进程透明调度下 Lv3 Trap 与上下文切换冲突（Xid 109，已修复）
 
 修复 DEF-26 后，`glb-lv3` 每次运行仍出现一次 **Xid 109 `CTX SWITCH TIMEOUT`**（LP 进程），驱动随后的恢复使**两个进程同时**报 `cuda error 719`，HP 有请求被阻塞约 4.3 s，LP 吞吐降到 13–32%。内核日志中 4 次 Xid 109 全部来自 `glb-lv3` 运行，`req-lv3` 与其他模式 0 次。
 
 机制：HP 与 LP 是两个上下文，GPU 按时间片在两者间切换。全局调度器下 HP 一变为 Ready 就继续发射内核，同时调度器异步挂起 LP；若 GPU 对 LP 上下文的时间片切换请求恰好在 LP 线程束处于 Trap 处理程序中时到达，该上下文无法被切出，切换超时（约 300 次挂起中出现一次，即约 0.3%/次）。`req-lv3` 中 HP 等到 LP 的驱逐确认后才发射，竞争不存在；单进程内 HP 与 LP 共用一个上下文，也不存在。
 
-缓解：`XSCHED_SCHEDULER=GLB` 时 SM120 内核默认走 Level-1 边界（新增路由原因 `lv1_glb_sched`，告警一次；`XSCHED_SM120_GLB_LV3=1` 可强制 Lv3）。根本修复需要以下之一：全局调度协议增加“低优先级队列已驱逐”的确认，HP 收到后再发射；或通过 RM 控制把 LP 上下文的计算抢占模式设为 CTA / WFI、加长其时间片（代码中已有 `NV2080_CTRL_CMD_GR_SET_CTXSW_PREEMPTION_MODE` 与 `NVA06C_CTRL_CMD_SET_TIMESLICE` 的调用，但在 Python 进程中需要先解决 RM 句柄捕获）。两者都未在本轮实现，DEF-27 保持开放。
+初版缓解（已被下述根本修复取代）：`XSCHED_SCHEDULER=GLB` 时 SM120 内核走 Level-1 边界（路由原因 `lv1_glb_sched`）。现在只有在关闭就绪门控（`XSCHED_GLB_READY_GATE=0`）且未设 `XSCHED_SM120_GLB_LV3=1` 时才使用这一回退。
+
+#### 2.3.1 根本修复：就绪门控（ready gate，GLB 下默认开启）
+
+思路与 `req-lv3` 相同，但对应用透明：**高优先级进程在低优先级进程完成驱逐之前不向 GPU 提交工作**，这样 LP 线程束处于 Trap 处理程序期间，GPU 上没有另一个上下文在等待时间片切换。
+
+| 组件 | 改动 |
+|---|---|
+| 客户端命令缓冲区 | 队列从 Idle 变为 Ready 时为该 Ready 事件编号（`ReadyGate::NoteReadySent()`）；这条命令不走直接提交，由发射线程在 `Dequeue()` 中等待服务端确认后再发射（`ReadyGate::Wait()`，超时 10 ms，`XSCHED_GLB_READY_GATE_TIMEOUT_US`） |
+| 协议 | `SchedOperation` 新增 `ready_ack`：服务端发出该操作时已处理的、该进程的 Ready 事件数；客户端执行操作后 `ReadyGate::Ack()` 放行编号不超过它的等待 |
+| 服务端调度（`LocalScheduler`，仅 `xserver` 启用） | 每轮先发送需要挂起队列的进程的操作；**其中挂起 Level-3（中断级）队列的进程，等它们回报完成**（已有的 `OperationCompleteEvent`；有界 100 ms），再发送其余进程的操作。Lv3 的挂起在返回前已等到流排空（驱逐完成）。Level-1/2 的挂起不需要等待（没有 Trap，等待只会推迟高优先级进程） |
+| 默认值 | `XSCHED_SCHEDULER=GLB` 时客户端与 `xserver` 默认开启，`XSCHED_GLB_READY_GATE=0` 关闭（两端须一致）；开启时 Lv3 在 GLB 下不再回退到 Level-1 |
+
+验证（真实 Lv3，`glb-lv3`）：
+
+| | RTX 5080，无门控（3 次） | RTX 5080，有门控（10 次） | RTX 5060，有门控（6 次） |
+|---|---|---|---|
+| Xid 109 | 0（本卡 3 次未复现超时） | **0** | **0**（无门控时 4/4 次运行出现） |
+| TPOT P50 / P99（相对 solo） | 1.03× / **3.1–3.5×**（P99 19–22 ms，即竞争表现为长时间切换阻塞） | 1.01–1.04× / 1.10–1.29× | 0.95–0.98× / 1.06–1.21× |
+| LP 吞吐 | 63–65% | 64–71% | 59–63% |
+| HP 门控等待（均值） | — | 160–580 µs（等 LP 驱逐） | 170–340 µs |
+| 门控超时 / CUDA 错误 | — / 0 | 0 / 0 | 0 / 0 |
+| 正确性（HP 请求 / LP 错误迭代） | 60/60 / 0 | 200/200 / 0 | 120/120 / 0 |
+
+RTX 5060 的 6 次门控运行中出现 1 次 `Xwayland` 的 Xid 31（OBS-8，见 §2.5），不是 Xid 109；重启后至本文写作时，全部门控 Lv3 运行中 Xid 109 为 0 次。全量回归中的 Suite 9 `glb-lv3` 因此改为真正走 Lv3（§4、§6）。
+
+**对 Level-1 的影响（8×8 交替 A/B，RTX 5060 `glb-lv1`）**：门控关 / 开的 TPOT P50 中位数 0.968× / 0.969×，P99 1.28–2.32× / 1.23–2.40×，P99 > 14 ms 的运行各 4/8，LP 均为 71%，HP 每次门控等待均值 15–30 µs。门控对 Level-1 没有可测影响；`glb-lv1` 的 P99 本身在运行间波动很大（HP 偶尔要等已在 GPU 上的 LP 内核），早先“门控使 P99 变差”的 4 次对比是抽样噪声。
 
 一般性提示：只要另一个进程的上下文在 Lv3 驱逐期间积极争用 GPU，就存在同样的竞争；早先的旁观进程测试（60 次脉冲）未遇到，与约 0.3% 的概率相符。
 
@@ -57,7 +83,11 @@ TPOT 比值以同一进程内 LP 空闲时背靠背测得的 solo TPOT 为分母
 
 教训（T-23）：同一台机器上 root 与普通用户交替运行使用 IPC 的测试时，要确认每个进程退出时都清理了 IPC 对象。
 
-### 2.5 OBS-8：显示 GPU 上桌面图形进程的 Xid 31
+### 2.4.1 OBS-9：暂停的 Level-1 发射线程在等待日志空位后仍会发射一条命令
+
+`LaunchWorker::LaunchHwCommand()` 只在命令日志未满时检查暂停状态；日志已满时它先等一个空位（同步最早的命令），随后**不再检查暂停**就发射。因此在等待期间被挂起的队列仍会发出一条命令（Level-3 下该内核被 Guardian 立即排空，不影响正确性）。曾尝试在等待后补做暂停检查，并做了交替 A/B（RTX 5060）：`request` 策略 6×6 无差别（TPOT P50 1.005× / 1.004×，P99 区间重叠，LP 69.4% / 69.1%）；`glb-lv1` 8×8 下改动后 HP 略差（P50 1.010× / 0.987×，P99 > 14 ms 的运行 6/8 / 3/8）。没有可测收益，改动已回退，记录为观察项。
+
+### 2.5 OBS-8：显示 GPU 上桌面图形进程的 Xid 31（第三、四次：门控测试中的 `Xwayland`、`gnome-shell`，进程均未重启；现在启动时告警）
 
 RTX 5060 同时驱动桌面。本周内核日志中有 4 条桌面进程的 Xid 31（`MMU Fault: ENGINE GRAPHICS GPC2 GPCCLIENT_GCC faulted @ 0x0`）：
 
@@ -114,7 +144,7 @@ RTX 5060 同时驱动桌面。本周内核日志中有 4 条桌面进程的 Xid 
 | `req-lv1` | LP 69%（= 上限），TPOT 1.00–1.01×、P99 1.08× | LP 76%，TPOT 1.00×、P99 1.01–1.02× |
 | `req-lv3`（各 3 次） | LP 59–62%，TPOT 0.99–1.01×、P99 1.04–1.12×，挂起 P50 0.16–0.24 ms | LP 67–72%，TPOT 1.00×、P99 1.01–1.02×，挂起 P50 0.10–0.14 ms |
 | `glb-lv1`（透明） | LP 71–74%（高于按请求挂起的上限），TPOT 0.95×、P99 1.08–1.24× | LP 76–78%，TPOT 1.02×、P99 1.06–1.07× |
-| `glb-lv3`（DEF-27 缓解后即 Level-1 边界） | LP 70–71%，TPOT 0.94–0.96×、P99 1.08–1.18× | LP 75%，TPOT 1.01–1.02×、P99 1.05× |
+| `glb-lv3`（本表测于初版缓解，实为 Level-1 边界；就绪门控下真正走 Lv3 的结果见 §2.3.1） | LP 70–71%，TPOT 0.94–0.96×、P99 1.08–1.18× | LP 75%，TPOT 1.01–1.02×、P99 1.05× |
 
 - **与单进程 Suite 8 对比**：`request` 策略 TPOT 由 1.02–1.07× 降到 1.00×（P50），LP 吞吐相当（5080 Lv1 76–80% → 76%、Lv3 68–71% → 67–72%）。
 - **透明跨进程调度**（`glb-*`）在 decode 步之间的 CPU 间隙里恢复 LP，5060 上 LP 吞吐超过按请求挂起的上限（71–74% vs 69%），代价是 TPOT P99 升高且在运行之间波动较大：5060 `glb-lv1` 1.08–1.42×、5080 1.06–1.28×（含 §4 回归中的一轮；每步开始时要等 LP 被挂起）。
@@ -132,7 +162,18 @@ RTX 5060 同时驱动桌面。本周内核日志中有 4 条桌面进程的 Xid 
 | 文件 | 内容 |
 |---|---|
 | `service/server/src/main.cpp` | DEF-28：SIGTERM 时清理 IPC 队列 |
-| `platforms/cuda/hal/src/level3/cuda_queue.cpp` | DEF-26：`CtxScope`；DEF-27：`XSCHED_SCHEDULER=GLB` 时路由到 Level-1（`lv1_glb_sched`，`XSCHED_SM120_GLB_LV3`） |
+| `platforms/cuda/hal/src/level3/cuda_queue.cpp` | DEF-26：`CtxScope`；DEF-27：仅在关闭就绪门控时回退到 Level-1（`lv1_glb_sched`，`XSCHED_SM120_GLB_LV3`） |
+| `preempt/{include,src}/.../sched/ready_gate.{h,cpp}`、`preempt/src/xqueue/command_buffer.cpp`、`preempt/src/sched/executor.cpp` | DEF-27 就绪门控（客户端）；`XSCHED_GLB_READY_GATE_TRACE=1` 输出门控统计 |
+| `sched/{include,src}/.../protocol/{operation,status}`、`sched/src/scheduler/local.cpp`、`service/server/src/server.cpp` | DEF-27：`ready_ack`、`ready_seen`，服务端“先挂起、等完成、再放行” |
+| `platforms/cuda/hal/src/level3/sm120_trap_engine.cpp` | OBS-8：显示 GPU（`KERNEL_EXEC_TIMEOUT`）上启动告警 |
 | `test/sm120_v2/eval/bench_mp_serving_p34.py` | 多进程服务测试（6 种模式）；`xserver` 日志写入 `<out>.xserver.log`；残留队列检查 |
 | `test/sm120_v2/eval/test_xqueue_idle_p34.py` | 同步后 Idle 状态与转换耗时检查 |
 | `test/sm120_v2/eval/regress_p3.py` | 新增 `SYN-xq-idle` 与 Suite 9（`S9-*`，多进程 6 项） |
+
+## 6. 就绪门控后的全量回归
+
+RTX 5060：全量回归 **288/288**（就绪门控初版：服务端等待所有挂起）；最终构建（只等待 Level-3 挂起）上 Suite 9 + `SYN-xq-idle` + 3 次门控 Lv3 共 **10/10**。重启后全部门控 Lv3 运行 0 次 Xid 109；期间 `gnome-shell` 1 次 Xid 31（OBS-8，进程未重启）。
+
+RTX 5080（共享）：全量回归 **283/288**。1 项因另一用户的作业持续占用 GPU 超过 10 分钟而跳过；4 项在 30 s 内于 CUDA 初始化阶段报 `CUDA unknown error`（耗时 0.7 s，含一项 native 运行，不涉及 XSched）。同一时段内核日志有 7 条 `NVRM: Going over RM unhandled interrupt threshold`，逐条对照时间：全部出现在本回归处于“等待 GPU 空闲”、没有任何本方测试运行的时刻，判断为共享主机上他人负载所致。这 5 项与 Suite 9、`SYN-xq-idle`、3 次门控 Lv3 在 GPU 空闲后用最终构建复跑：**15/15**，0 次让路、0 个 CUDA 错误、0 次门控超时，运行后无残留 IPC 队列。
+
+测试安全（T-24）：该 5080 上另一用户在运行自己的 XSched `xserver`（同一 IPC 键 0x1、同一端口）。root 启动的服务端会删除其队列并占用端口；`bench_mp_serving_p34.py` 改为只要键 0x1 的队列属于他人就拒绝启动（包括 root），回归也改为在 GPU 与 IPC 都空闲后才启动。证据中的 GPU 占用记录（含他人进程路径）已脱敏。证据：[`evidence/phase3_4_gate_20261126/`](evidence/phase3_4_gate_20261126/)。

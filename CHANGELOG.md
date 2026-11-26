@@ -2,6 +2,22 @@
 
 All notable changes to the Blackwell (`sm_120`) Level-3 transparent preemption and scheduling system are documented in this file.
 
+## [Unreleased] - 2026-11-26 — DEF-27 root fix: ready gate for the cross-process global scheduler
+
+### Fixed
+- **DEF-27**: under `XSCHED_SCHEDULER=GLB`, a high-priority process now holds the first launch after each Idle->Ready transition until `xserver` acknowledges that Ready event, and `xserver` sends those acknowledgements only after the lower-priority processes suspending a Level-3 (interrupt-level) queue have completed their suspensions (Level-3 suspension returns after the eviction; Level-1/2 suspensions are not waited for). So no other context waits for the GPU while warps are in the trap handler. Protocol: `SchedOperation::ReadyAck()` (`ready_ack`), `ProcessStatus::ready_seen`; client `ReadyGate` (`preempt/.../sched/ready_gate.{h,cpp}`); server `LocalScheduler::SetSuspendFirst()` (suspensions first, bounded wait on `OperationCompleteEvent`, then the rest). Default on under GLB for clients and `xserver` (`XSCHED_GLB_READY_GATE=0` disables; `XSCHED_GLB_READY_GATE_TIMEOUT_US`, default 10000; `XSCHED_GLB_READY_GATE_TRACE=1` prints statistics). With the gate on, SM120 kernels use Level-3 under GLB again; the Level-1 fallback applies only with the gate off.
+- RTX 5080 `glb-lv3`: TPOT P99 3.1-3.5x without the gate (19-22 ms stalls) -> 1.10-1.29x with it (10 runs, 0 Xid). RTX 5060: 0 Xid 109 in 6 gated runs (4/4 runs had one without). High-priority gate wait 160-580 us mean (the eviction), 0 timeouts. Level-1 is unaffected: 8x8 interleaved `glb-lv1` A/B, TPOT P50 0.968x / 0.969x, overlapping P99.
+
+### Observed
+- OBS-9: a paused launch worker that waited for a free command-log slot launches that command without re-checking the pause (Level-1 work during a suspension; at Level-3 the Guardian drains it). Re-checking was tried and reverted: interleaved A/B showed no gain (request policy unchanged, `glb-lv1` slightly worse).
+
+### Changed
+- Level-3 warns once at start-up on a GPU that drives a display (`CU_DEVICE_ATTRIBUTE_KERNEL_EXEC_TIMEOUT`): OBS-8, two more Xid 31 events in desktop graphics processes (`Xwayland`, `gnome-shell`, both recovered) during gated runs.
+- `bench_mp_serving_p34.py` refuses to start `xserver` whenever the host's IPC queue key 0x1 belongs to another user, also as root (a root server would delete another user's running server's queue and take its port).
+
+### Validation
+- RTX 5060 全量 288/288、最终构建 10/10；RTX 5080 全量 283/288（5 项为共享主机环境原因），最终构建复跑 15/15.
+
 ## [Unreleased] - 2026-11-26 — Phase 3.4-2: multi-process serving, DEF-26 / DEF-27 / DEF-28
 
 Doc: `doc/SM120_V2_PHASE3_4_MULTIPROCESS_ZH.md`.
