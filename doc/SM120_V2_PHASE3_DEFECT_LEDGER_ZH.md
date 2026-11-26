@@ -339,3 +339,9 @@
 - 实现：控制分配前缀 256 × 128 B 镜像行 `{cmd, is_restore_wave}`；Guardian 每个 CTA 读自己 SM 的行（一次 `LD.E.64`）；主机严格按 header 的写入者维护镜像（`PreemptStream` 只写 `cmd`；`PrepareRestore`、256 线程条件清零内核、`ResetControlSync`、重分配写全部字段）。
 - **T-21**（开发中发现并修复）：最初 `PreemptStream` 按读到的旧 `is_restore_wave` 写镜像，条件清零内核随后清零 header 时镜像留下过期 1，压测 4/4 非法指令；一致性检查器定位后修复，6/6 + 5060 44/44 + 5080 68/68（`LLM-08` 36/36）通过。
 - 结果（纯 Mode 5）：5080 `sort` +14.8% → +3.3%、`topk` +9.9% → +4.8%、`rope_apply` +54.1% → +7.3%、`transpose_copy` +53.4% → +1.1%；5060 `transpose_copy` +18.9% → +3.5%。关闭短 CTA 路由时纯 Mode 5 也满足 DEF-17 目标。
+
+### 10.9 DEF-10 非 root Level-3（Phase 3.4-1，2026-11-26，已修复）
+- 范围确认：非 root 进程中 Trap 处理程序补丁、Guardian 插桩、控制内存全部正常，只有 BAR0 驱逐脉冲失败（退化为等待内核结束，挂起 9–16 ms，结果仍正确）。
+- 修复：`xsched-bar0d` 代理。root 启动，只映射 Trap 寄存器与刷新寄存器所在的两页 BAR0，建 `root:<group> 0660` 的 `SOCK_SEQPACKET` socket 后降权为 `nobody`（`CapEff=0`、`NoNewPrivs=1`）；只接受 `PULSE` / `HELLO`，每连接令牌桶限流，单线程串行保证多进程脉冲不交错。客户端（`Sm120Arena`）先尝试直接映射，失败再连代理，`HELLO` 校验 PCI BDF，断线后自动重连。
+- 验证：非 root 5060 37/37、5080 50/50（`LLM-08` 24/24、双进程并发、压测、库与硬件特性、8 个生产算子比特一致）；故障注入（无代理、无权限、限流、接错 GPU、路径过长、运行中杀掉并重启代理）均按预期退化或恢复。开销：往返 4.5–12 µs，同会话 A/B 挂起延迟 +2–15 µs。
+- 详见 [`SM120_V2_PHASE3_4_DEF10_BAR0_PROXY_ZH.md`](SM120_V2_PHASE3_4_DEF10_BAR0_PROXY_ZH.md)。

@@ -1,0 +1,9 @@
+[BAR0-PROXY hello] PASS bdf=0000:01:00.0
+[BAR0-PROXY bad-magic] PASS status=-1 pulses=0
+[BAR0-PROXY bad-version] PASS status=-1 pulses=0
+[BAR0-PROXY bad-op] PASS status=-1 pulses=0
+[BAR0-PROXY short] PASS status=-1 pulses=0
+[BAR0-PROXY survives] PASS 
+[BAR0-PROXY 64-clients] PASS 64/64
+[BAR0-PROXY rtt] iters=20000 p50=12.0 us p99=14.8 us max=288.8 us
+[BAR0-PROXY all] PASS

@@ -9,6 +9,8 @@
 
 > **2026-11-25 晚更新：Phase 3.2 / 3.3 已完成**，详见 [`SM120_V2_PHASE3_2_3_3_REPORT_ZH.md`](SM120_V2_PHASE3_2_3_3_REPORT_ZH.md)：DEF-21 关闭（原合成失败为测试竞态）、DEF-19 缓解、DEF-22/23 修复、Entry Guardian 开销大幅下降（5080 最差 +101% → +56.5%，`embedding`/`gelu` 降至 ≈ 0；默认安全版本）、XQueue 有界自旋、真实服务调度策略 Pareto 前沿、一键两卡回归流水线；最终构建两卡全量回归 **265/265 + 265/265 全部通过**（含 3.2 验收组，该报告 §6）。下文 §0–§4 为 3.2 之前的状态，保留供对照；§4 中 3.2/3.3 各项的完成情况见 §4.0。
 
+> **2026-11-26 更新：Phase 3.4-1（DEF-10）已完成**，详见 [`SM120_V2_PHASE3_4_DEF10_BAR0_PROXY_ZH.md`](SM120_V2_PHASE3_4_DEF10_BAR0_PROXY_ZH.md)：新增 `xsched-bar0d` 代理，普通用户进程即可使用 Level-3 抢占；代理只映射两页 BAR0 并降权为 `nobody`，只接受“发一次脉冲”。非 root 验证 5060 37/37、5080 50/50（`LLM-08` 24/24），抢占延迟 +2–15 µs；两卡全量回归（root 直接映射路径）265/265 + 265/265。§2 表格已同步到当前状态。
+
 ---
 
 ## 0. 一句话现状
@@ -84,14 +86,14 @@
 |---|---|---|---|
 | DEF-21 | P1 | 恢复波次进行中再次抢占 | **已关闭**（3.2：合成失败为测试竞态 T-11；DEF-12 逻辑经约 3,000 次压测抢占验证） |
 | DEF-19 | P2 | CTA Cluster + DSMEM（HW-06）偶发 1–2 个 CTA 结果错误（5080 约 10%） | **已缓解**（3.2：Cluster 内核默认走 Level-1） |
-| DEF-17 | P1（性能） | Entry Guardian 每 CTA 开销：短 CTA 访存算子 Lv3 稳态最高 +101% | **改善**（3.3：去冗余重读，5080 `rope_apply` +101% → +56.5%、`embedding` +23% → +1.9%；5060 `transpose_copy` +28.5% → +18.1%）；更激进版本为实验开关 |
+| DEF-17 | P1（性能） | Entry Guardian 每 CTA 开销：短 CTA 访存算子 Lv3 稳态最高 +101% | **达标**（3.3：去冗余重读 + 短 CTA 路由 + `BAR.RED` + 门控镜像；29 个算子 Lv3 中位数两卡 +0.3%，最高 +5.7%） |
 | DEF-22 | P2（潜在） | `CALL.ABS` 未被识别为设备调用，被调函数栈帧不保存 | **已修复**（3.2） |
 | DEF-23 | P2（显存） | 含调用内核固定预留 4 KiB/线程栈保存区 | **已修复**（3.2：按栈上限精确预留） |
 | EXP-1 | — | 实验 Guardian v2 在双 Lv3 队列 + HP 下偶发错误（11/61） | 仅实验开关 |
 | DEF-20b | P3 | 255 寄存器内核的 R254 无法保存 | 生产内核未见 |
 | DEF-09 | P2 | CUDA Graph 仅在图边界抢占（Level-1） | 架构项 |
-| DEF-10 | P2 | BAR0 需要 root | 架构项 |
-| 遗留 | — | `shim/context_registry.{h,cpp}`：context-isolation 合并中断留下的未接入代码 | 待决定完成或删除 |
+| DEF-10 | P2 | BAR0 需要 root | **已修复**（3.4-1：`xsched-bar0d` 脉冲代理，普通用户可用 Level-3） |
+| 遗留 | — | `shim/context_registry.{h,cpp}`：context-isolation 合并中断留下的未接入代码 | **已删除**（3.2；保存在提交 `84e10dc`） |
 | 评测缺口 | — | 缺“原生高优先级流 / MPS / Green Context”基线；服务测试为单进程双线程（GIL 干扰）；模型仅 0.5B | 待补 |
 
 ---
@@ -148,10 +150,10 @@
 
 | # | 任务 |
 |---|---|
-| 1 | **DEF-10**：非 root BAR0 代理（特权守护进程 / 字符设备 + 进程校验 + 频率限流 + 多进程互斥） |
+| 1 | ✅ **DEF-10**：非 root BAR0 代理（特权守护进程 + 组授权 + 频率限流 + 多进程互斥；2026-11-26 完成，未采用字符设备） |
 | 2 | 多进程/多租户：HP 与 LP 独立进程的服务测试（消除 GIL 干扰），跨进程抢占仲裁 |
 | 3 | **DEF-09**：CUDA Graph 图内抢占（`cuGraphInstantiate` 节点预插桩）或与 Context CILP 的混合路由，覆盖 `torch.compile(reduce-overhead)` 与 vLLM Decode |
-| 4 | 决定 xsched `release/context-isolation` 合并方案（`context_registry` 接入或放弃） |
+| 4 | ✅ 决定 xsched `release/context-isolation` 合并方案：`context_registry` 已放弃并删除（3.2） |
 
 ### 4.4 Phase 3.5 — 论文评测（与 3.3/3.4 并行）
 

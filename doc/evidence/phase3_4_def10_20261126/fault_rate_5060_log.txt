@@ -1,0 +1,37 @@
+[XSCHED INFO @ T 241528 @ 06:14:32.204542] using app-managed scheduler
+[XSCHED INFO @ T 241528 @ 06:14:32.333359] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 241528 @ 06:14:32.369784] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 241528 @ 06:14:32.370326] sm120_arena: trap pulses via BAR0 proxy /run/xsched/test-rate.sock (0000:01:00.0, non-root, DEF-10)
+[XSCHED INFO @ T 241528 @ 06:14:32.414194] sm120_guardian: instrumented func=0x5690ec6cca90 orig_ep=0x7c20d76f3600 -> ep_inst=0x7c20d2c00000 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=9088B name=_Z15k_warp_patternsPjiii
+[XSCHED WARN @ T 241528 @ 06:14:32.445121] sm120_arena: BAR0 proxy refused pulse (status -2, rate limited) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_arena.cpp:563
+[XSCHED WARN @ T 241528 @ 06:14:32.445129] sm120_trap_engine: BAR0 pulse failed (check resource0 permissions) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_trap_engine.cpp:1712
+[XSCHED WARN @ T 241528 @ 06:14:32.472810] sm120_arena: BAR0 proxy refused pulse (status -2, rate limited) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_arena.cpp:563
+[XSCHED WARN @ T 241528 @ 06:14:32.472816] sm120_trap_engine: BAR0 pulse failed (check resource0 permissions) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_trap_engine.cpp:1712
+[XSCHED WARN @ T 241528 @ 06:14:32.504342] sm120_arena: BAR0 proxy refused pulse (status -2, rate limited) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_arena.cpp:563
+[XSCHED WARN @ T 241528 @ 06:14:32.504347] sm120_trap_engine: BAR0 pulse failed (check resource0 permissions) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_trap_engine.cpp:1712
+[XSCHED WARN @ T 241528 @ 06:14:32.532468] sm120_arena: BAR0 proxy refused pulse (status -2, rate limited) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_arena.cpp:563
+[XSCHED WARN @ T 241528 @ 06:14:32.532472] sm120_trap_engine: BAR0 pulse failed (check resource0 permissions) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_trap_engine.cpp:1712
+[XSCHED WARN @ T 241528 @ 06:14:32.538626] sm120_arena: BAR0 proxy refused pulse (status -2, rate limited) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_arena.cpp:563
+[XSCHED WARN @ T 241528 @ 06:14:32.538630] sm120_trap_engine: BAR0 pulse failed (check resource0 permissions) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_trap_engine.cpp:1712
+[XSCHED WARN @ T 241528 @ 06:14:32.566998] sm120_arena: BAR0 proxy refused pulse (status -2, rate limited) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_arena.cpp:563
+[XSCHED WARN @ T 241528 @ 06:14:32.567003] sm120_trap_engine: BAR0 pulse failed (check resource0 permissions) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_trap_engine.cpp:1712
+[XSCHED WARN @ T 241528 @ 06:14:32.611021] sm120_arena: BAR0 proxy refused pulse (status -2, rate limited) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_arena.cpp:563
+[XSCHED WARN @ T 241528 @ 06:14:32.611025] sm120_trap_engine: BAR0 pulse failed (check resource0 permissions) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_trap_engine.cpp:1712
+[XSCHED WARN @ T 241528 @ 06:14:32.652259] sm120_arena: BAR0 proxy refused pulse (status -2, rate limited) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_arena.cpp:563
+[XSCHED WARN @ T 241528 @ 06:14:32.652269] sm120_trap_engine: BAR0 pulse failed (check resource0 permissions) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_trap_engine.cpp:1712
+[XSCHED WARN @ T 241528 @ 06:14:32.658425] sm120_arena: BAR0 proxy refused pulse (status -2, rate limited) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_arena.cpp:563
+[XSCHED WARN @ T 241528 @ 06:14:32.658429] sm120_trap_engine: BAR0 pulse failed (check resource0 permissions) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_trap_engine.cpp:1712
+[XSCHED WARN @ T 241528 @ 06:14:32.699553] sm120_arena: BAR0 proxy refused pulse (status -2, rate limited) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_arena.cpp:563
+[XSCHED WARN @ T 241528 @ 06:14:32.699559] sm120_trap_engine: BAR0 pulse failed (check resource0 permissions) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_trap_engine.cpp:1712
+[XSCHED WARN @ T 241528 @ 06:14:32.743576] sm120_arena: BAR0 proxy refused pulse (status -2, rate limited) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_arena.cpp:563
+[XSCHED WARN @ T 241528 @ 06:14:32.743582] sm120_trap_engine: BAR0 pulse failed (check resource0 permissions) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_trap_engine.cpp:1712
+[XSCHED WARN @ T 241528 @ 06:14:32.784392] sm120_arena: BAR0 proxy refused pulse (status -2, rate limited) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_arena.cpp:563
+[XSCHED WARN @ T 241528 @ 06:14:32.784396] sm120_trap_engine: BAR0 pulse failed (check resource0 permissions) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_trap_engine.cpp:1712
+[XSCHED WARN @ T 241528 @ 06:14:32.790570] sm120_arena: BAR0 proxy refused pulse (status -2, rate limited) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_arena.cpp:563
+[XSCHED WARN @ T 241528 @ 06:14:32.790573] sm120_trap_engine: BAR0 pulse failed (check resource0 permissions) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_trap_engine.cpp:1712
+[XSCHED WARN @ T 241528 @ 06:14:32.831281] sm120_arena: BAR0 proxy refused pulse (status -2, rate limited) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_arena.cpp:563
+[XSCHED WARN @ T 241528 @ 06:14:32.831286] sm120_trap_engine: BAR0 pulse failed (check resource0 permissions) @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/sm120_trap_engine.cpp:1712
+[P3-PARTIAL K0 uniform] PASS | runs=2 ok=2 np=2 susp_avg=4.751 ms | blocks=60 thr=256 base=3480440 step=54381
+[P3-PARTIAL K1 half_exit] PASS | runs=2 ok=2 np=2 susp_avg=9.606 ms | blocks=60 thr=256 base=3480440 step=54381
+[P3-PARTIAL K2 staggered_exit] PASS | runs=2 ok=2 np=2 susp_avg=16.076 ms | blocks=60 thr=256 base=3480440 step=54381
+[P3-PARTIAL K3 staggered_reconv] PASS | runs=2 ok=2 np=2 susp_avg=15.872 ms | blocks=60 thr=256 base=3480440 step=54381

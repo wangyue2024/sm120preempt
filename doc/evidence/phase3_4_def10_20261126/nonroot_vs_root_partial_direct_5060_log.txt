@@ -1,0 +1,8 @@
+[XSCHED INFO @ T 241283 @ 06:13:44.036590] using app-managed scheduler
+[XSCHED INFO @ T 241283 @ 06:13:44.158598] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 241283 @ 06:13:44.195287] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 241283 @ 06:13:44.239616] sm120_guardian: instrumented func=0x5af41175dab0 orig_ep=0x7c76f76f3600 -> ep_inst=0x7c76f2c00000 regs=10->16 bars=1 lmem=0(cap=0,calls=0) loop_free=0 static_smem=0 bin=9088B name=_Z15k_warp_patternsPjiii
+[P3-PARTIAL K0 uniform] PASS | runs=5 ok=5 np=3 susp_avg=0.099 ms | blocks=60 thr=256 base=3497481 step=54648
+[P3-PARTIAL K1 half_exit] PASS | runs=5 ok=5 np=3 susp_avg=0.096 ms | blocks=60 thr=256 base=3497481 step=54648
+[P3-PARTIAL K2 staggered_exit] PASS | runs=5 ok=5 np=3 susp_avg=0.165 ms | blocks=60 thr=256 base=3497481 step=54648
+[P3-PARTIAL K3 staggered_reconv] PASS | runs=5 ok=5 np=3 susp_avg=0.171 ms | blocks=60 thr=256 base=3497481 step=54648

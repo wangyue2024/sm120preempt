@@ -2,6 +2,23 @@
 
 All notable changes to the Blackwell (`sm_120`) Level-3 transparent preemption and scheduling system are documented in this file.
 
+## [Unreleased] - 2026-11-26 — Phase 3.4-1: DEF-10 non-root Level-3 preemption
+
+Doc: `doc/SM120_V2_PHASE3_4_DEF10_BAR0_PROXY_ZH.md`; deployment: `xsched/platforms/cuda/bar0d/README.md`.
+
+### Added
+- **`xsched-bar0d`** (`platforms/cuda/bar0d/`): proxy for the one Level-3 operation that needs root, the BAR0 evict pulse. Started as root, it maps only the two 4 KiB BAR0 pages holding the trap register (`0x424684`) and the flush register (`0x9400`), creates a `root:<group> 0660` `SOCK_SEQPACKET` socket (`/run/xsched/bar0-<bdf>.sock`), then drops to `nobody` (`setgroups(0)`, `no_new_privs`, not dumpable). It accepts `PULSE` and `HELLO` only, rate-limits each connection (token bucket, default 5000/s, burst 64), and serializes pulses from all processes. Systemd template unit `xsched-bar0d@.service` (instance = BDF).
+- `Sm120Arena`: maps BAR0 directly when possible, otherwise connects to the proxy (`XSCHED_SM120_BAR0_PROXY`, `XSCHED_SM120_BAR0_FORCE_PROXY`, `XSCHED_SM120_BAR0_PROXY_TIMEOUT_MS`), checks the served PCI BDF with `HELLO`, reconnects after a broken connection; shared `FireBar0Pulse()` in `sm120_bar0_proxy.h` for both paths.
+- `test/sm120_v2/eval/test_bar0_proxy_p34.py`: protocol checks that never touch hardware.
+
+### Changed
+- The "BAR0 pulse failed" warning is limited to one per second with a running count.
+
+### Validation
+- Non-root: RTX 5060 37/37, RTX 5080 50/50 (`LLM-08` 24/24, two processes preempting concurrently, multi-wave stress, library/hardware cases, 8 production ops bit-exact). Fault injection: no proxy, no permission, rate limit, wrong-GPU proxy, over-long path, proxy killed and restarted mid-run (in-process reconnect) all degrade to run-to-completion or recover as designed.
+- Cost: socket round trip 4.5 us (RTX 5080 host) / 12 us (RTX 5060 host) P50; same-session A/B suspend latency +2-15 us versus direct mapping.
+- 两卡全量回归（root 直接映射路径）265/265 + 265/265.
+
 ## [Unreleased] - 2026-11-26 — Phase 3.3 completion: short-CTA routing, per-call submission path, PERF-2, DEF-24
 
 Final build, full regression (`regress_p3.py --suites full`, incl. the Phase 3.2 acceptance group and arena-trim-under-preemption runs): **RTX 5060 265/265, RTX 5080 265/265**.

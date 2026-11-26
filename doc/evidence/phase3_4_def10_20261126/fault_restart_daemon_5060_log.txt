@@ -1,0 +1,243 @@
+[xsched-bar0d 2026-11-26 06:16:50] serving 0000:01:00.0 on /run/xsched/bar0-0000:01:00.0.sock (group wy, rate 5000/s burst 64 per connection, running as nobody)
+[xsched-bar0d 2026-11-26 06:16:50] connect pid 242769 uid 1000
+[xsched-bar0d 2026-11-26 06:16:54] stopping (1980 pulses served)
+[xsched-bar0d 2026-11-26 06:16:57] serving 0000:01:00.0 on /run/xsched/bar0-0000:01:00.0.sock (group wy, rate 5000/s burst 64 per connection, running as nobody)
+[xsched-bar0d 2026-11-26 06:16:57] connect pid 242769 uid 1000
+[xsched-bar0d 2026-11-26 06:17:08] disconnect pid 242769 uid 1000: closed (pulses 4131, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] connect pid 243481 uid 1000
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:20] disconnect pid 243481 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:21] connect pid 243507 uid 1000
+[xsched-bar0d 2026-11-26 06:18:21] disconnect pid 243507 uid 1000: closed (pulses 60, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:22] connect pid 243547 uid 1000
+[xsched-bar0d 2026-11-26 06:18:22] connect pid 243546 uid 1000
+[xsched-bar0d 2026-11-26 06:18:23] disconnect pid 243547 uid 1000: closed (pulses 30, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:23] disconnect pid 243546 uid 1000: closed (pulses 60, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:23] connect pid 243588 uid 1000
+[xsched-bar0d 2026-11-26 06:18:25] disconnect pid 243588 uid 1000: closed (pulses 360, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:25] connect pid 243625 uid 1000
+[xsched-bar0d 2026-11-26 06:18:26] disconnect pid 243625 uid 1000: closed (pulses 360, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:27] connect pid 243662 uid 1000
+[xsched-bar0d 2026-11-26 06:18:28] disconnect pid 243662 uid 1000: closed (pulses 360, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:28] connect pid 243700 uid 1000
+[xsched-bar0d 2026-11-26 06:18:35] disconnect pid 243700 uid 1000: closed (pulses 288, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:36] connect pid 244388 uid 1000
+[xsched-bar0d 2026-11-26 06:18:38] disconnect pid 244388 uid 1000: closed (pulses 9, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:38] connect pid 244462 uid 1000
+[xsched-bar0d 2026-11-26 06:18:38] disconnect pid 244462 uid 1000: closed (pulses 2, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:38] connect pid 244498 uid 1000
+[xsched-bar0d 2026-11-26 06:18:39] disconnect pid 244498 uid 1000: closed (pulses 2, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:39] connect pid 244534 uid 1000
+[xsched-bar0d 2026-11-26 06:18:39] disconnect pid 244534 uid 1000: closed (pulses 2, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:40] connect pid 244645 uid 1000
+[xsched-bar0d 2026-11-26 06:18:40] disconnect pid 244645 uid 1000: closed (pulses 2, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:40] connect pid 244681 uid 1000
+[xsched-bar0d 2026-11-26 06:18:40] disconnect pid 244681 uid 1000: closed (pulses 1, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:41] connect pid 244738 uid 1000
+[xsched-bar0d 2026-11-26 06:18:41] disconnect pid 244738 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:41] connect pid 244828 uid 1000
+[xsched-bar0d 2026-11-26 06:18:41] disconnect pid 244828 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:44] connect pid 244916 uid 1000
+[xsched-bar0d 2026-11-26 06:18:46] disconnect pid 244916 uid 1000: closed (pulses 4, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:49] connect pid 245002 uid 1000
+[xsched-bar0d 2026-11-26 06:18:52] disconnect pid 245002 uid 1000: closed (pulses 4, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:54] connect pid 245075 uid 1000
+[xsched-bar0d 2026-11-26 06:18:57] disconnect pid 245075 uid 1000: closed (pulses 4, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:18:59] connect pid 245151 uid 1000
+[xsched-bar0d 2026-11-26 06:19:02] disconnect pid 245151 uid 1000: closed (pulses 4, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:19:05] connect pid 245220 uid 1000
+[xsched-bar0d 2026-11-26 06:19:07] disconnect pid 245220 uid 1000: closed (pulses 4, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:19:10] connect pid 245292 uid 1000
+[xsched-bar0d 2026-11-26 06:19:13] disconnect pid 245292 uid 1000: closed (pulses 4, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:19:15] connect pid 245368 uid 1000
+[xsched-bar0d 2026-11-26 06:19:18] disconnect pid 245368 uid 1000: closed (pulses 4, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:19:20] connect pid 245437 uid 1000
+[xsched-bar0d 2026-11-26 06:19:23] disconnect pid 245437 uid 1000: closed (pulses 4, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:19:26] connect pid 245507 uid 1000
+[xsched-bar0d 2026-11-26 06:19:28] disconnect pid 245507 uid 1000: closed (pulses 4, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:19:31] connect pid 245583 uid 1000
+[xsched-bar0d 2026-11-26 06:19:33] disconnect pid 245583 uid 1000: closed (pulses 4, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:19:36] connect pid 245653 uid 1000
+[xsched-bar0d 2026-11-26 06:19:39] disconnect pid 245653 uid 1000: closed (pulses 4, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:19:41] connect pid 245724 uid 1000
+[xsched-bar0d 2026-11-26 06:19:44] disconnect pid 245724 uid 1000: closed (pulses 4, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:19:45] connect pid 245800 uid 1000
+[xsched-bar0d 2026-11-26 06:19:50] disconnect pid 245800 uid 1000: closed (pulses 3, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:19:51] connect pid 245942 uid 1000
+[xsched-bar0d 2026-11-26 06:19:54] disconnect pid 245942 uid 1000: closed (pulses 3, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:19:56] connect pid 246043 uid 1000
+[xsched-bar0d 2026-11-26 06:19:57] disconnect pid 246043 uid 1000: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:19:58] connect pid 246098 uid 1000
+[xsched-bar0d 2026-11-26 06:20:00] disconnect pid 246098 uid 1000: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:20:01] connect pid 246154 uid 1000
+[xsched-bar0d 2026-11-26 06:20:03] disconnect pid 246154 uid 1000: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:20:04] connect pid 246214 uid 1000
+[xsched-bar0d 2026-11-26 06:20:05] disconnect pid 246214 uid 1000: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:20:06] connect pid 246269 uid 1000
+[xsched-bar0d 2026-11-26 06:20:07] disconnect pid 246269 uid 1000: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:20:10] connect pid 246363 uid 1000
+[xsched-bar0d 2026-11-26 06:20:11] disconnect pid 246363 uid 1000: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:20:30] connect pid 246603 uid 1000
+[xsched-bar0d 2026-11-26 06:20:31] disconnect pid 246603 uid 1000: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:20:33] connect pid 246657 uid 1000
+[xsched-bar0d 2026-11-26 06:20:34] disconnect pid 246657 uid 1000: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:24:12] connect pid 247419 uid 1000
+[xsched-bar0d 2026-11-26 06:24:35] disconnect pid 247419 uid 1000: closed (pulses 0, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:24:52] connect pid 247620 uid 0
+[xsched-bar0d 2026-11-26 06:24:53] disconnect pid 247620 uid 0: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:24:57] connect pid 247727 uid 0
+[xsched-bar0d 2026-11-26 06:24:58] disconnect pid 247727 uid 0: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:25:02] connect pid 247835 uid 0
+[xsched-bar0d 2026-11-26 06:25:04] disconnect pid 247835 uid 0: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:25:07] connect pid 247946 uid 0
+[xsched-bar0d 2026-11-26 06:25:08] disconnect pid 247946 uid 0: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:25:12] connect pid 248054 uid 0
+[xsched-bar0d 2026-11-26 06:25:14] disconnect pid 248054 uid 0: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:25:17] connect pid 248170 uid 0
+[xsched-bar0d 2026-11-26 06:25:19] disconnect pid 248170 uid 0: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:25:22] connect pid 248277 uid 0
+[xsched-bar0d 2026-11-26 06:25:23] disconnect pid 248277 uid 0: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:25:28] connect pid 248385 uid 0
+[xsched-bar0d 2026-11-26 06:25:29] disconnect pid 248385 uid 0: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:25:33] connect pid 248493 uid 0
+[xsched-bar0d 2026-11-26 06:25:34] disconnect pid 248493 uid 0: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:25:38] connect pid 248602 uid 0
+[xsched-bar0d 2026-11-26 06:25:39] disconnect pid 248602 uid 0: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:25:43] connect pid 248717 uid 0
+[xsched-bar0d 2026-11-26 06:25:44] disconnect pid 248717 uid 0: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:25:48] connect pid 248824 uid 0
+[xsched-bar0d 2026-11-26 06:25:49] disconnect pid 248824 uid 0: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:25:53] connect pid 248933 uid 0
+[xsched-bar0d 2026-11-26 06:25:54] disconnect pid 248933 uid 0: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:25:58] connect pid 249042 uid 0
+[xsched-bar0d 2026-11-26 06:25:59] disconnect pid 249042 uid 0: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:26:03] connect pid 249158 uid 0
+[xsched-bar0d 2026-11-26 06:26:05] disconnect pid 249158 uid 0: closed (pulses 15, rate-limited 0)
+[xsched-bar0d 2026-11-26 06:26:27] stopping (6066 pulses served)
