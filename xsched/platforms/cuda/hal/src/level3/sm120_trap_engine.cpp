@@ -1709,7 +1709,17 @@ bool Sm120StreamContext::PreemptStream(Sm120PreemptMode mode)
     }
 
     if (!engine_->FireEvictPulse()) {
-        XWARN("sm120_trap_engine: BAR0 pulse failed (check resource0 permissions)");
+        // At most one warning per second (a stopped proxy would otherwise log every pulse).
+        static std::atomic<int64_t> last_warn_ms{-1000000};
+        static std::atomic<uint64_t> failed{0};
+        const uint64_t n = failed.fetch_add(1) + 1;
+        const int64_t now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::steady_clock::now().time_since_epoch()).count();
+        int64_t prev = last_warn_ms.load();
+        if (now_ms - prev >= 1000 && last_warn_ms.compare_exchange_strong(prev, now_ms)) {
+            XWARN("sm120_trap_engine: BAR0 pulse failed (%llu so far; run as root or start xsched-bar0d; "
+                  "waiting for the kernel instead)", static_cast<unsigned long long>(n));
+        }
         return false;
     }
 

@@ -1,0 +1,20 @@
+# XSched SM120 Level-3 trap-pulse proxy (DEF-10), one instance per GPU.
+# Install:  install -m 0755 xsched-bar0d /usr/local/bin/ && groupadd -r xsched && usermod -aG xsched <user>
+#           cp xsched-bar0d@.service /etc/systemd/system/ && systemctl daemon-reload
+#           systemctl enable --now xsched-bar0d@0000:01:00.0     # instance = PCI BDF of the GPU
+[Unit]
+Description=XSched SM120 Level-3 trap-pulse proxy for GPU %i
+After=nvidia-persistenced.service
+
+[Service]
+ExecStart=/usr/local/bin/xsched-bar0d --bdf %i --group xsched
+Restart=on-failure
+RestartSec=1
+# The daemon maps two BAR0 pages as root, then drops to nobody with no_new_privs.
+ProtectHome=yes
+ProtectSystem=strict
+ReadWritePaths=/run/xsched
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

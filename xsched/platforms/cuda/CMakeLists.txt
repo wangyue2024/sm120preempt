@@ -6,6 +6,13 @@ add_shim_lib(cuda
 add_platform_test()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+    # DEF-10: privileged trap-pulse proxy so Level-3 runs without root (no CUDA dependency).
+    add_executable(xsched-bar0d "${CMAKE_CURRENT_LIST_DIR}/bar0d/xsched_bar0d.cpp")
+    target_include_directories(xsched-bar0d PRIVATE ${CMAKE_CURRENT_LIST_DIR}/hal/include)
+    target_compile_options(xsched-bar0d PRIVATE -Wall -Wextra -O2)
+    set_target_properties(xsched-bar0d PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+    install(TARGETS xsched-bar0d RUNTIME DESTINATION bin)
+
     if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
         set(CMAKE_CUDA_ARCHITECTURES "120")
     endif()

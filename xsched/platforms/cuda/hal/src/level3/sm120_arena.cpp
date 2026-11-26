@@ -1,16 +1,22 @@
 #include "xsched/cuda/hal/level3/sm120_arena.h"
 
+#include <algorithm>
+#include <cerrno>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <dirent.h>
 #include <fcntl.h>
+#include <poll.h>
 #include <sys/mman.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 #include <unistd.h>
 
 #include <cuxtra/cuxtra.h>
 
 #include "xsched/cuda/hal/common/driver.h"
+#include "xsched/cuda/hal/level3/sm120_bar0_proxy.h"
 #include "xsched/utils/log.h"
 
 namespace cuxtra::etbl
@@ -38,8 +44,6 @@ constexpr uint64_t kToolsOffsetFromLive  = 0x4400ULL;
 constexpr uint64_t kScanWindowBytes      = 0x8200ULL;
 constexpr uint64_t kHookSiteW0           = (0xffULL << 32) | 0x37202ULL;
 constexpr uint64_t kHookSiteW1           = (0x3ff000ULL << 32) | 0xf00ULL;
-constexpr uint32_t kBar0PtimerLoOff      = 0x00009400u; // NV_PTIMER_TIME_0 (non-PRI flush read)
-constexpr uint32_t kBar0TrapRegOff       = 0x00424684u;
 constexpr size_t   kBar0MapBytes         = 0x01000000u; // 16 MiB covers 0x424684
 
 // Relocation-free leading opcodes of .text.traphandler on sm_120.
@@ -127,6 +131,10 @@ Sm120Arena::~Sm120Arena()
     if (bar0_fd_ >= 0) {
         close(bar0_fd_);
         bar0_fd_ = -1;
+    }
+    if (proxy_fd_ >= 0) {
+        close(proxy_fd_);
+        proxy_fd_ = -1;
     }
 }
 
@@ -363,7 +371,118 @@ bool Sm120Arena::EnsureBar0Mapped()
 {
     std::lock_guard<std::mutex> lock(mu_);
     if (bar0_ != nullptr) return true;
+    {
+        std::lock_guard<std::mutex> plock(proxy_mu_);
+        if (proxy_fd_ >= 0) return true;
+    }
+    const char *force = getenv("XSCHED_SM120_BAR0_FORCE_PROXY");
+    if (!(force && force[0] == '1') && MapBar0DirectLocked()) return true;
+    return ConnectProxyLocked();
+}
 
+std::string Sm120Arena::ExpectedBdf()
+{
+    CUdevice dev = 0;
+    int dom = 0, bus = 0, slot = 0;
+    if (Driver::CtxGetDevice(&dev) != CUDA_SUCCESS ||
+        Driver::DeviceGetAttribute(&dom, CU_DEVICE_ATTRIBUTE_PCI_DOMAIN_ID, dev) != CUDA_SUCCESS ||
+        Driver::DeviceGetAttribute(&bus, CU_DEVICE_ATTRIBUTE_PCI_BUS_ID, dev) != CUDA_SUCCESS ||
+        Driver::DeviceGetAttribute(&slot, CU_DEVICE_ATTRIBUTE_PCI_DEVICE_ID, dev) != CUDA_SUCCESS) {
+        return std::string();
+    }
+    char bdf[32];
+    snprintf(bdf, sizeof(bdf), "%04x:%02x:%02x.0", dom, bus, slot);
+    return bdf;
+}
+
+bool Sm120Arena::ProxyRoundTrip(uint16_t op, int32_t *status, char *bdf_out)
+{
+    // Caller holds proxy_mu_.
+    namespace bp = bar0proxy;
+    if (proxy_fd_ < 0) return false;
+    bp::Request rq = {bp::kMagic, bp::kVersion, op, ++proxy_seq_};
+    bp::Reply rp = {};
+    static const int timeout_ms = [] {
+        const char *v = getenv("XSCHED_SM120_BAR0_PROXY_TIMEOUT_MS");
+        return v ? std::max(1, atoi(v)) : 200;
+    }();
+    struct pollfd pfd = {proxy_fd_, POLLIN, 0};
+    bool ok = send(proxy_fd_, &rq, sizeof(rq), MSG_NOSIGNAL) == static_cast<ssize_t>(sizeof(rq)) &&
+              poll(&pfd, 1, timeout_ms) == 1 && (pfd.revents & POLLIN) &&
+              recv(proxy_fd_, &rp, sizeof(rp), 0) == static_cast<ssize_t>(sizeof(rp)) &&
+              rp.magic == bp::kMagic && rp.seq == rq.seq;
+    if (!ok) {
+        // Broken or desynchronized connection: drop it; EnsureBar0Mapped reconnects later.
+        XWARN("sm120_arena: BAR0 proxy request failed; reconnecting on next pulse");
+        close(proxy_fd_);
+        proxy_fd_ = -1;
+        return false;
+    }
+    *status = rp.status;
+    if (bdf_out) {
+        memcpy(bdf_out, rp.bdf, sizeof(rp.bdf));
+        bdf_out[sizeof(rp.bdf) - 1] = '\0';
+    }
+    return true;
+}
+
+bool Sm120Arena::ConnectProxyLocked()
+{
+    namespace bp = bar0proxy;
+    std::lock_guard<std::mutex> plock(proxy_mu_);
+    if (proxy_fd_ >= 0) return true;
+    const char *env = getenv("XSCHED_SM120_BAR0_PROXY");
+    if (env && strcmp(env, "0") == 0) return false;
+    const auto now = std::chrono::steady_clock::now();
+    if (now < proxy_retry_after_) return false;
+    proxy_retry_after_ = now + std::chrono::milliseconds(200);
+
+    const std::string want = ExpectedBdf();
+    std::string path = (env && env[0]) ? std::string(env)
+                                        : std::string(bp::kDefaultDir) + "/bar0-" + want + ".sock";
+    if (path.empty() || (!(env && env[0]) && want.empty())) return false;
+
+    int fd = socket(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0);
+    if (fd < 0) return false;
+    struct sockaddr_un addr = {};
+    addr.sun_family = AF_UNIX;
+    if (path.size() >= sizeof(addr.sun_path)) {
+        if (!proxy_logged_) XWARN("sm120_arena: BAR0 proxy path too long (max %zu bytes): %s",
+                                  sizeof(addr.sun_path) - 1, path.c_str());
+        proxy_logged_ = true;
+        close(fd);
+        return false;
+    }
+    memcpy(addr.sun_path, path.c_str(), path.size() + 1);
+    if (connect(fd, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr)) != 0) {
+        if (!proxy_logged_ && errno != ENOENT) {
+            XWARN("sm120_arena: cannot connect to BAR0 proxy %s: %s", path.c_str(), strerror(errno));
+            proxy_logged_ = true;
+        }
+        close(fd);
+        return false;
+    }
+    proxy_fd_ = fd;
+    int32_t st = -1;
+    char served[sizeof(bp::Reply::bdf)] = {};
+    if (!ProxyRoundTrip(bp::kOpHello, &st, served) || st != bp::kOk) {
+        if (proxy_fd_ >= 0) { close(proxy_fd_); proxy_fd_ = -1; }
+        return false;
+    }
+    if (!want.empty() && want != served) {
+        if (!proxy_logged_) XWARN("sm120_arena: BAR0 proxy %s serves %s but this context runs on %s; not using it",
+                                  path.c_str(), served, want.c_str());
+        proxy_logged_ = true;
+        close(proxy_fd_);
+        proxy_fd_ = -1;
+        return false;
+    }
+    XINFO("sm120_arena: trap pulses via BAR0 proxy %s (%s, non-root, DEF-10)", path.c_str(), served);
+    return true;
+}
+
+bool Sm120Arena::MapBar0DirectLocked()
+{
     if (TryMmapBar0(getenv("XSCHED_SM120_BAR0_RESOURCE"), &bar0_, &bar0_fd_)) return true;
     if (TryMmapBar0(getenv("BAR0_PATH"), &bar0_, &bar0_fd_)) return true;
 
@@ -440,12 +559,18 @@ bool Sm120Arena::EnsureBar0Mapped()
 bool Sm120Arena::FireEvictPulse()
 {
     if (!EnsureBar0Mapped()) return false;
-    // Hardware rule (D10): NEVER read 0x00424684 (PGRAPH broadcast PRI) while STOP_TRIGGER
-    // (bit 31) is asserted. Flush the posted write via a non-PRI read of NV_PTIMER_TIME_0
-    // (0x00009400) to guarantee a clean ~1 us pulse window before deasserting STOP_TRIGGER.
-    bar0_[kBar0TrapRegOff >> 2] = 0x80001c01u;
-    (void)bar0_[kBar0PtimerLoOff >> 2];
-    bar0_[kBar0TrapRegOff >> 2] = 0x00001c01u;
+    if (bar0_ != nullptr) {
+        FireBar0Pulse(&bar0_[kBar0TrapRegOff >> 2], &bar0_[kBar0PtimerLoOff >> 2]);
+        return true;
+    }
+    std::lock_guard<std::mutex> plock(proxy_mu_);
+    int32_t st = -1;
+    if (!ProxyRoundTrip(bar0proxy::kOpPulse, &st, nullptr)) return false;
+    if (st != bar0proxy::kOk) {
+        XWARN("sm120_arena: BAR0 proxy refused pulse (status %d%s)", st,
+              st == bar0proxy::kRateLimited ? ", rate limited" : "");
+        return false;
+    }
     return true;
 }
 

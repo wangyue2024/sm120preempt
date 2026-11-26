@@ -1,7 +1,9 @@
 #pragma once
 
+#include <chrono>
 #include <cstdint>
 #include <mutex>
+#include <string>
 #include <vector>
 
 #include "xsched/cuda/hal/common/cuda.h"
@@ -32,8 +34,10 @@ public:
     bool PatchHandlerHook(uint64_t target_va);
     void RestoreAll();
 
+    /// @brief Make trap pulses possible: map BAR0 directly (root), otherwise connect to the
+    /// xsched-bar0d proxy (DEF-10, see sm120_bar0_proxy.h).
     bool EnsureBar0Mapped();
-    bool HasBar0() const { return bar0_ != nullptr; }
+    bool HasBar0() const { return bar0_ != nullptr || proxy_fd_ >= 0; }
     bool FireEvictPulse();
 
     bool     IsDiscovered()    const { return discovered_; }
@@ -70,9 +74,21 @@ private:
     std::vector<ArenaCave> caves_;
     std::vector<PatchedRegion> patched_caves_;
 
+    bool MapBar0DirectLocked();
+    bool ConnectProxyLocked();
+    bool ProxyRoundTrip(uint16_t op, int32_t *status, char *bdf_out);
+    std::string ExpectedBdf();
+
     volatile uint32_t *bar0_ = nullptr;
     int bar0_fd_ = -1;
     std::mutex mu_;
+
+    // DEF-10 proxy connection (proxy_mu_ guards proxy_fd_/proxy_seq_; lock order mu_ -> proxy_mu_).
+    int proxy_fd_ = -1;
+    uint64_t proxy_seq_ = 0;
+    bool proxy_logged_ = false;
+    std::chrono::steady_clock::time_point proxy_retry_after_{};
+    std::mutex proxy_mu_;
 };
 
 } // namespace xsched::cuda::sm120
