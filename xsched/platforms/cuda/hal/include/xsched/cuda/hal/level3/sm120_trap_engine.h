@@ -148,6 +148,12 @@ public:
     /// @brief Monotonic count of PrepareLaunch() calls (snapshot before a stream synchronization).
     uint64_t LaunchSeq() const;
 
+    /// @brief Write {cmd, is_restore_wave} into every gate mirror line (stream-ordered; caller holds mu_
+    /// and synchronizes the stream before firing a pulse / relaunching).
+    void WriteGateMirrorAsync(uint32_t cmd, uint32_t is_restore_wave, CUstream stream);
+    /// @brief Write only the cmd word of every gate mirror line (PreemptStream).
+    void WriteGateMirrorCmdAsync(uint32_t cmd, CUstream stream);
+
     /// @brief Phase 3.3 arena trimming, called after the stream was synchronized. If no launch was
     /// prepared since `seq_before_sync` and no eviction/restore state is pending, frees arenas
     /// retired by growth and, if the current arena stayed > 2x (and > 64 MiB) above the largest

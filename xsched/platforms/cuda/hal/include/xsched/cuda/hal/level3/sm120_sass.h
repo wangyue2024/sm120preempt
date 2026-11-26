@@ -34,6 +34,7 @@ inline constexpr uint32_t kSrCtaIdX            = 0x25;
 inline constexpr uint32_t kSrCtaIdY            = 0x26;
 inline constexpr uint32_t kSrCtaIdZ            = 0x27;
 inline constexpr uint32_t kSrSmemSz            = 0x32;
+inline constexpr uint32_t kSrVirtualSmId       = 0x43;  // %smid (S2R SR_VIRTUALSMID)
 inline constexpr uint32_t kSrEqMask            = 0x38;
 inline constexpr uint32_t kSrRegAlloc          = 0x3d;
 inline constexpr uint32_t kSrGlobalErrorStatus = 0x40;

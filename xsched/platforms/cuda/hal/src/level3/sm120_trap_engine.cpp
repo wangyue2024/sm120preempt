@@ -578,21 +578,33 @@ Sm120TrapEngine::~Sm120TrapEngine()
 bool Sm120TrapEngine::LoadHelperModule()
 {
     if (cond_clear_fn_ != nullptr) return true;
+    // Conditional post-restore clear (DEF-12): clears header[0..31] and every gate mirror line
+    // (Phase 3.3) ONLY if cmd is still 6 or 2 (no-op if Preempt #2 flipped cmd to 5/1). Launched with
+    // kGateMirrorEntries threads: all threads read cmd before the barrier, then thread t clears mirror t
+    // and thread 0 clears the header.
     static constexpr const char *kCondClearPtx =
         ".version 8.0\n"
         ".target sm_80\n"
         ".address_size 64\n"
         ".visible .entry sm120_cond_clear_hdr(.param .u64 p_ctrl) {\n"
-        "    .reg .u64 %rd<2>;\n"
-        "    .reg .u32 %r<2>;\n"
-        "    .reg .pred %p<2>;\n"
+        "    .reg .u64 %rd<4>;\n"
+        "    .reg .u32 %r<3>;\n"
+        "    .reg .pred %p<3>;\n"
         "    ld.param.u64 %rd1, [p_ctrl];\n"
         "    ld.global.cg.u32 %r1, [%rd1];\n"
         "    setp.eq.u32 %p0, %r1, 6;\n"
         "    setp.eq.u32 %p1, %r1, 2;\n"
         "    or.pred %p0, %p0, %p1;\n"
+        "    bar.sync 0;\n"
         "    @!%p0 bra DONE;\n"
         "    mov.u64 %rd0, 0;\n"
+        "    mov.u32 %r2, %tid.x;\n"
+        "    mul.wide.u32 %rd2, %r2, 128;\n"
+        "    sub.u64 %rd3, %rd1, 32768;\n"
+        "    add.u64 %rd3, %rd3, %rd2;\n"
+        "    st.global.cg.u64 [%rd3], %rd0;\n"
+        "    setp.ne.u32 %p2, %r2, 0;\n"
+        "    @%p2 bra DONE;\n"
         "    st.global.cg.u64 [%rd1 + 0], %rd0;\n"
         "    st.global.cg.u64 [%rd1 + 8], %rd0;\n"
         "    st.global.cg.u64 [%rd1 + 16], %rd0;\n"
@@ -1258,12 +1270,13 @@ Sm120StreamContext::~Sm120StreamContext()
         arena_dev_ = 0;
         arena_bytes_ = 0;
     }
+    // retired_ctrls_ hold allocation bases; the live allocation starts kGateMirrorBytes before ctrl_dev_.
     for (CUdeviceptr old_ctrl : retired_ctrls_) {
         if (old_ctrl != 0) Driver::MemFree_v2(old_ctrl);
     }
     retired_ctrls_.clear();
     if (ctrl_dev_ != 0) {
-        Driver::MemFree_v2(ctrl_dev_);
+        Driver::MemFree_v2(ctrl_dev_ - kGateMirrorBytes);
         ctrl_dev_ = 0;
     }
     if (ctrl_host_ != nullptr) {
@@ -1285,6 +1298,23 @@ bool Sm120StreamContext::ReadHeaderLocked(Sm120ControlHeader *out) const
     }
     if (Driver::StreamSynchronize(ctrl_op_stream_) != CUDA_SUCCESS) return false;
     memcpy(out, ctrl_host_, sizeof(Sm120ControlHeader));
+    static const bool check_mirror = GetEnvOption("XSCHED_SM120_GATE_MIRROR_CHECK", false);
+    if (check_mirror) {
+        // DEBUG: every gate mirror line must equal {cmd, is_restore_wave} of the primary header.
+        static thread_local std::vector<uint32_t> buf(kGateMirrorBytes / 4);
+        if (Driver::MemcpyDtoH_v2(buf.data(), ctrl_dev_ - kGateMirrorBytes, kGateMirrorBytes) == CUDA_SUCCESS) {
+            int bad = 0, first = -1;
+            for (uint32_t i = 0; i < kGateMirrorEntries; ++i) {
+                const uint32_t c = buf[i * (kGateMirrorStride / 4)], r = buf[i * (kGateMirrorStride / 4) + 1];
+                if (c != out->cmd || r != out->is_restore_wave) { if (first < 0) first = static_cast<int>(i); ++bad; }
+            }
+            if (bad) {
+                const uint32_t i = static_cast<uint32_t>(first);
+                XWARN("sm120_gate_mirror MISMATCH: %d lines, first line %u = {cmd %u, rw %u} vs header {cmd %u, rw %u}",
+                      bad, i, buf[i * 32], buf[i * 32 + 1], out->cmd, out->is_restore_wave);
+            }
+        }
+    }
     return true;
 }
 
@@ -1313,31 +1343,34 @@ bool Sm120StreamContext::EnsureControlCapacity(uint32_t num_ctas)
         (void)Driver::StreamSynchronize(last_stream_);
     }
 
-    const size_t new_bytes = AlignUpSize(sizeof(Sm120ControlHeader) +
+    // Layout: [gate mirror: kGateMirrorEntries x 128 B][Sm120ControlHeader][CtaEntry x needed_ctas];
+    // ctrl_dev_ (u_control) points at the header, the mirror sits at negative offsets from it.
+    const size_t new_bytes = AlignUpSize(kGateMirrorBytes + sizeof(Sm120ControlHeader) +
                                          static_cast<size_t>(needed_ctas) * sizeof(Sm120CtaEntry),
                                          4096ULL);
-    CUdeviceptr new_dev = 0;
-    if (Driver::MemAlloc_v2(&new_dev, new_bytes) != CUDA_SUCCESS || new_dev == 0) {
+    CUdeviceptr new_base = 0;
+    if (Driver::MemAlloc_v2(&new_base, new_bytes) != CUDA_SUCCESS || new_base == 0) {
         return false;
     }
+    const CUdeviceptr new_dev = new_base + kGateMirrorBytes;
     if (ctrl_op_stream_ != nullptr) {
-        Driver::MemsetD8Async(new_dev, 0, new_bytes, ctrl_op_stream_);
+        Driver::MemsetD8Async(new_base, 0, new_bytes, ctrl_op_stream_);
         if (ctrl_dev_ != 0) {
-            const size_t copy_bytes = sizeof(Sm120ControlHeader) +
+            const size_t copy_bytes = kGateMirrorBytes + sizeof(Sm120ControlHeader) +
                                       static_cast<size_t>(ctrl_cta_cap_) * sizeof(Sm120CtaEntry);
-            Driver::MemcpyDtoDAsync_v2(new_dev, ctrl_dev_, copy_bytes, ctrl_op_stream_);
-            retired_ctrls_.push_back(ctrl_dev_);
+            Driver::MemcpyDtoDAsync_v2(new_base, ctrl_dev_ - kGateMirrorBytes, copy_bytes, ctrl_op_stream_);
+            retired_ctrls_.push_back(ctrl_dev_ - kGateMirrorBytes);
         }
         Driver::MemsetD32Async(new_dev + offsetof(Sm120ControlHeader, max_ctas),
                                needed_ctas, 1, ctrl_op_stream_);
         Driver::StreamSynchronize(ctrl_op_stream_);
     } else {
-        Driver::MemsetD8_v2(new_dev, 0, new_bytes);
+        Driver::MemsetD8_v2(new_base, 0, new_bytes);
         if (ctrl_dev_ != 0) {
-            const size_t copy_bytes = sizeof(Sm120ControlHeader) +
+            const size_t copy_bytes = kGateMirrorBytes + sizeof(Sm120ControlHeader) +
                                       static_cast<size_t>(ctrl_cta_cap_) * sizeof(Sm120CtaEntry);
-            Driver::MemcpyDtoD_v2(new_dev, ctrl_dev_, copy_bytes);
-            retired_ctrls_.push_back(ctrl_dev_);
+            Driver::MemcpyDtoD_v2(new_base, ctrl_dev_ - kGateMirrorBytes, copy_bytes);
+            retired_ctrls_.push_back(ctrl_dev_ - kGateMirrorBytes);
         }
         Driver::MemsetD32_v2(new_dev + offsetof(Sm120ControlHeader, max_ctas), needed_ctas, 1);
     }
@@ -1654,6 +1687,11 @@ bool Sm120StreamContext::PreemptStream(Sm120PreemptMode mode)
                                    6 * sizeof(uint32_t), ctrl_op_stream_);
     }
     Driver::MemcpyHtoDAsync_v2(ctrl_dev_, ctrl_host_, sizeof(uint32_t), ctrl_op_stream_);
+    // Gate mirror: cmd word only. is_restore_wave must NOT be written here: `hdr` may be stale (the
+    // post-restore clear kernel can reset the header's is_restore_wave after it was read), and the
+    // header itself only gets cmd from this function. Mirrors therefore follow exactly the header's
+    // writers: cmd here, {cmd, is_restore_wave} in PrepareRestore / clear kernel / reset.
+    WriteGateMirrorCmdAsync(new_cmd, ctrl_op_stream_);
     Driver::StreamSynchronize(ctrl_op_stream_);
 
     if (was_mode5_restore) {
@@ -1761,8 +1799,24 @@ uint64_t Sm120StreamContext::PrepareRestore(Sm120PreemptMode mode)
                                &ctrl_host_->is_restore_wave, sizeof(uint32_t), ctrl_op_stream_);
     Driver::MemcpyHtoDAsync_v2(ctrl_dev_ + offsetof(Sm120ControlHeader, cmd),
                                &ctrl_host_->cmd, sizeof(uint32_t), ctrl_op_stream_);
+    WriteGateMirrorAsync(restore_cmd, 1u, ctrl_op_stream_);   // before the restore-wave relaunch
     Driver::StreamSynchronize(ctrl_op_stream_);
     return idx;
+}
+
+void Sm120StreamContext::WriteGateMirrorCmdAsync(uint32_t cmd, CUstream stream)
+{
+    if (ctrl_dev_ == 0) return;
+    Driver::MemsetD2D32Async(ctrl_dev_ - kGateMirrorBytes, kGateMirrorStride, cmd, 1, kGateMirrorEntries, stream);
+}
+
+void Sm120StreamContext::WriteGateMirrorAsync(uint32_t cmd, uint32_t is_restore_wave, CUstream stream)
+{
+    if (ctrl_dev_ == 0) return;
+    const CUdeviceptr base = ctrl_dev_ - kGateMirrorBytes;
+    // Strided 32-bit memsets: word 0 (cmd) and word 1 (is_restore_wave) of every 128 B mirror line.
+    Driver::MemsetD2D32Async(base, kGateMirrorStride, cmd, 1, kGateMirrorEntries, stream);
+    Driver::MemsetD2D32Async(base + 4, kGateMirrorStride, is_restore_wave, 1, kGateMirrorEntries, stream);
 }
 
 bool Sm120StreamContext::EnqueuePostRestoreClear(CUstream stream)
@@ -1779,9 +1833,11 @@ bool Sm120StreamContext::EnqueuePostRestoreClear(CUstream stream)
         // clears ctrl_dev_[0..31] ONLY if cmd == 6 or 2 (no-op if Preempt #2 flipped cmd to 5/1!).
         CUdeviceptr dev_arg = ctrl_dev_;
         void *params[] = { &dev_arg };
-        return Driver::LaunchKernel(fn, 1, 1, 1, 1, 1, 1, 0, stream, params, nullptr) == CUDA_SUCCESS;
+        return Driver::LaunchKernel(fn, 1, 1, 1, kGateMirrorEntries, 1, 1, 0, stream, params, nullptr) ==
+               CUDA_SUCCESS;
     }
-    return Driver::MemsetD8Async(ctrl_dev_, 0, 32, stream) == CUDA_SUCCESS;
+    return Driver::MemsetD8Async(ctrl_dev_ - kGateMirrorBytes, 0, kGateMirrorBytes, stream) == CUDA_SUCCESS &&
+           Driver::MemsetD8Async(ctrl_dev_, 0, 32, stream) == CUDA_SUCCESS;
 }
 
 void Sm120StreamContext::ResetControlSync()
@@ -1792,6 +1848,7 @@ void Sm120StreamContext::ResetControlSync()
     if (ctrl_dev_ == 0 || ctrl_op_stream_ == nullptr) return;
     ScopedCudaCtx guard(ctx_);
 
+    Driver::MemsetD8Async(ctrl_dev_ - kGateMirrorBytes, 0, kGateMirrorBytes, ctrl_op_stream_);
     Driver::MemsetD8Async(ctrl_dev_, 0, 32, ctrl_op_stream_);
     Driver::MemsetD8Async(ctrl_dev_ + offsetof(Sm120ControlHeader, overflow_err), 0, 8, ctrl_op_stream_);
     const size_t entries_bytes = static_cast<size_t>(ctrl_cta_cap_) * sizeof(Sm120CtaEntry);

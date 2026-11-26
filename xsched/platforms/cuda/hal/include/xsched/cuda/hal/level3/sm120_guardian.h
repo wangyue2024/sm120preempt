@@ -23,6 +23,17 @@ inline constexpr uint32_t kGuardianReplayBarOff   = 76u * 16u; // 0x4c0: Final B
 /// can have written entry_dec. Needs one more slot after the barrier, so restore_path / replay_state_c
 /// move by one slot (the replay pad slot is dropped; the replay barrier and the size stay unchanged).
 bool GuardianBarRedEnabled();
+
+/// Phase 3.3 gate mirror (default on; XSCHED_SM120_GATE_MIRROR=0 disables): the control allocation
+/// carries, right before the header, one 128 B line per SM holding {cmd, is_restore_wave}. The Guardian
+/// reads its SM's line with one 64-bit load instead of two serialized loads of the single (hot) header
+/// line. The host writes every mirror whenever it writes cmd / is_restore_wave (before the stream
+/// synchronization that precedes the BAR0 pulse or the relaunch), and the post-restore conditional
+/// clear kernel clears them together with the header.
+inline constexpr uint32_t kGateMirrorEntries = 256u;
+inline constexpr uint32_t kGateMirrorStride  = 128u;
+inline constexpr uint32_t kGateMirrorBytes   = kGateMirrorEntries * kGateMirrorStride;   // 0x8000
+bool GuardianGateMirrorEnabled();
 inline uint32_t GuardianRestorePathOff() { return GuardianBarRedEnabled() ? 45u * 16u : kGuardianRestorePathOff; }
 inline uint32_t GuardianReplayCIdxOff()  { return GuardianBarRedEnabled() ? 60u * 16u : kGuardianReplayCIdxOff; }
 inline constexpr uint32_t kKernelDescMagic        = 0x534D3132u; // "SM12"

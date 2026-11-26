@@ -162,7 +162,20 @@ std::vector<sass::Ins> BuildEntryGuardian()
     // unanimously even if Preempt #2 flips cmd 6->5 or 2->1 mid-wave.
     int br_restore_wave = -1;
     int br_cmd0_skip = -1;
-    if (v2_par_hdr) {
+    const bool gate_mirror = GuardianGateMirrorEnabled() && !v2_par_hdr && !v2_reload;
+    if (gate_mirror) {
+        // [12..18] gate mirror: R0 = cmd, R1 = is_restore_wave from this SM's private line
+        // (u_ctrl - 0x8000 + 128 * smid); one uncontended load instead of two hot-line loads.
+        g.push_back(s2r(8, kSrVirtualSmId));                   // 12
+        g.push_back(with_extra_wait(imad_wide_u32(8, 8, kGateMirrorStride, 4), 0x3u)); // 13
+        g.push_back(ld_e_64(0, 8, static_cast<uint32_t>(-static_cast<int32_t>(kGateMirrorBytes)))); // 14
+        g.push_back(isetp_ne_imm(1, 0));                       // 15: P0 = is_restore_wave
+        br_restore_wave = static_cast<int>(g.size());          // 16
+        g.push_back(nop());                                    // 16 -> @P0 restore_path
+        g.push_back(isetp_ne_imm(0, 0));                       // 17: P0 = (cmd != 0)
+        br_cmd0_skip = static_cast<int>(g.size());             // 18
+        g.push_back(nop());                                    // 18 -> norm_gate
+    } else if (v2_par_hdr) {
         g.push_back(with_ctl(ld_e_32(1, 4, 0x1c), 1, 1, 2, 7, 0)); // 12: is_restore_wave -> SB2
         g.push_back(with_ctl(ld_e_32(0, 4, 0x0), 1, 1, 3, 7, 0));  // 13: cmd -> SB3
         g.push_back(with_extra_wait(isetp_ne_imm(1, 0), (1u << 2) | (1u << 3))); // 14: + wait SB2|SB3
@@ -202,7 +215,8 @@ std::vector<sass::Ins> BuildEntryGuardian()
     // every path to here).
     // Safe: a CTA that observed cmd == 0 was resident before the host published cmd, and the BAR0
     // pulse is fired only after that write completes, so such a CTA is either finished or trapped.
-    g.push_back(v2_reload ? ld_e_32(0, 4, 0x0) : nop());       // 28
+    // (dropped in the gate-mirror layout, which needs one more slot above)
+    if (!gate_mirror) g.push_back(v2_reload ? ld_e_32(0, 4, 0x0) : nop()); // 28
     g.push_back(isetp_ne_and_notp0(0, 0));                     // 29: P0 = (tid==0 && cmd!=0)
     g.push_back(mov_imm(2, 2));                                // 30: R2 = 2 (State C entry_dec)
     g.push_back(isetp_eq_imm(0, 1, kP1));                      // 31: P1 = (cmd == 1)
@@ -313,6 +327,19 @@ std::vector<sass::Ins> BuildEntryGuardian()
 }
 
 } // namespace
+
+bool GuardianGateMirrorEnabled()
+{
+    static const bool on = []() {
+        const char *v1 = getenv("XSCHED_SM120_GUARDIAN_V1");
+        if (v1 != nullptr && v1[0] == '1') return false;
+        const char *v2 = getenv("XSCHED_SM120_GUARDIAN_V2");
+        if (v2 != nullptr && v2[0] == '1') return false;
+        const char *e = getenv("XSCHED_SM120_GATE_MIRROR");
+        return !(e != nullptr && e[0] == '0');
+    }();
+    return on;
+}
 
 bool GuardianBarRedEnabled()
 {
