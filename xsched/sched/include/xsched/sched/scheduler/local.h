@@ -32,6 +32,14 @@ public:
 
     void WaitAllOperations();
     void WaitOperations(PID pid);
+    /// @brief Wait until every operation issued to pid has completed, at most timeout.
+    bool WaitOperationsFor(PID pid, std::chrono::milliseconds timeout);
+    /// @brief DEF-27 (cross-process server only): each round first sends the operations that
+    /// suspend queues, waits (bounded) until those processes report them complete, and only then
+    /// sends the other processes their operations. Together with the client ready gate, a
+    /// higher-priority queue does not launch while a lower-priority one is still being preempted.
+    void SetSuspendFirst(bool on, std::chrono::milliseconds timeout)
+    { suspend_first_ = on; suspend_wait_ = timeout; }
     OperationId NextOperationId(PID pid);
 
 private:
@@ -65,6 +73,9 @@ private:
     std::mutex op_mtx_;
     std::condition_variable op_cv_;
     std::map<PID, OperationInfo> ops_;
+
+    bool suspend_first_ = false;
+    std::chrono::milliseconds suspend_wait_{100};
 };
 
 } // namespace xsched::sched

@@ -309,18 +309,19 @@ def run(args):
     if args.mode.startswith("glb"):
         env["XSCHED_SCHEDULER"] = "GLB"
         xbin = os.path.join(os.environ.get("XSCHED", ""), "bin", "xserver")
-        # xserver's IPC channel is SysV message queue key 1. A stale one owned by another user (e.g.
-        # left by a root run whose server was killed) cannot be replaced, and clients would block
-        # sending into it: refuse to start instead of hanging.
+        # xserver's IPC channel is SysV message queue key 1, one per host. If it belongs to another
+        # user, either their xserver is running (a new server would delete their queue -- root is
+        # allowed to -- and take their port) or it is stale and cannot be replaced by a non-root
+        # server (clients would block sending into it). Never take it over: refuse to start.
         import pwd
-        me = os.getuid()
+        me_name = pwd.getpwuid(os.getuid()).pw_name
         for line in subprocess.run(["ipcs", "-q"], capture_output=True, text=True).stdout.splitlines():
             f = line.split()
-            if len(f) >= 3 and f[0] == "0x00000001":
-                owner = f[2]
-                if owner != pwd.getpwuid(me).pw_name and me != 0:
-                    raise SystemExit(f"stale xserver message queue key 0x1 (msqid {f[1]}) owned by {owner}: "
-                                     f"remove it with 'ipcrm -q {f[1]}' as its owner or root")
+            if len(f) >= 3 and f[0] == "0x00000001" and f[2] != me_name:
+                raise SystemExit(f"xserver message queue key 0x1 (msqid {f[1]}) belongs to user {f[2]} "
+                                 f"(another XSched server on this host, or a stale queue): not starting a "
+                                 f"second server; if it is stale, its owner or root can remove it with "
+                                 f"'ipcrm -q {f[1]}'")
         xlog = open(args.out + ".xserver.log", "a")
         xlog.write(f"=== {time.strftime('%F %T')} mode={args.mode} lp={args.lp}\n")
         xlog.flush()
@@ -336,7 +337,11 @@ def run(args):
     res = None
     try:
         if args.mode != "solo":
-            lp = subprocess.Popen(common + ["--role", "lp"], stdout=subprocess.PIPE, text=True, env=env)
+            lp_env = dict(env)
+            for kv in args.lp_env:          # experiments: settings that only the LP process gets
+                k, _, v = kv.partition("=")
+                lp_env[k] = v
+            lp = subprocess.Popen(common + ["--role", "lp"], stdout=subprocess.PIPE, text=True, env=lp_env)
             for line in lp.stdout:
                 if line.startswith("LP_READY"):
                     break
@@ -406,6 +411,8 @@ def main():
             r.add_argument("--out", required=True)
             r.add_argument("--port", type=int, default=50000)
             r.add_argument("--timeout", type=int, default=600)
+            r.add_argument("--lp-env", action="append", default=[], metavar="KEY=VALUE",
+                           help="environment override for the LP process only (repeatable)")
         else:
             r.add_argument("--role", required=True, choices=["lp", "hp"])
             r.add_argument("--ctrl", required=True)

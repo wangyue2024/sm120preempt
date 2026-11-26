@@ -24,6 +24,13 @@ Server::Server(const std::string &policy_name, const std::string &port)
 
     scheduler_ = std::make_unique<LocalScheduler>(type);
     XINFO("scheduler created with policy %s", policy_name.c_str());
+    // DEF-27 ready gate: suspensions first, others after they complete (clients use the same
+    // variable to hold launches until acknowledged).
+    // Default on; XSCHED_GLB_READY_GATE=0 disables (clients must use the same setting).
+    if (const char *g = std::getenv("XSCHED_GLB_READY_GATE"); g == nullptr || g[0] == '\0' || g[0] != '0') {
+        scheduler_->SetSuspendFirst(true, std::chrono::milliseconds(100));
+        XINFO("ready gate enabled: suspend-first operation order");
+    }
 
     http_server_.Get("/xqueue/:handle", std::bind(&Server::GetXQueue, this,
         std::placeholders::_1, std::placeholders::_2));

@@ -47,6 +47,7 @@ SchedOperation::SchedOperation(OperationId id, const ProcessStatus &status)
     data->size = size;
     data->running_cnt = running_cnt;
     data->suspended_cnt = suspended_cnt;
+    data->ready_ack = status.ready_seen;
 
     xqueue_cnt = 0;
     for (auto &handle : status.running_xqueues) data->handles[xqueue_cnt++] = handle;
@@ -70,6 +71,7 @@ SchedOperation::SchedOperation(OperationId id, PID pid, SchedType type,
     data->size = size;
     data->running_cnt = running_cnt;
     data->suspended_cnt = suspended_cnt;
+    data->ready_ack = 0;
 
     memcpy(data->handles, xqs.data(), xqueue_cnt * sizeof(XQueueHandle));
 }

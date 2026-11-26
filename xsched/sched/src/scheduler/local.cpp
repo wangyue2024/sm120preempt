@@ -1,5 +1,6 @@
 #include <cstring>
 #include <algorithm>
+#include <vector>
 
 #include "xsched/utils/xassert.h"
 #include "xsched/protocol/names.h"
@@ -131,6 +132,16 @@ void LocalScheduler::WaitOperations(PID pid)
     });
 }
 
+bool LocalScheduler::WaitOperationsFor(PID pid, std::chrono::milliseconds timeout)
+{
+    std::unique_lock<std::mutex> lock(op_mtx_);
+    return op_cv_.wait_for(lock, timeout, [this, pid]() {
+        auto it = ops_.find(pid);
+        if (it == ops_.end()) return true;
+        return it->second.completed_id >= it->second.issued_id;
+    });
+}
+
 OperationId LocalScheduler::NextOperationId(PID pid)
 {
     std::lock_guard<std::mutex> lock(op_mtx_);
@@ -197,11 +208,50 @@ void LocalScheduler::Worker()
 
 void LocalScheduler::ExecuteOperations()
 {
+    auto send = [this](ProcessStatus &ps) {
+        Execute(std::make_shared<SchedOperation>(NextOperationId(ps.info.pid), ps));
+    };
+    auto empty = [](const ProcessStatus &ps) {
+        return ps.running_xqueues.empty() && ps.suspended_xqueues.empty();
+    };
+    if (!suspend_first_) {
+        for (auto &status : status_.process_status) {
+            if (!empty(*status.second)) send(*status.second);
+        }
+    } else {
+        // DEF-27: suspensions first, and wait for them to complete before anyone else proceeds.
+        // Only interrupt-level (Level-3 trap) suspensions need the wait: that is when a context
+        // switch to another process must not arrive mid-trap. Level-1/2 suspensions are sent first
+        // but not waited for (waiting on them only delays the high-priority process).
+        auto needs_wait = [this](const ProcessStatus &ps) {
+            for (XQueueHandle h : ps.xqueues_to_suspend) {
+                auto it = status_.xqueue_status.find(h);
+                if (it == status_.xqueue_status.end()) continue;
+                const XPreemptLevel lv = it->second->level;
+                if (lv >= kPreemptLevelInterrupt || lv == kPreemptLevelUnknown) return true;
+            }
+            return false;
+        };
+        std::vector<PID> suspending;
+        for (auto &status : status_.process_status) {
+            if (empty(*status.second) || status.second->xqueues_to_suspend.empty()) continue;
+            send(*status.second);
+            if (needs_wait(*status.second)) suspending.push_back(status.first);
+        }
+        for (PID pid : suspending) {
+            if (!WaitOperationsFor(pid, suspend_wait_)) {
+                XWARN("process " FMT_PID " did not complete its suspension within %lld ms",
+                      pid, static_cast<long long>(suspend_wait_.count()));
+            }
+        }
+        for (auto &status : status_.process_status) {
+            if (empty(*status.second) || !status.second->xqueues_to_suspend.empty()) continue;
+            send(*status.second);
+        }
+    }
     for (auto &status : status_.process_status) {
-        if (status.second->running_xqueues.empty() &&
-            status.second->suspended_xqueues.empty()) continue;
-        Execute(std::make_shared<SchedOperation>(
-            NextOperationId(status.second->info.pid), *status.second));
+        status.second->xqueues_to_suspend.clear();
+        status.second->xqueues_to_resume.clear();
     }
 }
 
@@ -324,6 +374,8 @@ void LocalScheduler::UpdateStatus(std::shared_ptr<const Event> event)
             it->second->ready = true;
             it->second->ready_time = e->ReadyTime();
         }
+        auto pit = status_.process_status.find(e->Pid());
+        if (pit != status_.process_status.end()) pit->second->ready_seen++;
         break;
     }
     case kEventXQueueIdle:

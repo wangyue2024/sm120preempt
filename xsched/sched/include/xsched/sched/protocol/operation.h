@@ -84,6 +84,10 @@ public:
 
     size_t RunningCnt()   const { return data_->running_cnt; }
     size_t SuspendedCnt() const { return data_->suspended_cnt; }
+    /// @brief Ready events of the target process the scheduler had processed when it issued this
+    /// operation (DEF-27 ready gate): a queue that reported its n-th Ready may launch once it
+    /// receives an operation with ReadyAck() >= n.
+    uint64_t ReadyAck()   const { return data_->ready_ack; }
     const XQueueHandle *Handles() const { return data_->handles; }
 
 private:
@@ -94,6 +98,7 @@ private:
         size_t        size;
         size_t        running_cnt;
         size_t        suspended_cnt;
+        uint64_t      ready_ack;
         /// @brief 64 is only a placeholder.
         /// The actual number of handles is (running_cnt + suspended_cnt).
         /// The handles are first running_cnt running xqueues, then 

@@ -78,6 +78,8 @@ private:
     bool worker_asleep_ = false;        // worker is blocked on cv_ waiting for work (idle)
 
     uint64_t idle_cnt_ = 0;
+    /// @brief DEF-27 ready gate: sequence number of the Ready event the next launch must wait for.
+    uint64_t ready_gate_seq_ = 0;
     std::condition_variable idle_cv_;
 };
 

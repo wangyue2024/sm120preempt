@@ -6,6 +6,7 @@
 #include "xsched/protocol/def.h"
 #include "xsched/preempt/sched/agent.h"
 #include "xsched/preempt/sched/executor.h"
+#include "xsched/preempt/sched/ready_gate.h"
 #include "xsched/preempt/xqueue/xqueue.h"
 
 using namespace xsched::sched;
@@ -74,6 +75,9 @@ void SchedExecutor::ExecuteSchedOperation(std::shared_ptr<const sched::SchedOper
         std::shared_ptr<XQueue> xq_shptr = XQueueManager::Get(handles[running_cnt + i]);
         if (xq_shptr != nullptr) xq_shptr->Suspend(suspend_flags);
     }
+    // DEF-27: the scheduler has processed op->ReadyAck() Ready events of this process; gated
+    // launches waiting for them may proceed.
+    ReadyGate::Ack(op->ReadyAck());
 }
 
 void SchedExecutor::ExecuteConfigOperation(std::shared_ptr<const sched::ConfigOperation> op)

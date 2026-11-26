@@ -363,28 +363,33 @@ void CudaQueueLv3Trap::OnHwCommandSubmit(std::shared_ptr<preempt::HwCommand> hw_
             // Adaptive SM120 Preemption Policy Router:
             // Route hardware-incompatible kernels cleanly to Level-1 boundary instead of faulting.
 
-            // DEF-27 (Phase 3.4-2): under the cross-process global scheduler, the high-priority
-            // process keeps launching while this process is being trapped. When the GPU's
-            // time-slice context switch to the other process's context arrives while warps are in
-            // the trap handler, the switch times out (Xid 109 CTX SWITCH TIMEOUT, ~1 per run of
-            // ~300 suspends on RTX 5060) and the driver's recovery fails every context on the GPU.
-            // Kernels therefore use the Level-1 boundary under GLB unless XSCHED_SM120_GLB_LV3=1.
-            // Application-level suspend that waits for the eviction before the other process
-            // launches (bench_mp_serving_p34.py req-lv3) does not hit this.
+            // DEF-27 (Phase 3.4-2): under the cross-process global scheduler, a high-priority
+            // process that keeps launching while this process is being trapped can make the GPU's
+            // time-slice context switch arrive while warps are in the trap handler; the switch
+            // times out (Xid 109 CTX SWITCH TIMEOUT) and the driver's recovery fails every context.
+            // The ready gate (XSCHED_GLB_READY_GATE, default on) prevents it: launches after a
+            // Ready transition wait until the server has completed the lower-priority suspensions.
+            // Only if the gate is disabled do kernels fall back to the Level-1 boundary under GLB
+            // (unless XSCHED_SM120_GLB_LV3=1 forces Level-3).
             static const bool glb_sched = [] {
                 const char *v = getenv("XSCHED_SCHEDULER");
                 return v != nullptr && std::string(v) == "GLB";
             }();
+            static const bool gate_off = [] {
+                const char *v = getenv("XSCHED_GLB_READY_GATE");
+                return v != nullptr && v[0] == '0';
+            }();
             static const bool glb_lv3 = GetEnvOption("XSCHED_SM120_GLB_LV3", false);
-            if (glb_sched && !glb_lv3) {
+            if (glb_sched && gate_off && !glb_lv3) {
                 CountRoute(kRouteLv1GlobalSched);
                 kernel->killable = false;
                 kernel->ClearProps(kCommandPropertyDeactivatable);
                 static bool warned_glb = false;
                 if (!warned_glb) {
                     warned_glb = true;
-                    XWARN("SM120 Level-3 under the global scheduler can stall GPU context switches "
-                          "(DEF-27), using the level-1 boundary (XSCHED_SM120_GLB_LV3=1 overrides)");
+                    XWARN("SM120 Level-3 under the global scheduler without the ready gate can stall "
+                          "GPU context switches (DEF-27), using the level-1 boundary "
+                          "(XSCHED_SM120_GLB_LV3=1 overrides)");
                 }
                 return;
             }

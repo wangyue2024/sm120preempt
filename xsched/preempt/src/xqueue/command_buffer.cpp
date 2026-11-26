@@ -1,6 +1,7 @@
 #include "xsched/utils/xassert.h"
 #include "xsched/preempt/sched/agent.h"
 #include "xsched/preempt/xqueue/command_buffer.h"
+#include "xsched/preempt/sched/ready_gate.h"
 #include "xsched/preempt/xqueue/spin.h"
 
 using namespace xsched::sched;
@@ -57,7 +58,19 @@ std::shared_ptr<XCommand> CommandBuffer::Dequeue()
         // gets enqueued meanwhile.
         while (direct_gate_) cv_.wait(lock);
 
-        if (!cmds_.empty()) return pop_front();
+        if (!cmds_.empty()) {
+            if (ready_gate_seq_ != 0) {
+                // DEF-27: hold the first launch after the Ready transition until the scheduler
+                // has suspended the lower-priority queues (bounded wait).
+                const uint64_t seq = ready_gate_seq_;
+                ready_gate_seq_ = 0;
+                lock.unlock();
+                ReadyGate::Wait(seq);
+                lock.lock();
+                continue;
+            }
+            return pop_front();
+        }
 
         XDEBG("cmd buf (%p) emptied, last_enqueued_cmd_ (%p), type (%d)",
               this, last_enqueued_cmd_.get(), last_enqueued_cmd_->GetType());
@@ -158,10 +171,15 @@ bool CommandBuffer::TryBeginDirect(std::shared_ptr<XCommand> xcmd, bool allow_aw
     // An awake worker is still taken over when the caller predicts a single-command call (the
     // previous call between two WaitAll()s had one command): no burst to pipeline with.
     if (!worker_asleep_ && !allow_awake) return false;
+    // DEF-27 ready gate: the command that turns the queue Ready must wait for the scheduler's
+    // acknowledgement, which happens on the worker path (Enqueue + Dequeue).
+    if (ReadyGate::Enabled() && xcmd->GetType() == kCommandTypeHardware &&
+        xq_state_ == kQueueStateIdle) return false;
     direct_gate_ = true;
     xcmd->SetState(kCommandStatePending);
     if (xcmd->GetType() == kCommandTypeHardware && xq_state_ == kQueueStateIdle) {
         xq_state_ = kQueueStateReady;
+        ReadyGate::NoteReadySent();
         SchedAgent::SendEvent(std::make_shared<XQueueReadyEvent>(kXQueueHandle, ready_time));
     }
     return true;
@@ -194,6 +212,8 @@ void CommandBuffer::Enqueue(std::shared_ptr<XCommand> xcmd)
 
     if (xcmd->GetType() == kCommandTypeHardware && xq_state_ == kQueueStateIdle) {
         xq_state_ = kQueueStateReady;
+        const uint64_t seq = ReadyGate::NoteReadySent();
+        if (ReadyGate::Enabled()) ready_gate_seq_ = seq;
         SchedAgent::SendEvent(std::make_shared<XQueueReadyEvent>(kXQueueHandle, ready_time));
     }
 

@@ -40,6 +40,8 @@ struct ProcessStatus
     std::set<XQueueHandle> suspended_xqueues;
     std::set<XQueueHandle> xqueues_to_resume;
     std::set<XQueueHandle> xqueues_to_suspend;
+    /// @brief Number of XQueueReadyEvents processed from this process (DEF-27 ready gate).
+    uint64_t ready_seen = 0;
 };
 
 struct Status
