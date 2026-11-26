@@ -285,7 +285,7 @@ def run(args):
     if lp_exc:
         res["error"] = (res["error"] or "") + " LP: " + lp_exc[0]
     res.update({
-        "n_req": len(reqs), "new_tokens": args.new_tokens, "hp_exact": hp_ok,
+        "n_req": len(reqs), "new_tokens": args.new_tokens, "mean_gap_ms": args.mean_gap_ms, "hp_exact": hp_ok,
         "ttft_ms": ttft, "tpot_ms_p50": pct(tpot, 0.5), "tpot_ms_p99": pct(tpot, 0.99),
         "ttft_ms_p50": pct(ttft, 0.5), "ttft_ms_p99": pct(ttft, 0.99),
         "e2e_ms_p50": pct(e2e, 0.5), "e2e_ms_p99": pct(e2e, 0.99),

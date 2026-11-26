@@ -20,4 +20,5 @@ B test_libs_and_features -lpreempt -lhalcuda -lcublas -lcublasLt -lcufft -lcuspa
 B test_real_cuda_libs_p3 -lpreempt -lhalcuda -lcublas -lcublasLt -lcufft -lcurand -lcusolver -lcusparse -lcudart
 B test_partial_exit_p3 -lpreempt -lhalcuda -lcuda
 B test_convbar_p3 -lpreempt -lhalcuda -lcuda
+B test_percall_p3 -DXSCHED_PERCALL_WITH_XSCHED -lpreempt -lhalcuda -lcudart
 echo "BUILD_REGRESS_BINS_OK -> $OUT"

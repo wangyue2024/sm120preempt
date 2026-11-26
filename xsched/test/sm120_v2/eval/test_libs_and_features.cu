@@ -198,7 +198,9 @@ bool TestCublasSgemm(XQueueHandle xq, cudaStream_t lp_stream, cudaStream_t hp_st
     CHK_RT(cudaMalloc(&dB, sz * sizeof(float)));
     CHK_RT(cudaMalloc(&dC, sz * sizeof(float)));
     CHK_RT(cudaMemcpy(dA, hA.data(), sz * sizeof(float), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
     CHK_RT(cudaMemcpy(dB, hB.data(), sz * sizeof(float), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
 
     cublasHandle_t handle = nullptr;
     CHK_BL(cublasCreate(&handle));
@@ -207,6 +209,7 @@ bool TestCublasSgemm(XQueueHandle xq, cudaStream_t lp_stream, cudaStream_t hp_st
     // Reference on unmanaged hp_stream
     CHK_BL(cublasSetStream(handle, hp_stream));
     CHK_RT(cudaMemcpy(dC, hC0.data(), sz * sizeof(float), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
     CHK_BL(cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, M, N, K, &alpha, dA, M, dB, K, &beta, dC, M));
     CHK_RT(cudaStreamSynchronize(hp_stream));
     CHK_RT(cudaMemcpy(hC_ref.data(), dC, sz * sizeof(float), cudaMemcpyDeviceToHost));
@@ -214,6 +217,7 @@ bool TestCublasSgemm(XQueueHandle xq, cudaStream_t lp_stream, cudaStream_t hp_st
     // Preempted on managed lp_stream (run 4 back-to-back or single large? Single beta=1 is non-idempotent!)
     CHK_BL(cublasSetStream(handle, lp_stream));
     CHK_RT(cudaMemcpy(dC, hC0.data(), sz * sizeof(float), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
     PreemptTiming pt{};
     bool ok = RunWithMidPreempt(xq, lp_stream, hp_stream, 2000, 2, [&]() -> bool {
         return cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, M, N, K,
@@ -261,7 +265,9 @@ bool TestCublasTensorCore(XQueueHandle xq, cudaStream_t lp_stream, cudaStream_t 
     CHK_RT(cudaMalloc(&dB, sz * sizeof(ElemT)));
     CHK_RT(cudaMalloc(&dC, sz * sizeof(float)));
     CHK_RT(cudaMemcpy(dA, hA.data(), sz * sizeof(ElemT), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
     CHK_RT(cudaMemcpy(dB, hB.data(), sz * sizeof(ElemT), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
 
     cublasHandle_t handle = nullptr;
     CHK_BL(cublasCreate(&handle));
@@ -270,6 +276,7 @@ bool TestCublasTensorCore(XQueueHandle xq, cudaStream_t lp_stream, cudaStream_t 
     // Reference
     CHK_BL(cublasSetStream(handle, hp_stream));
     CHK_RT(cudaMemcpy(dC, hC0.data(), sz * sizeof(float), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
     CHK_BL(cublasGemmEx(handle, CUBLAS_OP_N, CUBLAS_OP_N, M, N, K,
                         &alpha, dA, dtype, M, dB, dtype, K,
                         &beta, dC, CUDA_R_32F, M,
@@ -280,6 +287,7 @@ bool TestCublasTensorCore(XQueueHandle xq, cudaStream_t lp_stream, cudaStream_t 
     // Preempted on lp_stream (2 rounds of non-idempotent beta=1.0 Tensor Core GEMM)
     CHK_BL(cublasSetStream(handle, lp_stream));
     CHK_RT(cudaMemcpy(dC, hC0.data(), sz * sizeof(float), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
     PreemptTiming pt{};
     bool ok = RunWithMidPreempt(xq, lp_stream, hp_stream, 1000, 2, [&]() -> bool {
         return cublasGemmEx(handle, CUBLAS_OP_N, CUBLAS_OP_N, M, N, K,
@@ -328,7 +336,9 @@ bool TestCublasLt(XQueueHandle xq, cudaStream_t lp_stream, cudaStream_t hp_strea
     CHK_RT(cudaMalloc(&dC, sz * sizeof(float)));
     CHK_RT(cudaMalloc(&dWs, ws_sz));
     CHK_RT(cudaMemcpy(dA, hA.data(), sz * sizeof(__half), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
     CHK_RT(cudaMemcpy(dB, hB.data(), sz * sizeof(__half), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
 
     cublasLtHandle_t lt = nullptr;
     CHK_BL(cublasLtCreate(&lt));
@@ -352,12 +362,14 @@ bool TestCublasLt(XQueueHandle xq, cudaStream_t lp_stream, cudaStream_t hp_strea
 
     const float alpha = 1.0f, beta = 1.0f;
     CHK_RT(cudaMemcpy(dC, hC0.data(), sz * sizeof(float), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
     CHK_BL(cublasLtMatmul(lt, opDesc, &alpha, dA, aDesc, dB, bDesc, &beta, dC, cDesc, dC, cDesc,
                           &heur.algo, dWs, ws_sz, hp_stream));
     CHK_RT(cudaStreamSynchronize(hp_stream));
     CHK_RT(cudaMemcpy(hC_ref.data(), dC, sz * sizeof(float), cudaMemcpyDeviceToHost));
 
     CHK_RT(cudaMemcpy(dC, hC0.data(), sz * sizeof(float), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
     PreemptTiming pt{};
     bool ok = RunWithMidPreempt(xq, lp_stream, hp_stream, 1000, 2, [&]() -> bool {
         return cublasLtMatmul(lt, opDesc, &alpha, dA, aDesc, dB, bDesc, &beta, dC, cDesc, dC, cDesc,
@@ -405,19 +417,31 @@ bool TestCufftInPlace(XQueueHandle xq, cudaStream_t lp_stream, cudaStream_t hp_s
     cufftHandle plan = 0;
     CHK_FFT(cufftPlan1d(&plan, n_fft, CUFFT_C2C, batch));
 
-    // Reference (in-place forward FFT)
+    // kPasses chained in-place forward FFTs: long enough (several ms) that the LP work is still
+    // running when the harness preempts it (a single pass finishes in < 1 ms once the XQueue
+    // submit path is fast, leaving nothing to preempt). Magnitudes grow by <= n_fft per pass:
+    // 65536^4 ~ 1.8e19, far below FLT_MAX. Each pass is non-idempotent (in place).
+    const int kPasses = 4;
+
+    // Reference (in-place forward FFTs). The H2D copy from pageable memory may return before the
+    // data lands; synchronize the device before using it on another stream (pitfall T-11).
     CHK_FFT(cufftSetStream(plan, hp_stream));
     CHK_RT(cudaMemcpy(d_buf, h_in.data(), total * sizeof(cufftComplex), cudaMemcpyHostToDevice));
-    CHK_FFT(cufftExecC2C(plan, d_buf, d_buf, CUFFT_FORWARD));
+    CHK_RT(cudaDeviceSynchronize());
+    for (int k = 0; k < kPasses; ++k) CHK_FFT(cufftExecC2C(plan, d_buf, d_buf, CUFFT_FORWARD));
     CHK_RT(cudaStreamSynchronize(hp_stream));
     CHK_RT(cudaMemcpy(h_ref.data(), d_buf, total * sizeof(cufftComplex), cudaMemcpyDeviceToHost));
 
     // Preempted in-place forward FFT
     CHK_FFT(cufftSetStream(plan, lp_stream));
     CHK_RT(cudaMemcpy(d_buf, h_in.data(), total * sizeof(cufftComplex), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize());
     PreemptTiming pt{};
     bool ok = RunWithMidPreempt(xq, lp_stream, hp_stream, 800, 2, [&]() -> bool {
-        return cufftExecC2C(plan, d_buf, d_buf, CUFFT_FORWARD) == CUFFT_SUCCESS;
+        for (int k = 0; k < kPasses; ++k) {
+            if (cufftExecC2C(plan, d_buf, d_buf, CUFFT_FORWARD) != CUFFT_SUCCESS) return false;
+        }
+        return true;
     }, &pt);
 
     CHK_RT(cudaMemcpy(h_pre.data(), d_buf, total * sizeof(cufftComplex), cudaMemcpyDeviceToHost));
@@ -431,11 +455,13 @@ bool TestCufftInPlace(XQueueHandle xq, cudaStream_t lp_stream, cudaStream_t hp_s
         double ey = std::fabs(h_pre[i].y - h_ref[i].y);
         double e = std::max(ex, ey);
         if (e > max_err) max_err = e;
-        if (e > 1e-3) ++mismatch;
+        // Preempted execution must be bit-identical to the unpreempted reference (cuFFT is
+        // deterministic for a given plan and input).
+        if (std::memcmp(&h_pre[i], &h_ref[i], sizeof(cufftComplex)) != 0) ++mismatch;
     }
     bool pass = ok && (mismatch == 0);
-    std::printf("[LIB-06] cuFFT In-Place C2C (%d x %d): max_err=%.6e mismatch=%zu/%zu -> %s\n",
-                n_fft, batch, max_err, mismatch, total, pass ? "PASS" : "FAIL");
+    std::printf("[LIB-06] cuFFT In-Place C2C (%d x %d, %d passes): max_err=%.6e mismatch=%zu/%zu -> %s\n",
+                n_fft, batch, kPasses, max_err, mismatch, total, pass ? "PASS" : "FAIL");
     return pass;
 }
 
@@ -468,9 +494,13 @@ bool TestCusparseSpMM(XQueueHandle xq, cudaStream_t lp_stream, cudaStream_t hp_s
     CHK_RT(cudaMalloc(&dB, hB.size() * sizeof(float)));
     CHK_RT(cudaMalloc(&dC, hC0.size() * sizeof(float)));
     CHK_RT(cudaMemcpy(d_row, h_row.data(), (M + 1) * sizeof(int), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
     CHK_RT(cudaMemcpy(d_col, h_col.data(), nnz * sizeof(int), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
     CHK_RT(cudaMemcpy(d_val, h_val.data(), nnz * sizeof(float), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
     CHK_RT(cudaMemcpy(dB, hB.data(), hB.size() * sizeof(float), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
 
     cusparseHandle_t sp = nullptr;
     CHK_SP(cusparseCreate(&sp));
@@ -493,6 +523,7 @@ bool TestCusparseSpMM(XQueueHandle xq, cudaStream_t lp_stream, cudaStream_t hp_s
     std::vector<float> h_ref(hC0.size()), h_pre(hC0.size());
     CHK_SP(cusparseSetStream(sp, hp_stream));
     CHK_RT(cudaMemcpy(dC, hC0.data(), hC0.size() * sizeof(float), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
     CHK_SP(cusparseSpMM(sp, CUSPARSE_OPERATION_NON_TRANSPOSE, CUSPARSE_OPERATION_NON_TRANSPOSE,
                         &alpha, matA, matB, &beta, matC, CUDA_R_32F,
                         CUSPARSE_SPMM_ALG_DEFAULT, d_buf));
@@ -501,6 +532,7 @@ bool TestCusparseSpMM(XQueueHandle xq, cudaStream_t lp_stream, cudaStream_t hp_s
 
     CHK_SP(cusparseSetStream(sp, lp_stream));
     CHK_RT(cudaMemcpy(dC, hC0.data(), hC0.size() * sizeof(float), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
     PreemptTiming pt{};
     bool ok = RunWithMidPreempt(xq, lp_stream, hp_stream, 500, 2, [&]() -> bool {
         return cusparseSpMM(sp, CUSPARSE_OPERATION_NON_TRANSPOSE, CUSPARSE_OPERATION_NON_TRANSPOSE,
@@ -548,7 +580,9 @@ bool TestCubRadixSort(XQueueHandle xq, cudaStream_t lp_stream, cudaStream_t hp_s
     CHK_RT(cudaMalloc(&d_vin, N * sizeof(uint32_t)));
     CHK_RT(cudaMalloc(&d_vout, N * sizeof(uint32_t)));
     CHK_RT(cudaMemcpy(d_kin, h_k.data(), N * sizeof(uint32_t), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
     CHK_RT(cudaMemcpy(d_vin, h_v.data(), N * sizeof(uint32_t), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
 
     size_t temp_bytes = 0;
     CHK_RT(cub::DeviceRadixSort::SortPairs(nullptr, temp_bytes, d_kin, d_kout, d_vin, d_vout, N, 0, 32, hp_stream));
@@ -687,6 +721,7 @@ bool TestHwCpAsync(XQueueHandle xq, cudaStream_t lp_stream, cudaStream_t hp_stre
     CHK_RT(cudaMalloc(&d_in, n * sizeof(uint32_t)));
     CHK_RT(cudaMalloc(&d_out, n * sizeof(uint32_t)));
     CHK_RT(cudaMemcpy(d_in, h_in.data(), n * sizeof(uint32_t), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
 
     k_ptx_cp_async<<<blocks, threads, 0, hp_stream>>>(d_in, d_out, iters);
     CHK_RT(cudaStreamSynchronize(hp_stream));
@@ -803,6 +838,7 @@ bool TestHwCudaGraph(XQueueHandle xq, cudaStream_t lp_stream, cudaStream_t hp_st
     CHK_RT(cudaGraphInstantiate(&exec, graph, nullptr, nullptr, 0));
 
     CHK_RT(cudaMemcpy(d_x, h0.data(), n * sizeof(float), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
     auto tg0 = std::chrono::steady_clock::now();
     CHK_RT(cudaGraphLaunch(exec, hp_stream));
     CHK_RT(cudaStreamSynchronize(hp_stream));
@@ -812,6 +848,7 @@ bool TestHwCudaGraph(XQueueHandle xq, cudaStream_t lp_stream, cudaStream_t hp_st
 
     // Launch graph on managed lp_stream and try mid-suspend (expected Level-1 fallback!)
     CHK_RT(cudaMemcpy(d_x, h0.data(), n * sizeof(float), cudaMemcpyHostToDevice));
+    CHK_RT(cudaDeviceSynchronize()); // T-11: pageable H2D may return early
     PreemptTiming pt{};
     bool ok = RunWithMidPreempt(xq, lp_stream, hp_stream, 2000, 1, [&]() -> bool {
         return cudaGraphLaunch(exec, lp_stream) == cudaSuccess;
