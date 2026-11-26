@@ -1351,6 +1351,7 @@ bool Sm120StreamContext::EnsureControlCapacity(uint32_t num_ctas)
 
 bool Sm120StreamContext::EnsureArenaPool(size_t required_bytes)
 {
+    if (required_bytes > window_max_required_) window_max_required_ = required_bytes;
     if (required_bytes == 0) return true;
     if (arena_dev_ != 0 && required_bytes <= arena_bytes_) return true;
 
@@ -1365,6 +1366,52 @@ bool Sm120StreamContext::EnsureArenaPool(size_t required_bytes)
     arena_dev_ = new_arena;
     arena_bytes_ = alloc_bytes;
     return true;
+}
+
+uint64_t Sm120StreamContext::LaunchSeq() const
+{
+    std::lock_guard<std::mutex> lock(mu_);
+    return launch_seq_;
+}
+
+size_t Sm120StreamContext::TrimArenas(uint64_t seq_before_sync)
+{
+    static const bool enabled = GetEnvOption("XSCHED_SM120_ARENA_TRIM", true);
+    if (!enabled) return 0;
+    std::lock_guard<std::mutex> lock(mu_);
+    // Something was launched after the synchronization started (it may use the current arena), or
+    // an evicted kernel's state still lives in an arena: nothing is safe to free.
+    if (launch_seq_ != seq_before_sync || saved_arena_dev_ != 0 || is_restore_cmd_active_) return 0;
+    size_t freed = 0;
+    if (!retired_arenas_.empty()) {
+        ScopedCudaCtx guard(ctx_);
+        for (CUdeviceptr old_arena : retired_arenas_) {
+            if (old_arena != 0 && Driver::MemFree_v2(old_arena) == CUDA_SUCCESS) freed += 1;
+        }
+        retired_arenas_.clear();
+    }
+    constexpr uint32_t kWindowSyncs = 64;
+    static const size_t kMinTrimBytes = []() {
+        int64_t mb = 64;
+        GetEnvInt64("XSCHED_SM120_ARENA_TRIM_MIN_MB", mb);
+        return static_cast<size_t>(mb < 0 ? 0 : mb) << 20;
+    }();
+    if (++window_syncs_ >= kWindowSyncs) {
+        if (arena_dev_ != 0 && arena_bytes_ > kMinTrimBytes && arena_bytes_ > 2 * window_max_required_) {
+            ScopedCudaCtx guard(ctx_);
+            if (Driver::MemFree_v2(arena_dev_) == CUDA_SUCCESS) {
+                XINFO("sm120_arena: trimmed idle arena %zu B (window max requirement %zu B)",
+                      arena_bytes_, window_max_required_);
+                freed += arena_bytes_;
+                arena_dev_ = 0;
+                arena_bytes_ = 0;
+            }
+        }
+        window_syncs_ = 0;
+        window_max_required_ = 0;
+    }
+    if (freed) kernel_arena_map_.clear();   // no launched kernel can still reference a freed arena
+    return freed;
 }
 
 namespace
@@ -1425,6 +1472,7 @@ bool Sm120StreamContext::PrepareLaunch(CUfunction func,
     if (!EnsureControlCapacity(num_ctas)) return false;
 
     last_kernel_idx_ = kernel_idx;
+    ++launch_seq_;
     if (stream != nullptr) last_stream_ = stream;
 
     if (mode == Sm120PreemptMode::kTrapFrame) {

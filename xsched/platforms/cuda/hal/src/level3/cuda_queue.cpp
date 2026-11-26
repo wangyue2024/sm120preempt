@@ -144,6 +144,15 @@ void CudaQueueLv3Trap::Launch(std::shared_ptr<HwCommand> hw_cmd)
     CudaQueueLv2::Launch(hw_cmd);
 }
 
+void CudaQueueLv3Trap::Synchronize()
+{
+    // Phase 3.3: the stream is idle right after a synchronization, the safe point to release arenas
+    // retired by growth and oversized idle arenas (see Sm120StreamContext::TrimArenas()).
+    const uint64_t seq = (is_sm120_ && sm120_stream_) ? sm120_stream_->LaunchSeq() : 0;
+    CudaQueueLv1::Synchronize();
+    if (is_sm120_ && sm120_stream_) sm120_stream_->TrimArenas(seq);
+}
+
 void CudaQueueLv3Trap::Deactivate()
 {
     XASSERT(level_ >= kPreemptLevelDeactivate, "Deactivate() not supported on level-%d", level_);

@@ -48,6 +48,10 @@ private:
     // Serializes index assignment + enqueue / direct launch so that HwCommands reach the hardware
     // queue in index order even with concurrent submitters (required by direct submit).
     std::mutex submit_mtx_;
+    // Commands submitted since the last WaitAll() and the length of the previous such call
+    // (adaptive direct submit: single-command calls go direct even if the worker is awake).
+    int64_t submits_since_sync_ = 0;            // protected by submit_mtx_
+    std::atomic<int64_t> last_call_len_{0};
 };
 
 } // namespace xsched::preempt

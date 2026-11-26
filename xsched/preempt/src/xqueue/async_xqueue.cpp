@@ -55,8 +55,11 @@ void AsyncXQueue::Submit(std::shared_ptr<HwCommand> hw_cmd)
         // keeps the worker from dequeuing meanwhile; on any precondition failure the command is
         // queued in order and launched by the worker as usual.
         bool direct = false;
+        const bool single_call = submits_since_sync_ == 0 &&
+                                 last_call_len_.load(std::memory_order_relaxed) == 1;
+        ++submits_since_sync_;
         if (DirectSubmitEnabled() && !terminated_.load(std::memory_order_relaxed) &&
-            hw_cmd->DirectLaunchable() && cmd_buf_->TryBeginDirect(hw_cmd)) {
+            hw_cmd->DirectLaunchable() && cmd_buf_->TryBeginDirect(hw_cmd, single_call)) {
             direct = true;
             const bool launched = launch_worker_->TryLaunchDirect(hw_cmd);
             cmd_buf_->EndDirect(hw_cmd, launched);
@@ -73,6 +76,11 @@ std::shared_ptr<XQueueWaitAllCommand> AsyncXQueue::SubmitWaitAll()
 
 void AsyncXQueue::WaitAll()
 {
+    {
+        std::lock_guard<std::mutex> submit_lock(submit_mtx_);
+        last_call_len_.store(submits_since_sync_, std::memory_order_relaxed);
+        submits_since_sync_ = 0;
+    }
     // Caller-side WaitAll: when all submitted commands are already launched, synchronize the
     // hardware queue on this thread instead of waiting to be woken by the launch worker.
     if (CallerSyncEnabled() && !suspended_.load(std::memory_order_acquire)) {

@@ -145,6 +145,16 @@ public:
                        CUstream stream = nullptr,
                        const void *launch_handle = nullptr);
 
+    /// @brief Monotonic count of PrepareLaunch() calls (snapshot before a stream synchronization).
+    uint64_t LaunchSeq() const;
+
+    /// @brief Phase 3.3 arena trimming, called after the stream was synchronized. If no launch was
+    /// prepared since `seq_before_sync` and no eviction/restore state is pending, frees arenas
+    /// retired by growth and, if the current arena stayed > 2x (and > 64 MiB) above the largest
+    /// requirement for a window of synchronizations, frees it too (re-allocated on demand).
+    /// @return bytes released.
+    size_t TrimArenas(uint64_t seq_before_sync);
+
     /// @brief Zero c[0][0x170..0x187] so an instrumented function bypasses the Guardian cleanly.
     /// No-op (no driver call) if the window is already zero.
     static void ClearDebuggerParams(CUfunction func);
@@ -202,6 +212,9 @@ private:
 
     CUdeviceptr arena_dev_ = 0;
     size_t arena_bytes_ = 0;
+    uint64_t launch_seq_ = 0;                 // PrepareLaunch() calls
+    size_t window_max_required_ = 0;          // largest arena requirement in the trim window
+    uint32_t window_syncs_ = 0;               // synchronizations in the trim window
     std::vector<CUdeviceptr> retired_arenas_;
     std::vector<CUdeviceptr> retired_ctrls_;
     uint8_t *layout_stage_ = nullptr;

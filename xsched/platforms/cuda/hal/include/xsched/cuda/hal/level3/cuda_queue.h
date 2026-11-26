@@ -18,6 +18,7 @@ public:
     virtual ~CudaQueueLv3Trap() = default;
 
     virtual void Launch(std::shared_ptr<preempt::HwCommand> hw_cmd) override;
+    virtual void Synchronize() override;
     virtual void Deactivate() override;
     virtual void Interrupt() override;
     virtual void Restore(const preempt::CommandLog &log) override;

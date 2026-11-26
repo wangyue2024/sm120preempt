@@ -37,7 +37,7 @@ public:
     /// holding a dequeued hardware / host-function command that it has not finished processing,
     /// i.e., every previously submitted command has already been launched. While the gate is
     /// held the worker does not dequeue. On success the XQueue is marked ready (as Enqueue()).
-    bool TryBeginDirect(std::shared_ptr<XCommand> xcmd);
+    bool TryBeginDirect(std::shared_ptr<XCommand> xcmd, bool allow_awake = false);
 
     /// @brief Release the direct submit gate. If the command was launched (launched == true) it
     /// becomes the last enqueued command and the worker is woken so it keeps tracking completion

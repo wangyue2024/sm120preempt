@@ -147,7 +147,7 @@ bool CommandBuffer::AllOrderedLaunched()
     return true;
 }
 
-bool CommandBuffer::TryBeginDirect(std::shared_ptr<XCommand> xcmd)
+bool CommandBuffer::TryBeginDirect(std::shared_ptr<XCommand> xcmd, bool allow_awake)
 {
     auto ready_time = std::chrono::system_clock::now();
     std::lock_guard<std::mutex> lock(mtx_);
@@ -155,7 +155,9 @@ bool CommandBuffer::TryBeginDirect(std::shared_ptr<XCommand> xcmd)
     // Direct submit only pays off when handing over would need a futex wake-up of a sleeping
     // worker; an awake (spinning) worker takes the command almost for free and pipelines the
     // driver launch cost with this thread.
-    if (!worker_asleep_) return false;
+    // An awake worker is still taken over when the caller predicts a single-command call (the
+    // previous call between two WaitAll()s had one command): no burst to pipeline with.
+    if (!worker_asleep_ && !allow_awake) return false;
     direct_gate_ = true;
     xcmd->SetState(kCommandStatePending);
     if (xcmd->GetType() == kCommandTypeHardware && xq_state_ == kQueueStateIdle) {
