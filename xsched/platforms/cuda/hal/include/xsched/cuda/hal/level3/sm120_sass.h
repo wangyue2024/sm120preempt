@@ -127,6 +127,19 @@ inline constexpr Ins bar_sync0(int pred = kPT)
     return with_pred({0x7b1dULL, 0x000fec0000010000ULL}, pred);
 }
 
+// BAR.RED.OR.DEFER_BLOCKING 0x0, P0 — CTA barrier 0 with OR-reduction of P0 (encoding taken from
+// nvcc output for `bar.red.or.pred`); the result is read with B2R.RESULT.
+inline constexpr Ins bar_red_or0_p0()
+{
+    return {0x0000000000007b1dULL, 0x000fec0000014800ULL};
+}
+
+// B2R.RESULT RZ, Pd — barrier reduction result into predicate Pd (completes on scoreboard 1).
+inline constexpr Ins b2r_result_p(int pd)
+{
+    return {0x0000000000ff731cULL, 0x000e640000004000ULL | (static_cast<uint64_t>(pd & 7) << 17)};
+}
+
 inline constexpr Ins bar_sync_trap()
 {
     return {0x0000000000007b1dULL, 0x000fc00000008000ULL};
@@ -336,6 +349,12 @@ inline constexpr Ins isetp_eq_imm(int ra, uint32_t imm, int pred_dst = kP0)
 inline constexpr Ins isetp_eq_and_pred(int ra, uint32_t imm, int pred_dst, int pred_src)
 {
     const uint32_t ps = (static_cast<uint32_t>(pred_src & 0xf) << 23) | 0x00702270U;
+    return isetp_imm_raw(pred_dst, ra, imm, ps);
+}
+
+inline constexpr Ins isetp_ne_and_pred(int ra, uint32_t imm, int pred_dst, int pred_src)
+{
+    const uint32_t ps = (static_cast<uint32_t>(pred_src & 0xf) << 23) | 0x00705270U;
     return isetp_imm_raw(pred_dst, ra, imm, ps);
 }
 

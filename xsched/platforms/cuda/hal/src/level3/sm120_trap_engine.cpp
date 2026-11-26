@@ -934,7 +934,7 @@ bool Sm120TrapEngine::EmitStaticHandler()
     c0.push_back(nop());
 
     // Interval 2: kGuardianBarOff <= pc_off < kGuardianRestorePathOff
-    c0.push_back(isetp_lt_u64_imm(6, kGuardianRestorePathOff));
+    c0.push_back(isetp_lt_u64_imm(6, GuardianRestorePathOff()));
     const int br_not_r2 = static_cast<int>(c0.size());
     c0.push_back(nop());
     const int r2_postbar_chk_idx = static_cast<int>(c0.size());
@@ -950,7 +950,7 @@ bool Sm120TrapEngine::EmitStaticHandler()
     // Interval 3: pc_off < kGuardianReplayCIdxOff
     const int chk_r3_idx = static_cast<int>(c0.size());
     c0[br_not_r2] = bra_rel(chk_r3_idx - br_not_r2 - 1, kNotP0);
-    c0.push_back(isetp_lt_u64_imm(6, kGuardianReplayCIdxOff));
+    c0.push_back(isetp_lt_u64_imm(6, GuardianReplayCIdxOff()));
     const int br_not_r3 = static_cast<int>(c0.size());
     c0.push_back(nop());
     const int chk_state_a_idx = static_cast<int>(c0.size());

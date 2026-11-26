@@ -17,6 +17,14 @@ inline constexpr uint32_t kGuardianBarOff         = 39u * 16u; // 0x270: BAR.SYN
 inline constexpr uint32_t kGuardianRestorePathOff = 44u * 16u; // 0x2c0: Restore/Replay path offset
 inline constexpr uint32_t kGuardianReplayCIdxOff  = 59u * 16u; // 0x3b0: replay_state_c entry offset
 inline constexpr uint32_t kGuardianReplayBarOff   = 76u * 16u; // 0x4c0: Final BAR.SYNC 0 before exit/fallthrough
+
+/// Phase 3.3 (default on; XSCHED_SM120_GUARDIAN_BARRED=0 disables): the norm_gate barrier becomes BAR.RED.OR over
+/// P0 = (tid == 0 && cmd != 0), and the post-barrier entry_dec load is skipped when no warp of the CTA
+/// can have written entry_dec. Needs one more slot after the barrier, so restore_path / replay_state_c
+/// move by one slot (the replay pad slot is dropped; the replay barrier and the size stay unchanged).
+bool GuardianBarRedEnabled();
+inline uint32_t GuardianRestorePathOff() { return GuardianBarRedEnabled() ? 45u * 16u : kGuardianRestorePathOff; }
+inline uint32_t GuardianReplayCIdxOff()  { return GuardianBarRedEnabled() ? 60u * 16u : kGuardianReplayCIdxOff; }
 inline constexpr uint32_t kKernelDescMagic        = 0x534D3132u; // "SM12"
 
 /// @brief Immutable device-resident metadata bound to c[0][0x178..0x17f] per CUfunction.

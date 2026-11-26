@@ -214,13 +214,29 @@ std::vector<sass::Ins> BuildEntryGuardian()
     g.push_back(mov_imm(0, 1));                                // 37
     g.push_back(redg_add_u32(4, 0x14, 0, kP0));                // 38: @P0 drained_cnt++
     // Index 39 MUST match kGuardianBarOff (0x270).
+    const bool barred = GuardianBarRedEnabled();
     const int bar_idx = static_cast<int>(g.size());            // 39
-    g.push_back(bar_sync0());                                  // 39: BAR.SYNC.DEFER_BLOCKING 0x0
-    g.push_back(ld_e_32(2, 6, 0x54));                          // 40: cta[b].entry_dec
-    g.push_back(isetp_ne_imm(2, 0));                           // 41
-    g.push_back(exit_inst(kP0));                               // 42: early-exit if entry_dec!=0
-    const int br_run_orig = static_cast<int>(g.size());        // 43
-    g.push_back(nop());                                        // 43 -> orig_kernel (+0x500)
+    int br_run_orig = -1;
+    if (barred) {
+        // OR over P0 = (tid==0 && cmd!=0): entry_dec can only have been written by this Guardian
+        // if the result is true (the trap handler never completes this barrier: trapped warps
+        // decide from entry_dec in Cave 0). If B2R runs after a State B restore its value is
+        // undefined, but both outcomes are correct there (entry_dec == 0 => run).
+        g.push_back(bar_red_or0_p0());                         // 39: BAR.RED.OR 0x0, P0
+        g.push_back(b2r_result_p(kP1));                        // 40: P1 = OR result (SB1)
+        g.push_back(with_extra_wait(ld_e_32(2, 6, 0x54, kP1), 1u << 1)); // 41: @P1 entry_dec
+        g.push_back(isetp_ne_and_pred(2, 0, kP0, kP1));       // 42: P0 = entry_dec!=0 && P1
+        g.push_back(exit_inst(kP0));                           // 43: early-exit if drained
+        br_run_orig = static_cast<int>(g.size());              // 44
+        g.push_back(nop());                                    // 44 -> orig_kernel (+0x500)
+    } else {
+        g.push_back(bar_sync0());                              // 39: BAR.SYNC.DEFER_BLOCKING 0x0
+        g.push_back(ld_e_32(2, 6, 0x54));                      // 40: cta[b].entry_dec
+        g.push_back(isetp_ne_imm(2, 0));                       // 41
+        g.push_back(exit_inst(kP0));                           // 42: early-exit if entry_dec!=0
+        br_run_orig = static_cast<int>(g.size());              // 43
+        g.push_back(nop());                                    // 43 -> orig_kernel (+0x500)
+    }
 
     // [44..58]: restore_path — multi-kernel isolation & unanimous state dispatch (is_restore_wave != 0).
     const int restore_path_idx = static_cast<int>(g.size());   // 44
@@ -265,7 +281,7 @@ std::vector<sass::Ins> BuildEntryGuardian()
     g.push_back(isetp_ne_and_notp0(0, 0));                     // 72: P0 = (tid==0 && (cmd&1)!=0)
     g.push_back(mov_imm(1, 1));                                // 73
     g.push_back(redg_add_u32(4, 0x14, 1, kP0));                // 74: @P0 drained_cnt++
-    g.push_back(nop());                                        // 75: pad
+    if (!barred) g.push_back(nop());                           // 75: pad (dropped in the BAR.RED layout)
     const int replay_bar_idx = static_cast<int>(g.size());     // 76 (0x4c0)
     g.push_back(bar_sync0());                                  // 76: consensus barrier
     g.push_back(ld_e_32(2, 6, 0x54));                          // 77: cta[b].entry_dec
@@ -274,14 +290,14 @@ std::vector<sass::Ins> BuildEntryGuardian()
 
     const int end_idx = static_cast<int>(g.size()); // 80 -> +0x500 (orig_kernel)
     if (bar_idx * 16 != static_cast<int>(kGuardianBarOff) ||
-        restore_path_idx * 16 != static_cast<int>(kGuardianRestorePathOff) ||
-        replay_c_idx * 16 != static_cast<int>(kGuardianReplayCIdxOff) ||
+        restore_path_idx * 16 != static_cast<int>(GuardianRestorePathOff()) ||
+        replay_c_idx * 16 != static_cast<int>(GuardianReplayCIdxOff()) ||
         replay_bar_idx * 16 != static_cast<int>(kGuardianReplayBarOff)) {
         XERRO("sm120_guardian: offset mismatch bar=%#x(exp %#x) rest=%#x(exp %#x) "
               "rep_c=%#x(exp %#x) rep_bar=%#x(exp %#x)",
               bar_idx * 16, kGuardianBarOff,
-              restore_path_idx * 16, kGuardianRestorePathOff,
-              replay_c_idx * 16, kGuardianReplayCIdxOff,
+              restore_path_idx * 16, GuardianRestorePathOff(),
+              replay_c_idx * 16, GuardianReplayCIdxOff(),
               replay_bar_idx * 16, kGuardianReplayBarOff);
     }
 
@@ -297,6 +313,19 @@ std::vector<sass::Ins> BuildEntryGuardian()
 }
 
 } // namespace
+
+bool GuardianBarRedEnabled()
+{
+    // Default on (Phase 3.3): XSCHED_SM120_GUARDIAN_BARRED=0 restores the BAR.SYNC norm_gate;
+    // XSCHED_SM120_GUARDIAN_V1=1 (exact original Guardian) also disables it.
+    static const bool on = []() {
+        const char *v1 = getenv("XSCHED_SM120_GUARDIAN_V1");
+        if (v1 != nullptr && v1[0] == '1') return false;
+        const char *e = getenv("XSCHED_SM120_GUARDIAN_BARRED");
+        return !(e != nullptr && e[0] == '0');
+    }();
+    return on;
+}
 
 std::shared_ptr<Sm120GuardianRegistry> Sm120GuardianRegistry::Instance(CUcontext ctx)
 {
