@@ -44,7 +44,7 @@
 | DEF-22 | P2 | 潜在（未触发） | 已修复 | 两卡 | SASS 审查 |
 | DEF-23 | P2 | 显存过度预留 | 已修复 | 两卡 | arena 测量 |
 | EXP-1 | — | 实验 Guardian v2 在多 Lv3 队列下偶发错误 | 仅实验开关，默认不启用 | 5080 | LLM-08 二分 |
-| OBS-1..12 | — | 观察，非缺陷 | 记录 | — | — |
+| OBS-1..15 | — | 观察，非缺陷 | 记录 | — | — |
 
 ---
 
@@ -171,6 +171,9 @@
 | OBS-10 | `CALL.ABS` 返回地址由 `LEPC`（运行时 PC）计算，内核搬移（插桩复制到 `ep_inst+0x500`）是安全的 | SASS 审查 |
 | OBS-11 | Trap 屏障 `bar_sync_trap()`（`w1=0x000fc00000008000`）是硬件专用 `BAR.SYNC.TRAP`，`nvdisasm` 无法解码 | 不与用户命名屏障 0–15 冲突 |
 | OBS-12 | 收敛屏障编号（B0–B5 嵌套）本身不是触发条件；`BMOV.32(.CLEAR) B0..B15` 手写编码 32 条全部正确 | `test_convbar_p3` D1–D6 全部通过；`nvdisasm` 核验 |
+| OBS-13 | 用户内核的越界写可以破坏 XSched 的设备端控制结构（与同进程任何设备分配相同，属固有风险） | 自写微基准 `out[1024+b]` 越界（T-16，Phase 3.3） |
+| OBS-14 | 同时驱动桌面的 GPU 上，Lv3 运行期间桌面图形进程（`ghostty` / `gnome-shell` / `Xwayland`）偶发 Xid 31 MMU 故障，进程均恢复；计算型旁观进程未受影响 | 内核日志与测试日志逐条对时（Phase 3.4-2）；Lv3 在 `KERNEL_EXEC_TIMEOUT != 0` 的 GPU 上启动告警 |
+| OBS-15 | 暂停的 Level-1 发射线程在命令日志满、等待空位后不再检查暂停，仍发射一条命令（Level-3 下被 Guardian 立即排空） | 补做检查的改动经交替 A/B 无收益，已回退（Phase 3.4-2） |
 
 ---
 
@@ -184,7 +187,7 @@
 | T-4 | “独占作业耗时”包含首次运行的预热 | 作业膨胀率出现 −53% 的无意义值 | 增加一次不计时预热，取两次最小值 |
 | T-5 | 服务测试 HP 负载过高（请求耗时 ~250 ms、到达间隔 150 ms，HP 占空 97%） | LP 保留率指标无意义（881% 等） | 改为 16 token、间隔 500 ms（占空 ~30%），LP 指标改为“占独占吞吐百分比” |
 | T-6 | 困惑度 LP 用 4×1024 token，FP32 logits 达 2.3 GB | 8 GB 的 5060 上 OOM | 改为 2×512 |
-| T-7 | 第一版驱逐现场诊断从控制头读取布局 | RMSNorm 的“PC”实为浮点数据（布局被排队内核覆盖，见 OBS-9） | 改为按活跃内核记录重算布局并使用抢占时保存的 arena 地址 |
+| T-7 | 第一版驱逐现场诊断从控制头读取布局 | RMSNorm 的“PC”实为浮点数据（布局被排队内核覆盖，见 OBS-15） | 改为按活跃内核记录重算布局并使用抢占时保存的 arena 地址 |
 | T-8 | `SR_REGALLOC` 探针第一版：编译器把被改写的 `S2R` 结果复用到 `threadIdx.x==0` 判断 | 读到全 0 | 只用 `blockIdx.x` 作写入条件 |
 | T-9 | 本地 `smem_size_probe` 在 0 字节动态 SMEM 时写共享内存 | illegal address | 仅在 `dsz>0` 时写入 |
 | T-10 | 跨进程摘要比较受库启发式影响（OBS-1） | 一度被怀疑为 Lv3 数据错误 | 增加 native-vs-native 对照与同进程 A/B |
@@ -352,7 +355,7 @@
 - **DEF-28（已修复）**：`xserver` 只在 SIGINT / SIGQUIT 时删除 IPC 消息队列（SysV 键 0x1）。root 回归运行后残留的队列使普通用户的 `xserver` 无法启动通道，客户端向满队列发送时阻塞，跨进程测试挂起。修复：处理 SIGTERM；测试脚本用 SIGINT 结束服务并预检残留队列（T-23）。
 - **DEF-26（已修复）**：全局 / 本地调度器在其执行线程上挂起 / 恢复队列，该线程无 CUDA 上下文；Lv3 `Reactivate()` 重新发射内核时 `PrepareLaunch` 断言失败。修复：Lv3 的 `Deactivate/Interrupt/Reactivate` 临时压入队列上下文。
 - **DEF-27（已缓解，开放）**：跨进程透明调度下 HP 在 LP 被驱逐期间继续发射，GPU 时间片切换若在 LP 线程束处于 Trap 处理程序时到达会超时（Xid 109 `CTX SWITCH TIMEOUT`，约 0.3%/次挂起），驱动恢复使两个进程都报 719。应用层“等驱逐确认再发射”（`req-lv3`）不触发。缓解：`XSCHED_SCHEDULER=GLB` 时默认走 Level-1（`XSCHED_SM120_GLB_LV3=1` 覆盖）。
-- **OBS-8**：RTX 5060 同时驱动桌面，两次 Lv3 多波次压测开始后约 1 s 内桌面图形进程（`ghostty` / `gnome-shell`）出现 Xid 31 MMU 故障，进程未崩溃；早先的旁观测试只覆盖计算上下文。
+- **OBS-14**：RTX 5060 同时驱动桌面，两次 Lv3 多波次压测开始后约 1 s 内桌面图形进程（`ghostty` / `gnome-shell`）出现 Xid 31 MMU 故障，进程未崩溃；早先的旁观测试只覆盖计算上下文。
 - 详见 [`SM120_V2_PHASE3_4_MULTIPROCESS_ZH.md`](SM120_V2_PHASE3_4_MULTIPROCESS_ZH.md)。
 
 ### 10.11 DEF-27 根本修复：就绪门控（2026-11-26）
@@ -360,6 +363,6 @@
 - 默认：`XSCHED_SCHEDULER=GLB` 时客户端与 `xserver` 默认开启（`XSCHED_GLB_READY_GATE=0` 关闭）；开启时 Lv3 在 GLB 下不再回退到 Level-1。
 - 验证：RTX 5080 无门控 3 次 TPOT P99 3.1–3.5×（P99 19–22 ms），有门控 10 次 P99 1.10–1.29×、0 Xid；RTX 5060 有门控 6 次 0 次 Xid 109（无门控时 4/4 次运行出现）、P99 1.06–1.21×；HP 门控等待均值 160–580 µs，0 次超时，HP 请求 380/380 一致、LP 0 错。RTX 5060 全量 288/288、最终构建 10/10；RTX 5080 全量 283/288（5 项为共享主机环境原因），最终构建复跑 15/15。
 - 对 Level-1 无可测影响（`glb-lv1` 8×8 交替 A/B：P50 0.968× / 0.969×，P99 区间重叠）。
-- OBS-9：暂停的 Level-1 发射线程在命令日志满、等待空位后不再检查暂停，仍会发射一条命令；补做检查的改动经交替 A/B 无收益（`request` 无差别，`glb-lv1` 略差），已回退，记录为观察项。
-- OBS-8 第三、四次：5060 门控测试中 `Xwayland`、`gnome-shell` 各出现一次 Xid 31（进程均未重启）；Lv3 现在在显示 GPU（`KERNEL_EXEC_TIMEOUT`）上启动时告警。
+- OBS-15：暂停的 Level-1 发射线程在命令日志满、等待空位后不再检查暂停，仍会发射一条命令；补做检查的改动经交替 A/B 无收益（`request` 无差别，`glb-lv1` 略差），已回退，记录为观察项。
+- OBS-14 第三、四次：5060 门控测试中 `Xwayland`、`gnome-shell` 各出现一次 Xid 31（进程均未重启）；Lv3 现在在显示 GPU（`KERNEL_EXEC_TIMEOUT`）上启动时告警。
 - 测试安全（T-24）：5080 上另一用户运行着自己的 XSched `xserver`（同一 IPC 键）。root 启动的服务端会删除其队列并占用其端口；多进程测试脚本改为只要键 0x1 的队列属于他人就拒绝启动（包括 root），回归在 GPU 与 IPC 都空闲后才开始。

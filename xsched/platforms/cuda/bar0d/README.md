@@ -20,7 +20,7 @@ that performs only that pulse on behalf of authorized processes.
 The pulse is a GPU-wide broadcast. An earlier cross-process test (60 pulses while an unrelated
 compute process without XSched ran kernels) saw no errors and no slowdown in that process. On an
 RTX 5060 that also drives the desktop, however, two multi-wave stress runs coincided with MMU
-faults (Xid 31) in desktop graphics processes, which recovered (OBS-8 in
+faults (Xid 31) in desktop graphics processes, which recovered (OBS-14 in
 `doc/SM120_V2_PHASE3_4_MULTIPROCESS_ZH.md`); prefer GPUs without a display for Level-3. And a group
 member can make the GPU take trap entries as often as the rate limit allows. Treat group
 membership as a scheduling privilege: on a shared GPU, grant it only to users whose jobs are

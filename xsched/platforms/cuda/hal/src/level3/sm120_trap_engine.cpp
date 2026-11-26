@@ -635,7 +635,7 @@ bool Sm120TrapEngine::Init()
         return false;
     }
     arena_.EnsureBar0Mapped();
-    // OBS-8 (Phase 3.4-2): the evict pulse is a GPU-wide broadcast. On a GPU that also drives a
+    // OBS-14 (Phase 3.4-2): the evict pulse is a GPU-wide broadcast. On a GPU that also drives a
     // display (kernel execution timeout active), Level-3 stress runs coincided with occasional
     // MMU faults (Xid 31) in desktop graphics processes, which recovered. Warn once.
     CUdevice dev = 0;
@@ -646,7 +646,7 @@ bool Sm120TrapEngine::Init()
         static std::atomic<bool> warned{false};
         if (!warned.exchange(true)) {
             XWARN("sm120_trap_engine: this GPU drives a display; Level-3 trap pulses can "
-                  "occasionally fault desktop graphics clients (OBS-8), prefer a GPU without display");
+                  "occasionally fault desktop graphics clients (OBS-14), prefer a GPU without display");
         }
     }
     ready_ = true;

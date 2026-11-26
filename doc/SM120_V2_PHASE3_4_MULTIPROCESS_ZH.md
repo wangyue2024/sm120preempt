@@ -4,7 +4,7 @@
 > 结论：
 > 1. **OBS-7 得到证实**：把 HP 与 LP 放进两个进程后，按请求挂起 LP 时 HP 的 TPOT P50 两卡均为 solo 的 **1.00×**（单进程 Suite 8 为 1.02–1.07×），残余膨胀来自单进程内的 GIL 争用。
 > 2. 新的多进程测试发现：**DEF-26**（调度器执行线程没有 CUDA 上下文，跨进程模式下 Lv3 恢复断言失败，已修复）、**DEF-27**（跨进程透明调度下 Lv3 Trap 与 GPU 时间片上下文切换冲突，触发 Xid 109 `CTX SWITCH TIMEOUT`；**已修复**：新增“就绪门控”，HP 在服务端确认低优先级队列已被驱逐后才发射，§2.3.1）、**DEF-28**（`xserver` 收到 SIGTERM 不清理 IPC 消息队列，换用户再启动时客户端阻塞，已修复）。曾登记的 **DEF-25 已撤回**：属于测量误判，为它做的改动引入了新问题，已回退（§2.1）。
-> 3. 另记录 **OBS-8**：在同时驱动桌面的 RTX 5060 上，Lv3 运行期间三次出现桌面图形进程的 Xid 31 MMU 故障（进程均未崩溃）；Lv3 现在在显示 GPU 上启动时告警一次。
+> 3. 另记录 **OBS-14**：在同时驱动桌面的 RTX 5060 上，Lv3 运行期间三次出现桌面图形进程的 Xid 31 MMU 故障（进程均未崩溃）；Lv3 现在在显示 GPU 上启动时告警一次。
 
 ---
 
@@ -69,7 +69,7 @@ TPOT 比值以同一进程内 LP 空闲时背靠背测得的 solo TPOT 为分母
 | 门控超时 / CUDA 错误 | — / 0 | 0 / 0 | 0 / 0 |
 | 正确性（HP 请求 / LP 错误迭代） | 60/60 / 0 | 200/200 / 0 | 120/120 / 0 |
 
-RTX 5060 的 6 次门控运行中出现 1 次 `Xwayland` 的 Xid 31（OBS-8，见 §2.5），不是 Xid 109；重启后至本文写作时，全部门控 Lv3 运行中 Xid 109 为 0 次。全量回归中的 Suite 9 `glb-lv3` 因此改为真正走 Lv3（§4、§6）。
+RTX 5060 的 6 次门控运行中出现 1 次 `Xwayland` 的 Xid 31（OBS-14，见 §2.5），不是 Xid 109；重启后至本文写作时，全部门控 Lv3 运行中 Xid 109 为 0 次。全量回归中的 Suite 9 `glb-lv3` 因此改为真正走 Lv3（§4、§6）。
 
 **对 Level-1 的影响（8×8 交替 A/B，RTX 5060 `glb-lv1`）**：门控关 / 开的 TPOT P50 中位数 0.968× / 0.969×，P99 1.28–2.32× / 1.23–2.40×，P99 > 14 ms 的运行各 4/8，LP 均为 71%，HP 每次门控等待均值 15–30 µs。门控对 Level-1 没有可测影响；`glb-lv1` 的 P99 本身在运行间波动很大（HP 偶尔要等已在 GPU 上的 LP 内核），早先“门控使 P99 变差”的 4 次对比是抽样噪声。
 
@@ -83,11 +83,11 @@ RTX 5060 的 6 次门控运行中出现 1 次 `Xwayland` 的 Xid 31（OBS-8，�
 
 教训（T-23）：同一台机器上 root 与普通用户交替运行使用 IPC 的测试时，要确认每个进程退出时都清理了 IPC 对象。
 
-### 2.4.1 OBS-9：暂停的 Level-1 发射线程在等待日志空位后仍会发射一条命令
+### 2.4.1 OBS-15：暂停的 Level-1 发射线程在等待日志空位后仍会发射一条命令
 
 `LaunchWorker::LaunchHwCommand()` 只在命令日志未满时检查暂停状态；日志已满时它先等一个空位（同步最早的命令），随后**不再检查暂停**就发射。因此在等待期间被挂起的队列仍会发出一条命令（Level-3 下该内核被 Guardian 立即排空，不影响正确性）。曾尝试在等待后补做暂停检查，并做了交替 A/B（RTX 5060）：`request` 策略 6×6 无差别（TPOT P50 1.005× / 1.004×，P99 区间重叠，LP 69.4% / 69.1%）；`glb-lv1` 8×8 下改动后 HP 略差（P50 1.010× / 0.987×，P99 > 14 ms 的运行 6/8 / 3/8）。没有可测收益，改动已回退，记录为观察项。
 
-### 2.5 OBS-8：显示 GPU 上桌面图形进程的 Xid 31（第三、四次：门控测试中的 `Xwayland`、`gnome-shell`，进程均未重启；现在启动时告警）
+### 2.5 OBS-14：显示 GPU 上桌面图形进程的 Xid 31（第三、四次：门控测试中的 `Xwayland`、`gnome-shell`，进程均未重启；现在启动时告警）
 
 RTX 5060 同时驱动桌面。本周内核日志中有 4 条桌面进程的 Xid 31（`MMU Fault: ENGINE GRAPHICS GPC2 GPCCLIENT_GCC faulted @ 0x0`）：
 
@@ -165,14 +165,14 @@ RTX 5060 同时驱动桌面。本周内核日志中有 4 条桌面进程的 Xid 
 | `platforms/cuda/hal/src/level3/cuda_queue.cpp` | DEF-26：`CtxScope`；DEF-27：仅在关闭就绪门控时回退到 Level-1（`lv1_glb_sched`，`XSCHED_SM120_GLB_LV3`） |
 | `preempt/{include,src}/.../sched/ready_gate.{h,cpp}`、`preempt/src/xqueue/command_buffer.cpp`、`preempt/src/sched/executor.cpp` | DEF-27 就绪门控（客户端）；`XSCHED_GLB_READY_GATE_TRACE=1` 输出门控统计 |
 | `sched/{include,src}/.../protocol/{operation,status}`、`sched/src/scheduler/local.cpp`、`service/server/src/server.cpp` | DEF-27：`ready_ack`、`ready_seen`，服务端“先挂起、等完成、再放行” |
-| `platforms/cuda/hal/src/level3/sm120_trap_engine.cpp` | OBS-8：显示 GPU（`KERNEL_EXEC_TIMEOUT`）上启动告警 |
+| `platforms/cuda/hal/src/level3/sm120_trap_engine.cpp` | OBS-14：显示 GPU（`KERNEL_EXEC_TIMEOUT`）上启动告警 |
 | `test/sm120_v2/eval/bench_mp_serving_p34.py` | 多进程服务测试（6 种模式）；`xserver` 日志写入 `<out>.xserver.log`；残留队列检查 |
 | `test/sm120_v2/eval/test_xqueue_idle_p34.py` | 同步后 Idle 状态与转换耗时检查 |
 | `test/sm120_v2/eval/regress_p3.py` | 新增 `SYN-xq-idle` 与 Suite 9（`S9-*`，多进程 6 项） |
 
 ## 6. 就绪门控后的全量回归
 
-RTX 5060：全量回归 **288/288**（就绪门控初版：服务端等待所有挂起）；最终构建（只等待 Level-3 挂起）上 Suite 9 + `SYN-xq-idle` + 3 次门控 Lv3 共 **10/10**。重启后全部门控 Lv3 运行 0 次 Xid 109；期间 `gnome-shell` 1 次 Xid 31（OBS-8，进程未重启）。
+RTX 5060：全量回归 **288/288**（就绪门控初版：服务端等待所有挂起）；最终构建（只等待 Level-3 挂起）上 Suite 9 + `SYN-xq-idle` + 3 次门控 Lv3 共 **10/10**。重启后全部门控 Lv3 运行 0 次 Xid 109；期间 `gnome-shell` 1 次 Xid 31（OBS-14，进程未重启）。
 
 RTX 5080（共享）：全量回归 **283/288**。1 项因另一用户的作业持续占用 GPU 超过 10 分钟而跳过；4 项在 30 s 内于 CUDA 初始化阶段报 `CUDA unknown error`（耗时 0.7 s，含一项 native 运行，不涉及 XSched）。同一时段内核日志有 7 条 `NVRM: Going over RM unhandled interrupt threshold`，逐条对照时间：全部出现在本回归处于“等待 GPU 空闲”、没有任何本方测试运行的时刻，判断为共享主机上他人负载所致。这 5 项与 Suite 9、`SYN-xq-idle`、3 次门控 Lv3 在 GPU 空闲后用最终构建复跑：**15/15**，0 次让路、0 个 CUDA 错误、0 次门控超时，运行后无残留 IPC 队列。
 

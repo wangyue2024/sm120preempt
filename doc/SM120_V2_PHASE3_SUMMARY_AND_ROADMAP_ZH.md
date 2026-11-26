@@ -11,7 +11,9 @@
 
 > **2026-11-26 更新：Phase 3.4-1（DEF-10）已完成**，详见 [`SM120_V2_PHASE3_4_DEF10_BAR0_PROXY_ZH.md`](SM120_V2_PHASE3_4_DEF10_BAR0_PROXY_ZH.md)：新增 `xsched-bar0d` 代理，普通用户进程即可使用 Level-3 抢占；代理只映射两页 BAR0 并降权为 `nobody`，只接受“发一次脉冲”。非 root 验证 5060 37/37、5080 50/50（`LLM-08` 24/24），抢占延迟 +2–15 µs；两卡全量回归（root 直接映射路径）265/265 + 265/265。§2 表格已同步到当前状态。
 
-> **2026-11-26 更新：Phase 3.4-2（多进程服务测试）已完成**，详见 [`SM120_V2_PHASE3_4_MULTIPROCESS_ZH.md`](SM120_V2_PHASE3_4_MULTIPROCESS_ZH.md)：HP / LP 分为两个进程后，按请求挂起的 TPOT 两卡均为 solo 的 1.00×（证实 OBS-7 的 GIL 假设）；XSched 透明跨进程调度（`xserver` HPF）LP 71–78%、TPOT P50 0.94–1.02×。新发现并修复 DEF-26（调度器线程无 CUDA 上下文）、DEF-28（`xserver` 收到 SIGTERM 不清理 IPC 队列），缓解 DEF-27（跨进程透明调度下 Lv3 Trap 与上下文切换冲突，Xid 109；GLB 下默认走 Level-1）；记录 OBS-8（显示 GPU 上桌面图形进程偶发 Xid 31）；曾登记的 DEF-25 为测量误判，已撤回，相应改动已回退。两卡全量回归（最终构建，含 Suite 9 与 SYN-xq-idle）288/288 + 288/288。
+> **完整原理与过程文档**：[`SM120_V2_PHASE3_PRINCIPLES_AND_IMPLEMENTATION_ZH.md`](SM120_V2_PHASE3_PRINCIPLES_AND_IMPLEMENTATION_ZH.md)（原理与实现详解）、[`SM120_V2_PHASE3_EXPLORATION_REVIEW_ZH.md`](SM120_V2_PHASE3_EXPLORATION_REVIEW_ZH.md)（开发探索回顾与新发现）。
+
+> **2026-11-26 更新：Phase 3.4-2（多进程服务测试）已完成**，详见 [`SM120_V2_PHASE3_4_MULTIPROCESS_ZH.md`](SM120_V2_PHASE3_4_MULTIPROCESS_ZH.md)：HP / LP 分为两个进程后，按请求挂起的 TPOT 两卡均为 solo 的 1.00×（证实 OBS-7 的 GIL 假设）；XSched 透明跨进程调度（`xserver` HPF）LP 71–78%、TPOT P50 0.94–1.02×。新发现并修复 DEF-26（调度器线程无 CUDA 上下文）、DEF-28（`xserver` 收到 SIGTERM 不清理 IPC 队列），缓解 DEF-27（跨进程透明调度下 Lv3 Trap 与上下文切换冲突，Xid 109；GLB 下默认走 Level-1）；记录 OBS-14（显示 GPU 上桌面图形进程偶发 Xid 31）；曾登记的 DEF-25 为测量误判，已撤回，相应改动已回退。两卡全量回归（最终构建，含 Suite 9 与 SYN-xq-idle）288/288 + 288/288。
 
 ---
 
@@ -99,7 +101,7 @@
 | DEF-26 | P1 | 调度器执行线程无 CUDA 上下文，跨进程 Lv3 恢复失败 | **已修复**（3.4-2） |
 | DEF-27 | P1 | 跨进程透明调度下 Lv3 Trap 与上下文切换冲突（Xid 109） | **已修复**（就绪门控：服务端先挂起、等完成再放行，HP 等确认后发射；GLB 下默认开启） |
 | DEF-28 | P2 | `xserver` 收到 SIGTERM 不清理 IPC 队列，换用户启动后客户端阻塞 | **已修复**（3.4-2） |
-| OBS-8 | — | 显示 GPU 上 Lv3 压测时桌面图形进程偶发 Xid 31 | 记录；建议 Lv3 用无显示 GPU |
+| OBS-14 | — | 显示 GPU 上 Lv3 压测时桌面图形进程偶发 Xid 31 | 记录；建议 Lv3 用无显示 GPU |
 | 遗留 | — | `shim/context_registry.{h,cpp}`：context-isolation 合并中断留下的未接入代码 | **已删除**（3.2；保存在提交 `84e10dc`） |
 | 评测缺口 | — | 缺“原生高优先级流 / MPS / Green Context”基线；模型仅 0.5B（单进程 GIL 干扰已由 3.4-2 多进程测试消除） | 部分待补 |
 

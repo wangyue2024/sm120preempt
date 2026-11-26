@@ -2,6 +2,12 @@
 
 All notable changes to the Blackwell (`sm_120`) Level-3 transparent preemption and scheduling system are documented in this file.
 
+## [Unreleased] - 2026-11-26 — Documentation: principles and exploration review
+
+- `doc/SM120_V2_PHASE3_PRINCIPLES_AND_IMPLEMENTATION_ZH.md`: every mechanism of the system as of Phase 3.4 - XQueue submission / launch / synchronization / suspend / resume, the BAR0 evict pulse, the 9 trap-handler caves, what Mode 5 saves (with the DEF-20 register-cascade correction), CTA states and the zero-pulse self-trap restore, the control header byte layout and the DebuggerParams window, the Entry Guardian slot map and its four optimizations with the SASS encodings they needed, routing rules, memory, launch-path optimizations, the BAR0 proxy, cross-process scheduling with the ready gate, scheduling bounds, a complete environment-variable reference, build / regression / deployment procedures.
+- `doc/SM120_V2_PHASE3_EXPLORATION_REVIEW_ZH.md`: the development process - how each problem was found, the hypotheses and the experiments that confirmed or rejected them (including our own misdiagnoses such as DEF-25), 18 new hardware / driver / software facts with evidence, the T-1..T-24 methodology lessons, final results and open items.
+- Observation IDs: the Phase 3.4-2 observations first logged as OBS-8 / OBS-9 collided with the existing OBS-8 (`SR_SMEMSZ` reserve) and OBS-9 (single control-header layout slot); they are now **OBS-14** (desktop graphics Xid 31 on a display GPU) and **OBS-15** (paused Level-1 worker launches after a log-full wait). The Level-3 display warning text follows. Ledger table extended with OBS-13..15. Word manual §11.5 lists the two new documents.
+
 ## [Unreleased] - 2026-11-26 — DEF-27 root fix: ready gate for the cross-process global scheduler
 
 ### Fixed
@@ -9,10 +15,10 @@ All notable changes to the Blackwell (`sm_120`) Level-3 transparent preemption a
 - RTX 5080 `glb-lv3`: TPOT P99 3.1-3.5x without the gate (19-22 ms stalls) -> 1.10-1.29x with it (10 runs, 0 Xid). RTX 5060: 0 Xid 109 in 6 gated runs (4/4 runs had one without). High-priority gate wait 160-580 us mean (the eviction), 0 timeouts. Level-1 is unaffected: 8x8 interleaved `glb-lv1` A/B, TPOT P50 0.968x / 0.969x, overlapping P99.
 
 ### Observed
-- OBS-9: a paused launch worker that waited for a free command-log slot launches that command without re-checking the pause (Level-1 work during a suspension; at Level-3 the Guardian drains it). Re-checking was tried and reverted: interleaved A/B showed no gain (request policy unchanged, `glb-lv1` slightly worse).
+- OBS-15: a paused launch worker that waited for a free command-log slot launches that command without re-checking the pause (Level-1 work during a suspension; at Level-3 the Guardian drains it). Re-checking was tried and reverted: interleaved A/B showed no gain (request policy unchanged, `glb-lv1` slightly worse).
 
 ### Changed
-- Level-3 warns once at start-up on a GPU that drives a display (`CU_DEVICE_ATTRIBUTE_KERNEL_EXEC_TIMEOUT`): OBS-8, two more Xid 31 events in desktop graphics processes (`Xwayland`, `gnome-shell`, both recovered) during gated runs.
+- Level-3 warns once at start-up on a GPU that drives a display (`CU_DEVICE_ATTRIBUTE_KERNEL_EXEC_TIMEOUT`): OBS-14, two more Xid 31 events in desktop graphics processes (`Xwayland`, `gnome-shell`, both recovered) during gated runs.
 - `bench_mp_serving_p34.py` refuses to start `xserver` whenever the host's IPC queue key 0x1 belongs to another user, also as root (a root server would delete another user's running server's queue and take its port).
 
 ### Validation
@@ -35,7 +41,7 @@ Doc: `doc/SM120_V2_PHASE3_4_MULTIPROCESS_ZH.md`.
 
 ### Withdrawn
 - DEF-25 (caller-side `WaitAll` "never reports Idle") was a measurement error: the launch worker makes the transition ~21 us after the synchronize returns. The caller-side transition added for it broke the command buffer's invariant (an Idle queue's last command is a completed `WaitAll`) and made `HW-05` assert; it was reverted before release.
-- OBS-8 recorded: on the RTX 5060 that drives the desktop, two Level-3 stress runs coincided with Xid 31 MMU faults in desktop graphics processes (no crash).
+- OBS-14 recorded: on the RTX 5060 that drives the desktop, two Level-3 stress runs coincided with Xid 31 MMU faults in desktop graphics processes (no crash).
 
 ### Validation
 - 两卡全量回归（最终构建，含 Suite 9 与 SYN-xq-idle）288/288 + 288/288.
