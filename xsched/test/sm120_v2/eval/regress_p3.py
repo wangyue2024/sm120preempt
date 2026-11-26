@@ -79,6 +79,8 @@ def plan(args):
             L("SYN-stress-gap300", 900, f"{M5} GRID_MULT=8 CHAIN=4 GAP_US=300 $OUT/test_convbar_p3 all 3 8")
             for m in ("lv1", "lv3"):
                 L(f"SYN-percall-{m}", 120, f"$OUT/test_percall_p3 {m} 2000")
+            # Arena trimming exercised under preemption (1 MiB threshold => frequent frees).
+            L("SYN-stress-trim", 900, f"{M5} XSCHED_SM120_ARENA_TRIM_MIN_MB=1 GRID_MULT=8 CHAIN=6 GAP_US=1000 TARGET_MS=4 $OUT/test_convbar_p3 all 3 10")
         elif g == "acc":
             L("ACC-C1-np2", 600, f"{M5} $OUT/test_convbar_p3 C1 10 2")
             L("ACC-C1-np3", 600, f"{M5} $OUT/test_convbar_p3 C1 10 3")
@@ -101,6 +103,7 @@ def plan(args):
         elif g == "s6":
             for c in LLM:
                 L(f"S6-{c}", 300, f"$PY $EVAL/test_real_llm_prod_p3.py {c}")
+            L("S6-llm08-trim", 300, "XSCHED_SM120_ARENA_TRIM_MIN_MB=1 $PY $EVAL/test_real_llm_prod_p3.py llm08")
         elif g in ("s7", "s7full"):
             res = os.path.join(out_dir, "suite7.jsonl")
             for op in op_names():

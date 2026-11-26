@@ -104,8 +104,48 @@ def pct(xs, q):
     return s[min(len(s) - 1, max(0, int(math.ceil(q * len(s))) - 1))]
 
 
+class _CUdevSmResource(ctypes.Structure):
+    _fields_ = [("smCount", ctypes.c_uint)]
+
+
+class _CUdevResource(ctypes.Structure):
+    # CUdevResource: int type; 92 B internal padding; union { CUdevSmResource sm; 48 B }.
+    _fields_ = [("type", ctypes.c_int), ("_pad", ctypes.c_ubyte * 92), ("sm", _CUdevSmResource),
+                ("_tail", ctypes.c_ubyte * 48)]
+
+
+def make_green_stream(n_sms):
+    """Create a CUDA green context with `n_sms` SMs (spatial partition) and a non-blocking stream in it.
+    Returns (granted_sms, total_sms, stream_ptr). Kernels launched on the stream run only on those SMs."""
+    cu = ctypes.CDLL("libcuda.so.1")
+
+    def chk(r, what):
+        if r != 0:
+            raise RuntimeError(f"{what} failed: {r}")
+
+    dev = ctypes.c_int(torch.cuda.current_device())
+    res = _CUdevResource()
+    chk(cu.cuDeviceGetDevResource(dev, ctypes.byref(res), 1), "cuDeviceGetDevResource")  # 1 = SM
+    groups = (_CUdevResource * 1)()
+    nb = ctypes.c_uint(1)
+    rem = _CUdevResource()
+    chk(cu.cuDevSmResourceSplitByCount(groups, ctypes.byref(nb), ctypes.byref(res), ctypes.byref(rem), 0,
+                                       ctypes.c_uint(n_sms)), "cuDevSmResourceSplitByCount")
+    desc = ctypes.c_void_p()
+    chk(cu.cuDevResourceGenerateDesc(ctypes.byref(desc), groups, 1), "cuDevResourceGenerateDesc")
+    gctx = ctypes.c_void_p()
+    chk(cu.cuGreenCtxCreate(ctypes.byref(gctx), desc, dev, 1), "cuGreenCtxCreate")  # 1 = default stream
+    stream = ctypes.c_void_p()
+    chk(cu.cuGreenCtxStreamCreate(ctypes.byref(stream), gctx, 1, 0), "cuGreenCtxStreamCreate")  # non-blocking
+    make_green_stream.keep = getattr(make_green_stream, "keep", []) + [gctx]
+    return groups[0].sm.smCount, res.sm.smCount, stream.value
+
+
 def run(args):
+    import sys
     from transformers import AutoModelForCausalLM, AutoTokenizer
+    if args.switch_interval_ms > 0:
+        sys.setswitchinterval(args.switch_interval_ms / 1000.0)
     torch.manual_seed(0)
     torch.cuda.set_device(0)
     prop = torch.cuda.get_device_properties(0)
@@ -193,6 +233,17 @@ def run(args):
     lp_solo_ms = (time.perf_counter() - t0) * 1e3 / 3
     res["lp_solo_ms"] = lp_solo_ms
     res["lp_tokens_per_step"] = args.lp_batch * args.lp_seq
+
+    # Spatial sharing (Phase 3.3): after goldens and the LP solo reference were measured on the full
+    # GPU, move LP to a green context holding --lp-sms SMs; HP keeps the remaining SMs to itself.
+    res["lp_sms"] = 0
+    res["switch_interval_ms"] = args.switch_interval_ms or 5.0
+    if args.lp_sms > 0:
+        if args.mode in ("lv1", "lv3"):
+            raise SystemExit("--lp-sms is supported with --mode native / solo only")
+        got, total, sptr = make_green_stream(args.lp_sms)
+        lp = torch.cuda.ExternalStream(sptr)
+        res["lp_sms"], res["total_sms"] = got, total
 
     xs = hwq = xq = None
     if args.mode in ("lv1", "lv3"):
@@ -363,6 +414,10 @@ def main():
     r.add_argument("--mean-gap-ms", type=float, default=500.0)
     r.add_argument("--lp-batch", type=int, default=None, help="default: 4 (prefill) / 2 (ppl)")
     r.add_argument("--lp-seq", type=int, default=None, help="default: 1024 (prefill) / 512 (ppl)")
+    r.add_argument("--switch-interval-ms", type=float, default=0.0,
+                   help="Python GIL switch interval (HP and LP share one process in this bench); 0 = default 5 ms")
+    r.add_argument("--lp-sms", type=int, default=0,
+                   help="run LP on a CUDA green context with this many SMs (spatial sharing; native mode)")
     r.add_argument("--out", required=True)
     rp = sp.add_parser("report")
     rp.add_argument("paths", nargs="+")
@@ -379,7 +434,7 @@ def main():
         fh.write(json.dumps(res) + "\n")
     st = "ERR " + res["error"] if res.get("error") else (
         "PASS" if res["hp_exact"] == res["n_req"] and res.get("lp_bad_iters", 0) == 0 else "FAIL")
-    print(f"[SERVE mode={a.mode} policy={res.get('policy')} lp={a.lp}] {st} TTFT p50/p99={fmt(res.get('ttft_ms_p50'))}/{fmt(res.get('ttft_ms_p99'))}ms "
+    print(f"[SERVE mode={a.mode} policy={res.get('policy')} lp={a.lp}{(' lp_sms=' + str(res.get('lp_sms'))) if res.get('lp_sms') else ''}] {st} TTFT p50/p99={fmt(res.get('ttft_ms_p50'))}/{fmt(res.get('ttft_ms_p99'))}ms "
           f"TPOT p50/p99={fmt(res.get('tpot_ms_p50'))}/{fmt(res.get('tpot_ms_p99'))}ms hp_exact={res['hp_exact']}/{res['n_req']} "
           f"lp_iters={res.get('lp_iters')} bad={res.get('lp_bad_iters')} lp_tput={fmt(res.get('lp_tput_pct_of_solo'), '{:.1f}%')} "
           f"hp_duty={fmt(res.get('hp_duty_pct'), '{:.0f}%')}",
