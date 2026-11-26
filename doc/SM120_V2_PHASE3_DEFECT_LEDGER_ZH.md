@@ -327,3 +327,4 @@
 - **MEM-1 arena 空闲回收**：`CudaQueueLv3Trap::Synchronize()` 后调用 `TrimArenas()`，在“同步期间无新发射且无待恢复驱逐状态”时释放增长替换下来的旧 arena，并在 64 次同步窗口内持续超大（> 2× 需求且 > 64 MiB，`XSCHED_SM120_ARENA_TRIM_MIN_MB`）时释放当前 arena。回归计划新增 1 MiB 阈值下的抢占测试以覆盖释放路径。
 - **空间共享实验**（报告 §5.3）：用 CUDA green context 把 LP 限制在部分 SM 上，HP 独占其余 SM。原负载下 5060（LP 24/30 SM）LP 79–80%、TPOT P50 不变，但 P99 为 solo 的 1.44×；5080（LP 64–72/84 SM）LP 86–87%，但 P50 +27–43%（HP 可用 SM 不足）：green context 只划分 SM，不划分显存带宽（推测为 LP 的访存密集阶段拖慢 HP decode；GIL 切换间隔已排除）。
 - **DEF-19 完整支持的方案**（未实现，Phase 3.4）：Cluster 状态（集群屏障相位、DSMEM 映射）无法从 Trap 帧保存与恢复，可行路线是“Cluster 级排空”——Guardian 以 `barrier.cluster` + DSMEM 广播 rank 0 的决定，使整个 Cluster 一致地排空或运行；已运行的 Cluster 不驱逐，抢占延迟上限为单个 Cluster 时长。
+- **Lv1 / Lv3 的 LP 吞吐相对 `1 − 占空比` 上限**：Lv1 挂起只停止发射新命令，在途命令继续进入 HP 请求，因而略高于上限（5060 71–72% vs 65%）；Lv3 立即驱逐在途内核并承担驱逐/恢复成本，低于上限约 4–7 个百分点。属于挂起语义差异，不是缺陷。
