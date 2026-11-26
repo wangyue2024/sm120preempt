@@ -2,6 +2,34 @@
 
 All notable changes to the Blackwell (`sm_120`) Level-3 transparent preemption and scheduling system are documented in this file.
 
+## [Unreleased] - 2026-11-26 — Phase 3.5 (tier 1): Level-3 value, CUDA Graph in-graph preemption, vLLM
+
+Doc: `doc/SM120_V2_PHASE3_5_TIER1_ZH.md`; mechanisms in `doc/SM120_V2_PHASE3_PRINCIPLES_AND_IMPLEMENTATION_ZH.md` §3.5, §5, §5.1, §5.2, §7.3; ledger §10.12.
+
+### Added
+- **DEF-09 done - CUDA Graph flattening** (`platforms/cuda/shim/src/graph_flatten.cpp`): at `cuGraphInstantiate*` the graph is walked (Kahn topological order, child graphs inlined, kernel arguments copied byte-wise via `cuFuncGetParamInfo`, memset / memcpy nodes kept); on a Level-3 XQueue `cuGraphLaunch` submits the nodes one by one, so every kernel is trap-preemptible. Host / event / conditional / memory-alloc nodes, `extra` arguments, cluster and cooperative kernels keep the graph whole; any `cuGraphExecUpdate` / `cuGraphExec*SetParams` / `cuGraphNodeSetEnabled` invalidates the plan. `XSCHED_CUDA_GRAPH_FLATTEN` (0 off, 1 default: Level >= Interrupt queues, 2 all XQueues), `XSCHED_CUDA_GRAPH_FLATTEN_MIN_US` (flatten only graphs whose first, timed whole launch ran at least that long). `XCudaGraphFlattenStats()` counters. Whole-network-captured training step (fwd + bwd + capturable AdamW): bit-exact under 15 suspensions, suspend P99 407 ms -> 0.4-1.4 ms; `DNN-07` / `HW-04` preempt inside the graph.
+- `bench_lv3_value_p35.py`: HP latency vs LP kernel duration (cuBLAS GEMM, Triton persistent GEMM partial / full occupancy, SDPA) x native / lv1 / lv1-sync / lv3 / lv3-strict x small / large HP, both GPUs; `test_graph_preempt_p35.py`, `test_graph_relaunch_p35.py`, `test_event_bridge_p35.py`, `test_vllm_lv3_p35.py` (vLLM 0.34 in-process engine on an XQueue). Regression: `SYN-graph-preempt`, `SYN-event-bridge-{lv3,lv1,modload,hazard}`, `SYN-graph-relaunch-{whole,flat}`.
+- `XQueue::GetPreemptLevel()`, `XHintGetPriority()`.
+
+### Fixed
+- **DEF-32 (P0, silent data corruption)**: kernel nodes of a whole-graph launch use their function's Guardian parameter window *at launch time*; a window left by an earlier Mode 5 launch of the same function made graph kernels get evicted / drained as that launch and never restored (vLLM without flattening: wrong tokens after every preemption). Graphs now record all kernel functions at instantiation; whole-graph launches (Level-3 queue, and pass-through on ordinary streams when any window is set) clear those windows under the context `LaunchMutex` first.
+- **DEF-31**: Level-3 `Reactivate()` relaunched non-killable commands (whole graphs, Level-1-routed kernels, copies) that had already run, using an `active_kernel_idx` only killable kernels update. Only killable kernels and idempotent commands are relaunched now.
+- **DEF-29**: `cuStreamWaitEvent(ordinary stream, XQueue event)` blocked the caller until the event completed (vLLM `copy_stream.wait_stream(main_stream)`: 1.8 ms per decode step, Level-1 -22% tokens/s). Level-1 recording queues: wait until the record is launched, then the native GPU wait. Level-2/3: the waiting stream is promoted to an internal Level-1 XQueue whose worker waits (inherits the priority hint, drained and destroyed with the stream). `XSCHED_CUDA_ASYNC_EVENT_WAIT` (0 old blocking, 1 default, 2 unsafe test mode). A first design (GPU waits on a host flag) deadlocked against `cuModuleLoadData`, which holds a driver lock while waiting for the GPU to idle; rejected.
+- **DEF-30**: the short-CTA router also requires a measured duration <= `XSCHED_SM120_SHORT_CTA_MAX_US` (default 200 us; first launch of each geometry stays Level-3 and is timed). RTX 5060 Level-3 suspend P99 under GEMM / SDPA LP 1.94 / 2.53 -> 0.22 / 0.25 ms.
+- **PERF-3**: the router's occupancy query is cached per geometry instead of issued on every launch.
+- **DEF-33**: at process exit the per-context trap engines were destroyed by static destruction and wrote the original trap handler back (`cuXtraMemcpyHtoD`) into contexts the CUDA runtime / cuFFT exit handlers may already have torn down: heap corruption inside libcuda (RTX 5080 `LIB-12` aborted at exit in 18/20 runs; the committed f29aab3 build too). The trap handler lives in each context's own ToolsMemory, so nothing needs restoring at exit: the trap-engine, Guardian-registry and launch-mutex singletons and the graph-plan table are now intentionally leaked. LIB-12 0/20.
+
+### Observed
+- OBS-20 (open): three processes in two RTX 5060 full regressions failed right at start (non-deterministic native golden twice, Xid 43 once), each right after a Level-3 process with preemptions; controlled reproduction 0/54. Possibly the same exit-time write as DEF-33; not seen again in the final-build regression.
+- OBS-21 (open): one RTX 5080 run of `S8-prefill-lv3-slo` had 1 of 156 LP iterations differ from the golden (HP 20/20 exact, an unusual 50 ms TTFT P99 in that run); 10/10 reruns pass; ~1 in 2,700 LP iterations over the day.
+
+### Validation
+- Final build, full regression (295 entries incl. the 7 new SYN tests): RTX 5060 295/295, RTX 5080 294/295 (OBS-21); no new Xid on either GPU.
+
+### Results
+- Level-3 value: with an SM-filling LP kernel, native HP P99 grows with the LP kernel (RTX 5060 12.7 / 26.6 ms, RTX 5080 4.0-19.4 ms) while Level-3 stays at 0.8-2.6 ms; when the LP leaves SMs free, native already co-schedules the HP kernel (P99 0.7-1.8 ms) and Level-3 is 10-40% lower. Level-1 with synchronous suspension grows linearly with the LP kernel (up to 370 ms).
+- vLLM 0.34 on RTX 5080 (Qwen2.5-0.5B / 3B / 7B-AWQ), 32/32 greedy outputs identical under preemption in every mode. 7B prefill HP P99: native 3.9, Level-1 9.6, Level-3 1.1 ms; 7B decode: 3.4 / 7.2 / 2.6 ms. Level-3 throughput cost (flattening CPU per node): decode -20% (7B) / -36% (0.5B), prefill -10% / -16%.
+
 ## [Unreleased] - 2026-11-26 — Documentation: principles and exploration review
 
 - `doc/SM120_V2_PHASE3_PRINCIPLES_AND_IMPLEMENTATION_ZH.md`: every mechanism of the system as of Phase 3.4 - XQueue submission / launch / synchronization / suspend / resume, the BAR0 evict pulse, the 9 trap-handler caves, what Mode 5 saves (with the DEF-20 register-cascade correction), CTA states and the zero-pulse self-trap restore, the control header byte layout and the DebuggerParams window, the Entry Guardian slot map and its four optimizations with the SASS encodings they needed, routing rules, memory, launch-path optimizations, the BAR0 proxy, cross-process scheduling with the ready gate, scheduling bounds, a complete environment-variable reference, build / regression / deployment procedures.

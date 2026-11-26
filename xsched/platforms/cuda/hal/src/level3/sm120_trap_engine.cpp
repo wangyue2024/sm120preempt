@@ -528,24 +528,31 @@ Cave8Layout BuildSmemHwFrameCave(uint64_t cave_va,
 std::shared_ptr<Sm120TrapEngine> Sm120TrapEngine::Instance(CUcontext ctx)
 {
     static std::mutex s_mtx;
-    static std::map<CUcontext, std::shared_ptr<Sm120TrapEngine>> s_map;
+    // DEF-33: intentionally leaked. Engines used to be destroyed by static destruction at process
+    // exit, where ~Sm120TrapEngine wrote the original trap handler back into ToolsMemory
+    // (cuXtraMemcpyHtoD) - after exit handlers of the CUDA runtime / libraries (e.g. cuFFT) may
+    // already have torn the context down: heap corruption inside libcuda (RTX 5080, LIB-12,
+    // "malloc(): invalid size", 5-8 of 8 runs). The trap handler lives in the context's own
+    // ToolsMemory, so restoring it at exit is unnecessary; the driver reclaims it with the context.
+    static auto *s_map = new std::map<CUcontext, std::shared_ptr<Sm120TrapEngine>>();
     std::lock_guard<std::mutex> lock(s_mtx);
-    auto it = s_map.find(ctx);
-    if (it != s_map.end()) return it->second;
+    auto it = s_map->find(ctx);
+    if (it != s_map->end()) return it->second;
 
     CUdevice dev = 0;
     CUDA_ASSERT(Driver::CtxGetDevice(&dev));
     auto eng = std::make_shared<Sm120TrapEngine>(ctx, dev);
-    s_map[ctx] = eng;
+    (*s_map)[ctx] = eng;
     return eng;
 }
 
 std::mutex &Sm120TrapEngine::LaunchMutex(CUcontext ctx)
 {
     static std::mutex s_mtx;
-    static std::map<CUcontext, std::unique_ptr<std::mutex>> s_map;
+    // Leaked (DEF-33): launch workers may still hold these mutexes while static destructors run.
+    static auto *s_map = new std::map<CUcontext, std::unique_ptr<std::mutex>>();
     std::lock_guard<std::mutex> lock(s_mtx);
-    auto &ptr = s_map[ctx];
+    auto &ptr = (*s_map)[ctx];
     if (!ptr) ptr = std::make_unique<std::mutex>();
     return *ptr;
 }
@@ -1490,6 +1497,11 @@ void Sm120StreamContext::ClearDebuggerParams(CUfunction func)
     }
     uint8_t zeros[24] = {};
     cuXtraSetDebuggerParams(func, zeros, sizeof(zeros));
+}
+
+bool Sm120StreamContext::AnyParamsSet()
+{
+    return g_params_cnt.load(std::memory_order_acquire) != 0;
 }
 
 bool Sm120StreamContext::MaybeParamsSet(const void *launch_handle)

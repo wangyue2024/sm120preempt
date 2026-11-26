@@ -1,0 +1,24 @@
+=== guarded run start 2026-11-27T05:12:03+08:00 host=<host> plan=~/p3runs/lib12h.plan ===
+NVIDIA GeForce RTX 5080, 580.95.05, 7 MiB, 0 %, 21
+>>> [L12-HEAD] 05:12:03
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+bash: line 1: 2309424 Aborted                 (core dumped) XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2309443 Aborted                 (core dumped) XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2309453 Aborted                 (core dumped) XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2309481 Aborted                 (core dumped) XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2309491 Aborted                 (core dumped) XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+L12 HEAD fails=5/8
+<<< [L12-HEAD] rc=0 wall=3.1s
+>>> [L12-NEW] 05:12:06
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+bash: line 1: 2309532 Aborted                 (core dumped) XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2309542 Aborted                 (core dumped) XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2309552 Aborted                 (core dumped) XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2309562 Aborted                 (core dumped) XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2309572 Aborted                 (core dumped) XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2309582 Aborted                 (core dumped) XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2309592 Aborted                 (core dumped) XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2309602 Aborted                 (core dumped) XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+L12 NEW fails=8/8
+<<< [L12-NEW] rc=0 wall=3.1s
+=== guarded run done 2026-11-27T05:12:09+08:00 ===

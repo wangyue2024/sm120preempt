@@ -169,6 +169,8 @@ public:
     /// to cuLaunchKernel) may still hold non-zero Mode 5 debugger params. Lets pass-through
     /// launches skip resolving the CUfunction. Call with the context's LaunchMutex held.
     static bool MaybeParamsSet(const void *launch_handle);
+    /// True if any function currently holds a Mode 5 window (cheap, lock-free).
+    static bool AnyParamsSet();
 
     /// @brief Evict running/queued waves on this stream with 1 single BAR0 pulse.
     bool PreemptStream(Sm120PreemptMode mode);

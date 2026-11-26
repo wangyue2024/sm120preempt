@@ -67,6 +67,9 @@ public:
     mutable CUfunction lazy_func_handle_ = nullptr;
 
     bool killable = false;
+    /// DEF-17 duration-aware routing: when set, Level-3 Launch() times this launch with CUDA events
+    /// so the router can learn whether the kernel is short enough for the Level-1 route.
+    uint64_t route_probe_key = 0;
     CUdeviceptr preempt_buffer = 0;
     CUdeviceptr entry_point_original = 0;
     CUdeviceptr entry_point_guardian = 0;
@@ -221,6 +224,10 @@ class CudaGraphLaunchCommand : public CudaGraphCommand
 public:
     CudaGraphLaunchCommand(CUgraphExec graph_exec): CudaGraphCommand(graph_exec) {}
     virtual ~CudaGraphLaunchCommand() = default;
+    /// DEF-32: the CUfunctions of the graph's kernel nodes. A kernel node runs with the Guardian
+    /// parameter window its function holds when the graph is launched, so a Level-3 queue clears
+    /// these windows right before launching the graph as a whole (see CudaQueueLv3Trap::Launch).
+    std::shared_ptr<const std::vector<CUfunction>> graph_funcs;
 
 private:
     virtual CUresult Launch(CUstream stream) override

@@ -1,0 +1,61 @@
+=== guarded run start 2026-11-27T04:01:25+08:00 host=<host> plan=~/p3runs/def31_5080.plan ===
+NVIDIA GeForce RTX 5080, 580.95.05, 7 MiB, 0 %, 24
+>>> [R-whole-1] 04:01:25
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2268689 @ 04:01:25.438731] using app-managed scheduler
+[XSCHED INFO @ T 2268689 @ 04:01:26.244562] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2268689 @ 04:01:26.257092] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 2268689 @ 04:01:26.265539] CUDA graph cannot support trap-based level-3 preemption, falling back to level-1 @ ~/workspace/sm120preempt/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:418
+[GRAPH-RELAUNCH flatten=0] PASS | graph 3.6 ms | iters 60 counter 60 | suspensions 49
+<<< [R-whole-1] rc=0 wall=1.4s
+>>> [R-whole-2] 04:01:26
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2268750 @ 04:01:26.879334] using app-managed scheduler
+[XSCHED INFO @ T 2268750 @ 04:01:27.592049] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2268750 @ 04:01:27.604546] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 2268750 @ 04:01:27.613018] CUDA graph cannot support trap-based level-3 preemption, falling back to level-1 @ ~/workspace/sm120preempt/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:418
+[GRAPH-RELAUNCH flatten=0] PASS | graph 3.6 ms | iters 60 counter 60 | suspensions 49
+<<< [R-whole-2] rc=0 wall=1.3s
+>>> [R-flat] 04:01:28
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2268812 @ 04:01:28.225430] using app-managed scheduler
+[XSCHED INFO @ T 2268812 @ 04:01:28.939198] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2268812 @ 04:01:28.951623] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 2268812 @ 04:01:28.960040] CUDA graph 0x49a9b110 flattened for in-graph preemption: 17 commands (9 kernels)
+[GRAPH-RELAUNCH flatten=1] PASS | graph 3.6 ms | iters 60 counter 60 | suspensions 90
+<<< [R-flat] rc=0 wall=1.4s
+>>> [EB-lv3] 04:01:29
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2268872 @ 04:01:29.676691] using app-managed scheduler
+[XSCHED INFO @ T 2268872 @ 04:01:30.408281] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2268872 @ 04:01:30.420364] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 2268872 @ 04:01:30.446758] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2268872 @ 04:01:30.446890] stream 0x20c93390 waits on an event of a level-2/3 XQueue: promoted to a level-1 XQueue so the wait does not block the caller (XSCHED_CUDA_ASYNC_EVENT_WAIT=0 disables)
+[EVENT-BRIDGE lv3 mode=1] PASS | iters 30 corrupted 0 | work 10.1 ms | wait_event caller blocked p50 2 us max 145 us | native deterministic True | {'lv1_gpu_wait': 0, 'promoted_waits': 1, 'blocking': 0, 'promotions': 1}
+<<< [EB-lv3] rc=0 wall=1.5s
+>>> [EB-modload] 04:01:31
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2268962 @ 04:01:31.188277] using app-managed scheduler
+[XSCHED INFO @ T 2268962 @ 04:01:31.918381] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2268962 @ 04:01:31.930469] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 2268962 @ 04:01:31.956821] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2268962 @ 04:01:31.956950] stream 0xf508150 waits on an event of a level-2/3 XQueue: promoted to a level-1 XQueue so the wait does not block the caller (XSCHED_CUDA_ASYNC_EVENT_WAIT=0 disables)
+[EVENT-BRIDGE lv3 mode=1 module-load] PASS | iters 10 corrupted 0 | work 10.1 ms | wait_event caller blocked p50 3 us max 141 us | native deterministic True | {'lv1_gpu_wait': 0, 'promoted_waits': 1, 'blocking': 0, 'promotions': 1}
+<<< [EB-modload] rc=0 wall=1.4s
+>>> [EB-hazard] 04:01:32
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2269032 @ 04:01:32.566158] using app-managed scheduler
+[XSCHED INFO @ T 2269032 @ 04:01:33.298775] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2269032 @ 04:01:33.310792] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[EVENT-BRIDGE lv3 mode=2] PASS | iters 10 corrupted 1 | work 10.2 ms | wait_event caller blocked p50 10945 us max 10985 us | native deterministic True | {'lv1_gpu_wait': 10, 'promoted_waits': 0, 'blocking': 0, 'promotions': 0}
+  first bad iter 7: 16777215/16777216 elements differ, max |diff| 0.0694, nan 0, Y==gold now True
+<<< [EB-hazard] rc=0 wall=1.2s
+>>> [GP] 04:01:33
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2269101 @ 04:01:33.826983] using app-managed scheduler
+[XSCHED INFO @ T 2269101 @ 04:01:35.940250] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2269101 @ 04:01:35.952679] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 2269101 @ 04:01:35.954166] CUDA graph 0x37e614e0 flattened for in-graph preemption: 133 commands (108 kernels)
+[GRAPH-PREEMPT lv3 flatten=1] PASS | replay native 9.770 xq 10.318 ms | susp p50 0.084 p99 0.404 max 0.404 ms | HP p50 0.196 p99 0.769 ms | preempts 15 | exact True (no-preempt True, deterministic True) | {'flat_launches': 83, 'whole_launches': 0, 'flat_cmds': 11039, 'unflattenable': 0, 'kept_whole_short': 0}
+<<< [GP] rc=0 wall=3.5s
+=== guarded run done 2026-11-27T04:01:37+08:00 ===

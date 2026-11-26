@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <mutex>
 #include <string>
+#include <unordered_map>
 
 #include "xsched/utils/env.h"
 #include "xsched/utils/common.h"
@@ -49,6 +50,31 @@ enum Sm120RouteStat : int {
     kRouteStatCount,
 };
 std::atomic<uint64_t> g_sm120_route_stats[kRouteStatCount] = {};
+
+// Duration-aware short-CTA routing (tier-1 item 2 follow-up). The wave-count window alone admitted
+// kernels lasting 1-2 ms (large elementwise kernels on the 5060); a suspend that arrives while such
+// Level-1-routed kernels are queued behind the trapped kernel waits for all of them (Lv3 HP P99 2-3
+// ms vs 0.5-1 ms with the router off). The first launch of each candidate (function, CTA count)
+// stays at Level-3 and is timed with CUDA events; later launches take the Level-1 route only if the
+// measured duration is <= XSCHED_SM120_SHORT_CTA_MAX_US (default 200 us; 0 = wave window only).
+// A measurement inflated by a preemption classifies the kernel as long (the safe side).
+struct ShortCtaProbe
+{
+    int window = -1;          // wave-window decision for this (function, geometry): -1 not computed
+    int state = 0;            // 0 unknown, 1 short (route Level-1), 2 long (stay Level-3)
+    bool pending = false;     // a timed launch was submitted
+    bool recorded = false;    // ... and its events were recorded by Launch() (an event that was never
+                              // recorded reads as complete, so it must not be queried before)
+    CUevent beg = nullptr, end = nullptr;
+};
+std::mutex g_probe_mtx;
+std::unordered_map<uint64_t, ShortCtaProbe> g_probes;
+
+int64_t ShortCtaMaxUs()
+{
+    static const int64_t v = [] { int64_t x = 200; GetEnvInt64("XSCHED_SM120_SHORT_CTA_MAX_US", x); return x; }();
+    return v;
+}
 
 inline void CountRoute(Sm120RouteStat s)
 {
@@ -144,12 +170,41 @@ void CudaQueueLv3Trap::Launch(std::shared_ptr<HwCommand> hw_cmd)
             } else {
                 sm120::Sm120StreamContext::ClearDebuggerParams(kernel->kFuncHandle);
             }
+            if (kernel->route_probe_key != 0) {
+                // Time this launch for duration-aware routing (see ShortCtaProbe).
+                CUevent beg = nullptr, end = nullptr;
+                {
+                    std::lock_guard<std::mutex> lk(g_probe_mtx);
+                    ShortCtaProbe &p = g_probes[kernel->route_probe_key];
+                    if (p.beg == nullptr) Driver::EventCreate(&p.beg, CU_EVENT_DEFAULT);
+                    if (p.end == nullptr) Driver::EventCreate(&p.end, CU_EVENT_DEFAULT);
+                    beg = p.beg;
+                    end = p.end;
+                }
+                Driver::EventRecord(beg, kStream);
+                CUDA_ASSERT(kernel->LaunchWrapper(kStream));
+                Driver::EventRecord(end, kStream);
+                std::lock_guard<std::mutex> lk(g_probe_mtx);
+                g_probes[kernel->route_probe_key].recorded = true;
+                return;
+            }
             CUDA_ASSERT(kernel->LaunchWrapper(kStream));
             return;
         }
         if (std::dynamic_pointer_cast<CudaGraphCommand>(hw_cmd) != nullptr) {
             std::lock_guard<std::mutex> lk(last_kernel_mtx_);
             last_kernel_ = hw_cmd;
+        }
+        auto graph = std::dynamic_pointer_cast<CudaGraphLaunchCommand>(hw_cmd);
+        if (graph != nullptr && graph->graph_funcs != nullptr && sm120::Sm120StreamContext::AnyParamsSet()) {
+            // DEF-32: a whole-graph launch is not trap-managed; its kernel nodes must not run with a
+            // Mode 5 window left by an earlier killable launch of the same function (they would be
+            // drained / evicted as that launch and never restored). Clear and launch under the
+            // LaunchMutex so that no Mode 5 launch can set a window in between.
+            std::lock_guard<std::mutex> lock(sm120::Sm120TrapEngine::LaunchMutex(context_));
+            for (CUfunction f : *graph->graph_funcs) sm120::Sm120StreamContext::ClearDebuggerParams(f);
+            CudaQueueLv1::Launch(hw_cmd);
+            return;
         }
         CudaQueueLv1::Launch(hw_cmd);
         return;
@@ -237,6 +292,22 @@ void CudaQueueLv3Trap::Restore(const CommandLog &)
     }
 }
 
+// DEF-31 (Phase 3.5): on restore, only commands that the trap / Entry Guardian can have killed are
+// relaunched: killable (trap-managed) kernels, and idempotent commands (event records) that must be
+// re-issued after them. Non-killable commands - whole CUDA graphs, Level-1-routed kernels, memory
+// copies, host functions - are never stopped by the gate or the trap (their Guardian parameters are
+// cleared or they are not instrumented), so they always ran to completion; relaunching them executed
+// them twice. The launch worker's barrier rule (a non-deactivatable, non-idempotent command waits for
+// all in-flight deactivatable commands) keeps them from being queued behind a killed kernel, but the
+// no-eviction path below compared with a stale active_kernel_idx (the last trap-managed kernel, which
+// had finished) and relaunched e.g. a vLLM decode graph that was the last launched command when the
+// suspension arrived (graph without flattening + non-blocking cross-stream waits: wrong tokens).
+static bool RelaunchableAfterTrap(const std::shared_ptr<HwCommand> &cmd)
+{
+    if (auto k = std::dynamic_pointer_cast<CudaKernelCommand>(cmd)) return k->killable;
+    return cmd->GetProps(kCommandPropertyIdempotent) != 0;
+}
+
 void CudaQueueLv3Trap::Reactivate(const CommandLog &log)
 {
     CtxScope ctx_scope(context_);
@@ -276,7 +347,8 @@ void CudaQueueLv3Trap::Reactivate(const CommandLog &log)
             sm120_stream_->ResetControlSync();
             if (t.active_kernel_idx != 0) {
                 for (const auto &cmd : log) {
-                    if (static_cast<uint64_t>(cmd->GetIdx()) > t.active_kernel_idx) {
+                    if (static_cast<uint64_t>(cmd->GetIdx()) > t.active_kernel_idx &&
+                        RelaunchableAfterTrap(cmd)) {
                         this->Launch(cmd);
                     }
                 }
@@ -287,6 +359,7 @@ void CudaQueueLv3Trap::Reactivate(const CommandLog &log)
         bool cleared_post_active = false;
         for (const auto &cmd : log) {
             if (active_idx != 0 && static_cast<uint64_t>(cmd->GetIdx()) < active_idx) continue;
+            if (!RelaunchableAfterTrap(cmd)) continue;
             this->Launch(cmd);
             if (!cleared_post_active &&
                 (active_idx == 0 || static_cast<uint64_t>(cmd->GetIdx()) == active_idx)) {
@@ -452,15 +525,43 @@ void CudaQueueLv3Trap::OnHwCommandSubmit(std::shared_ptr<preempt::HwCommand> hw_
                     int64_t v = 2; GetEnvInt64("XSCHED_SM120_SHORT_CTA_MIN_WAVES", v); return v; }();
                 static const int64_t max_waves = []() {
                     int64_t v = 1024; GetEnvInt64("XSCHED_SM120_SHORT_CTA_MAX_WAVES", v); return v; }();
-                int blocks_per_sm = 0;
-                if (Driver::OccupancyMaxActiveBlocksPerMultiprocessor(
-                        &blocks_per_sm, kernel->kFuncHandle, static_cast<int>(kernel->ThreadCnt()),
-                        kernel->DynSmemBytes()) != CUDA_SUCCESS || blocks_per_sm <= 0) {
-                    blocks_per_sm = 1;
-                }
-                const int64_t capacity = static_cast<int64_t>(sm_count_) * blocks_per_sm;
                 const int64_t ctas = static_cast<int64_t>(kernel->BlockCnt());
-                if (ctas >= min_waves * capacity && ctas <= max_waves * capacity) {
+                uint64_t key = reinterpret_cast<uint64_t>(kernel->kFuncHandle);
+                key = key * 1000003ULL ^ static_cast<uint64_t>(ctas);
+                key = key * 1000003ULL ^ static_cast<uint64_t>(kernel->ThreadCnt());
+                key = key * 1000003ULL ^ static_cast<uint64_t>(kernel->DynSmemBytes());
+                std::lock_guard<std::mutex> lk(g_probe_mtx);
+                ShortCtaProbe &p = g_probes[key];
+                if (p.window < 0) {
+                    // The occupancy query is a driver call: done once per (function, geometry), not
+                    // on every launch (flattened CUDA graphs submit thousands of kernels per second).
+                    int blocks_per_sm = 0;
+                    if (Driver::OccupancyMaxActiveBlocksPerMultiprocessor(
+                            &blocks_per_sm, kernel->kFuncHandle, static_cast<int>(kernel->ThreadCnt()),
+                            kernel->DynSmemBytes()) != CUDA_SUCCESS || blocks_per_sm <= 0) {
+                        blocks_per_sm = 1;
+                    }
+                    const int64_t capacity = static_cast<int64_t>(sm_count_) * blocks_per_sm;
+                    p.window = (ctas >= min_waves * capacity && ctas <= max_waves * capacity) ? 1 : 0;
+                }
+                bool route = p.window == 1;
+                if (route && ShortCtaMaxUs() > 0) {
+                    if (p.state == 0 && p.pending && p.recorded && Driver::EventQuery(p.end) == CUDA_SUCCESS) {
+                        float ms = 0.0f;
+                        const bool ok = Driver::EventElapsedTime(&ms, p.beg, p.end) == CUDA_SUCCESS;
+                        p.state = (ok && ms * 1000.0f <= static_cast<float>(ShortCtaMaxUs())) ? 1 : 2;
+                        p.pending = false;
+                    }
+                    if (p.state != 1) {
+                        route = false;
+                        if (p.state == 0 && !p.pending) {
+                            p.pending = true;
+                            p.recorded = false;
+                            kernel->route_probe_key = key;
+                        }
+                    }
+                }
+                if (route) {
                     CountRoute(kRouteLv1ShortCta);
                     kernel->killable = false;
                     kernel->ClearProps(kCommandPropertyDeactivatable);

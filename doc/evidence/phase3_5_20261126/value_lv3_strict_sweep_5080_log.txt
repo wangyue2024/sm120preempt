@@ -1,0 +1,127 @@
+=== guarded run start 2026-11-27T02:44:25+08:00 host=<host> plan=~/p3runs/strict_5080.plan ===
+NVIDIA GeForce RTX 5080, 580.95.05, 7 MiB, 0 %, 21
+>>> [VS-small-gemm] 02:44:25
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2254704 @ 02:44:25.677870] using app-managed scheduler
+[XSCHED INFO @ T 2254704 @ 02:44:26.519364] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2254704 @ 02:44:26.531506] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[LV3-VALUE gemm:1024 lv3-strict] PASS | kernel 0.029 ms | HP p50 0.225 p99 0.274 max 0.274 ms (solo 0.186) | susp p50 0.026 | LP tput 0.54 (HP busy 0.05) | exact HP 20/20 LP mism False | route {'lv3_killable': 8360, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2254704 @ 02:44:26.697396] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE gemm:2048 lv3-strict] PASS | kernel 0.189 ms | HP p50 0.284 p99 0.306 max 0.306 ms (solo 0.186) | susp p50 0.065 | LP tput 0.82 (HP busy 0.05) | exact HP 20/20 LP mism False | route {'lv3_killable': 3112, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2254704 @ 02:44:26.897624] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE gemm:4096 lv3-strict] PASS | kernel 1.277 ms | HP p50 0.329 p99 0.345 max 0.345 ms (solo 0.186) | susp p50 0.105 | LP tput 0.86 (HP busy 0.05) | exact HP 20/20 LP mism False | route {'lv3_killable': 560, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2254704 @ 02:44:27.138619] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE gemm:6144 lv3-strict] PASS | kernel 3.823 ms | HP p50 0.367 p99 0.383 max 0.383 ms (solo 0.184) | susp p50 0.146 | LP tput 0.90 (HP busy 0.03) | exact HP 20/20 LP mism False | route {'lv3_killable': 308, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2254704 @ 02:44:27.547761] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE gemm:8192 lv3-strict] PASS | kernel 8.961 ms | HP p50 0.430 p99 0.446 max 0.446 ms (solo 0.186) | susp p50 0.217 | LP tput 0.92 (HP busy 0.02) | exact HP 20/20 LP mism False | route {'lv3_killable': 204, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2254704 @ 02:44:28.328357] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE gemm:12288 lv3-strict] PASS | kernel 30.042 ms | HP p50 0.639 p99 0.673 max 0.673 ms (solo 0.186) | susp p50 0.426 | LP tput 0.95 (HP busy 0.01) | exact HP 20/20 LP mism False | route {'lv3_killable': 188, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+<<< [VS-small-gemm] rc=0 wall=4.4s
+>>> [VS-small-persistent] 02:44:30
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2254776 @ 02:44:30.112944] using app-managed scheduler
+[XSCHED INFO @ T 2254776 @ 02:44:31.096013] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2254776 @ 02:44:31.108528] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[LV3-VALUE persistent:1024 lv3-strict] PASS | kernel 0.040 ms | HP p50 0.261 p99 0.271 max 0.271 ms (solo 0.186) | susp p50 0.051 | LP tput 0.65 (HP busy 0.05) | exact HP 20/20 LP mism False | route {'lv3_killable': 7152, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2254776 @ 02:44:31.276985] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE persistent:2048 lv3-strict] PASS | kernel 0.265 ms | HP p50 0.279 p99 0.284 max 0.284 ms (solo 0.185) | susp p50 0.060 | LP tput 0.86 (HP busy 0.05) | exact HP 20/20 LP mism False | route {'lv3_killable': 2328, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2254776 @ 02:44:31.484018] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE persistent:4096 lv3-strict] PASS | kernel 1.745 ms | HP p50 0.304 p99 0.308 max 0.308 ms (solo 0.186) | susp p50 0.084 | LP tput 0.89 (HP busy 0.05) | exact HP 20/20 LP mism False | route {'lv3_killable': 408, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2254776 @ 02:44:31.753831] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE persistent:6144 lv3-strict] PASS | kernel 6.474 ms | HP p50 0.330 p99 0.389 max 0.389 ms (solo 0.186) | susp p50 0.118 | LP tput 0.93 (HP busy 0.03) | exact HP 20/20 LP mism False | route {'lv3_killable': 200, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2254776 @ 02:44:32.251446] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE persistent:8192 lv3-strict] PASS | kernel 15.260 ms | HP p50 0.378 p99 0.384 max 0.384 ms (solo 0.185) | susp p50 0.166 | LP tput 0.96 (HP busy 0.02) | exact HP 20/20 LP mism False | route {'lv3_killable': 144, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+<<< [VS-small-persistent] rc=0 wall=3.0s
+>>> [VS-small-persistent-full] 02:44:33
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2254850 @ 02:44:33.149900] using app-managed scheduler
+[XSCHED INFO @ T 2254850 @ 02:44:34.150748] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2254850 @ 02:44:34.163150] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[LV3-VALUE persistent-full:1024 lv3-strict] PASS | kernel 0.032 ms | HP p50 0.219 p99 0.283 max 0.283 ms (solo 0.186) | susp p50 0.021 | LP tput 0.60 (HP busy 0.05) | exact HP 20/20 LP mism False | route {'lv3_killable': 8232, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2254850 @ 02:44:34.330628] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE persistent-full:2048 lv3-strict] PASS | kernel 0.201 ms | HP p50 0.289 p99 0.301 max 0.301 ms (solo 0.185) | susp p50 0.067 | LP tput 0.83 (HP busy 0.05) | exact HP 20/20 LP mism False | route {'lv3_killable': 2948, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2254850 @ 02:44:34.531485] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE persistent-full:4096 lv3-strict] PASS | kernel 1.265 ms | HP p50 0.320 p99 0.328 max 0.328 ms (solo 0.186) | susp p50 0.099 | LP tput 0.87 (HP busy 0.05) | exact HP 20/20 LP mism False | route {'lv3_killable': 520, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2254850 @ 02:44:34.767184] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE persistent-full:6144 lv3-strict] PASS | kernel 4.049 ms | HP p50 0.346 p99 0.377 max 0.377 ms (solo 0.185) | susp p50 0.126 | LP tput 0.92 (HP busy 0.03) | exact HP 20/20 LP mism False | route {'lv3_killable': 256, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2254850 @ 02:44:35.150590] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE persistent-full:8192 lv3-strict] PASS | kernel 9.422 ms | HP p50 0.394 p99 0.499 max 0.499 ms (solo 0.185) | susp p50 0.174 | LP tput 0.92 (HP busy 0.03) | exact HP 20/20 LP mism False | route {'lv3_killable': 164, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+<<< [VS-small-persistent-full] rc=0 wall=2.7s
+>>> [VS-small-sdpa] 02:44:35
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2254924 @ 02:44:35.886685] using app-managed scheduler
+[XSCHED INFO @ T 2254924 @ 02:44:36.633723] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2254924 @ 02:44:36.646195] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[LV3-VALUE sdpa:2048 lv3-strict] PASS | kernel 0.243 ms | HP p50 0.282 p99 0.295 max 0.295 ms (solo 0.185) | susp p50 0.062 | LP tput 0.84 (HP busy 0.05) | exact HP 20/20 LP mism False | route {'lv3_killable': 1952, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2254924 @ 02:44:36.846507] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE sdpa:4096 lv3-strict] PASS | kernel 0.787 ms | HP p50 0.299 p99 0.311 max 0.311 ms (solo 0.186) | susp p50 0.079 | LP tput 0.85 (HP busy 0.05) | exact HP 20/20 LP mism False | route {'lv3_killable': 828, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2254924 @ 02:44:37.060767] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE sdpa:8192 lv3-strict] PASS | kernel 2.812 ms | HP p50 0.314 p99 0.328 max 0.328 ms (solo 0.184) | susp p50 0.094 | LP tput 0.91 (HP busy 0.03) | exact HP 20/20 LP mism False | route {'lv3_killable': 340, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2254924 @ 02:44:37.417290] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE sdpa:16384 lv3-strict] PASS | kernel 10.627 ms | HP p50 0.352 p99 0.374 max 0.374 ms (solo 0.186) | susp p50 0.132 | LP tput 0.95 (HP busy 0.02) | exact HP 20/20 LP mism False | route {'lv3_killable': 204, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2254924 @ 02:44:38.354325] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE sdpa:32768 lv3-strict] PASS | kernel 41.180 ms | HP p50 0.429 p99 0.459 max 0.459 ms (solo 0.186) | susp p50 0.211 | LP tput 0.95 (HP busy 0.01) | exact HP 20/20 LP mism False | route {'lv3_killable': 168, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+<<< [VS-small-sdpa] rc=0 wall=4.5s
+>>> [VS-large-gemm] 02:44:40
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2254992 @ 02:44:40.425911] using app-managed scheduler
+[XSCHED INFO @ T 2254992 @ 02:44:41.167273] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2254992 @ 02:44:41.179589] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[LV3-VALUE gemm:1024 lv3-strict] PASS | kernel 0.029 ms | HP p50 0.788 p99 0.822 max 0.822 ms (solo 0.760) | susp p50 0.021 | LP tput 0.48 (HP busy 0.15) | exact HP 20/20 LP mism False | route {'lv3_killable': 8252, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2254992 @ 02:44:41.365129] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE gemm:2048 lv3-strict] PASS | kernel 0.188 ms | HP p50 0.834 p99 0.852 max 0.852 ms (solo 0.760) | susp p50 0.064 | LP tput 0.74 (HP busy 0.13) | exact HP 20/20 LP mism False | route {'lv3_killable': 3096, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2254992 @ 02:44:41.585031] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE gemm:4096 lv3-strict] PASS | kernel 1.283 ms | HP p50 0.878 p99 0.889 max 0.889 ms (solo 0.764) | susp p50 0.107 | LP tput 0.79 (HP busy 0.13) | exact HP 20/20 LP mism False | route {'lv3_killable': 560, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2254992 @ 02:44:41.845412] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE gemm:6144 lv3-strict] PASS | kernel 3.824 ms | HP p50 0.918 p99 0.930 max 0.930 ms (solo 0.764) | susp p50 0.148 | LP tput 0.86 (HP busy 0.08) | exact HP 20/20 LP mism False | route {'lv3_killable': 308, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2254992 @ 02:44:42.274097] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE gemm:8192 lv3-strict] PASS | kernel 9.004 ms | HP p50 0.992 p99 1.011 max 1.011 ms (solo 0.768) | susp p50 0.220 | LP tput 0.89 (HP busy 0.05) | exact HP 20/20 LP mism False | route {'lv3_killable': 204, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2254992 @ 02:44:43.077148] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE gemm:12288 lv3-strict] PASS | kernel 30.209 ms | HP p50 1.211 p99 1.244 max 1.244 ms (solo 0.766) | susp p50 0.438 | LP tput 0.94 (HP busy 0.02) | exact HP 20/20 LP mism False | route {'lv3_killable': 188, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+<<< [VS-large-gemm] rc=0 wall=4.4s
+>>> [VS-large-persistent] 02:44:44
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2255065 @ 02:44:44.871341] using app-managed scheduler
+[XSCHED INFO @ T 2255065 @ 02:44:45.761842] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2255065 @ 02:44:45.774109] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[LV3-VALUE persistent:1024 lv3-strict] PASS | kernel 0.040 ms | HP p50 0.814 p99 0.823 max 0.823 ms (solo 0.760) | susp p50 0.047 | LP tput 0.58 (HP busy 0.15) | exact HP 20/20 LP mism False | route {'lv3_killable': 7112, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2255065 @ 02:44:45.962276] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE persistent:2048 lv3-strict] PASS | kernel 0.266 ms | HP p50 0.830 p99 0.835 max 0.835 ms (solo 0.760) | susp p50 0.061 | LP tput 0.78 (HP busy 0.13) | exact HP 20/20 LP mism False | route {'lv3_killable': 2316, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2255065 @ 02:44:46.188106] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE persistent:4096 lv3-strict] PASS | kernel 1.750 ms | HP p50 0.856 p99 0.861 max 0.861 ms (solo 0.764) | susp p50 0.085 | LP tput 0.82 (HP busy 0.13) | exact HP 20/20 LP mism False | route {'lv3_killable': 408, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2255065 @ 02:44:46.477214] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE persistent:6144 lv3-strict] PASS | kernel 6.481 ms | HP p50 0.890 p99 0.948 max 0.948 ms (solo 0.764) | susp p50 0.117 | LP tput 0.89 (HP busy 0.07) | exact HP 20/20 LP mism False | route {'lv3_killable': 200, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2255065 @ 02:44:46.992284] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE persistent:8192 lv3-strict] PASS | kernel 15.056 ms | HP p50 0.939 p99 0.944 max 0.944 ms (solo 0.765) | susp p50 0.166 | LP tput 0.93 (HP busy 0.04) | exact HP 20/20 LP mism False | route {'lv3_killable': 144, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+<<< [VS-large-persistent] rc=0 wall=3.0s
+>>> [VS-large-persistent-full] 02:44:47
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2255137 @ 02:44:47.898803] using app-managed scheduler
+[XSCHED INFO @ T 2255137 @ 02:44:48.786328] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2255137 @ 02:44:48.798693] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[LV3-VALUE persistent-full:1024 lv3-strict] PASS | kernel 0.032 ms | HP p50 0.790 p99 0.836 max 0.836 ms (solo 0.761) | susp p50 0.022 | LP tput 0.54 (HP busy 0.15) | exact HP 20/20 LP mism False | route {'lv3_killable': 8296, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2255137 @ 02:44:48.985801] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE persistent-full:2048 lv3-strict] PASS | kernel 0.203 ms | HP p50 0.842 p99 0.852 max 0.852 ms (solo 0.765) | susp p50 0.070 | LP tput 0.76 (HP busy 0.13) | exact HP 20/20 LP mism False | route {'lv3_killable': 2944, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2255137 @ 02:44:49.206275] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE persistent-full:4096 lv3-strict] PASS | kernel 1.266 ms | HP p50 0.869 p99 0.877 max 0.877 ms (solo 0.764) | susp p50 0.099 | LP tput 0.79 (HP busy 0.14) | exact HP 20/20 LP mism False | route {'lv3_killable': 520, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2255137 @ 02:44:49.461541] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE persistent-full:6144 lv3-strict] PASS | kernel 4.051 ms | HP p50 0.900 p99 0.920 max 0.920 ms (solo 0.764) | susp p50 0.127 | LP tput 0.87 (HP busy 0.09) | exact HP 20/20 LP mism False | route {'lv3_killable': 256, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2255137 @ 02:44:49.865159] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE persistent-full:8192 lv3-strict] PASS | kernel 9.470 ms | HP p50 0.948 p99 0.954 max 0.954 ms (solo 0.767) | susp p50 0.176 | LP tput 0.89 (HP busy 0.06) | exact HP 20/20 LP mism False | route {'lv3_killable': 164, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+<<< [VS-large-persistent-full] rc=0 wall=2.7s
+>>> [VS-large-sdpa] 02:44:50
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2255209 @ 02:44:50.621802] using app-managed scheduler
+[XSCHED INFO @ T 2255209 @ 02:44:51.367481] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2255209 @ 02:44:51.379728] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[LV3-VALUE sdpa:2048 lv3-strict] PASS | kernel 0.243 ms | HP p50 0.837 p99 0.903 max 0.903 ms (solo 0.761) | susp p50 0.061 | LP tput 0.77 (HP busy 0.13) | exact HP 20/20 LP mism False | route {'lv3_killable': 1960, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2255209 @ 02:44:51.600667] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE sdpa:4096 lv3-strict] PASS | kernel 0.791 ms | HP p50 0.849 p99 0.857 max 0.857 ms (solo 0.765) | susp p50 0.078 | LP tput 0.78 (HP busy 0.14) | exact HP 20/20 LP mism False | route {'lv3_killable': 832, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2255209 @ 02:44:51.834906] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE sdpa:8192 lv3-strict] PASS | kernel 2.813 ms | HP p50 0.865 p99 0.878 max 0.878 ms (solo 0.765) | susp p50 0.094 | LP tput 0.85 (HP busy 0.09) | exact HP 20/20 LP mism False | route {'lv3_killable': 340, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2255209 @ 02:44:52.210892] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE sdpa:16384 lv3-strict] PASS | kernel 10.595 ms | HP p50 0.907 p99 0.930 max 0.930 ms (solo 0.767) | susp p50 0.134 | LP tput 0.92 (HP busy 0.04) | exact HP 20/20 LP mism False | route {'lv3_killable': 204, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+[XSCHED INFO @ T 2255209 @ 02:44:53.171116] level-3 sm120 trap backend enabled (default)
+[LV3-VALUE sdpa:32768 lv3-strict] PASS | kernel 41.482 ms | HP p50 0.993 p99 1.105 max 1.105 ms (solo 0.774) | susp p50 0.213 | LP tput 0.95 (HP busy 0.01) | exact HP 20/20 LP mism False | route {'lv3_killable': 168, 'lv1_mbarrier': 0, 'lv1_cooperative': 0, 'lv1_cluster': 0, 'lv1_graph': 0, 'lv1_uninstrumentable': 0, 'lv1_short_cta': 0, 'lv1_glb_sched': 0} | 
+<<< [VS-large-sdpa] rc=0 wall=4.6s
+=== guarded run done 2026-11-27T02:44:55+08:00 ===

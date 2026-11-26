@@ -1,0 +1,5 @@
+sm120_trace: idx=4231 func=0x70d4c44c11c0 name=triton_per_fused_fused_add_rms_norm_0 ctas=336 thr=32 dyn_smem=0 level=1 killable=0 mode=5
+sm120_trace: idx=4231 func=0x286110e0 name=_ZN7cutlass7Kernel2I68cutlass_80_wmma_tensorop_bf16_s161616gemm_bf16_16x16_128x2_tn_align8EEvNT_6ParamsE ctas=9496 thr=32 dyn_smem=16896 level=3 killable=1 mode=5
+sm120_trace: reactivate cmd=5 evicted=140 restored=0 drained=4441 m1exit=0 restore_wave=0 active_idx=5872 preempted=1 arena_bytes=183173120 log=[5870O 5871K 5872K 5873K 5874K 5875K 5876K 5877K 5878K 5879O 5880K ]
+sm120_trace: reactivate cmd=5 evicted=420 restored=0 drained=476 m1exit=0 restore_wave=0 active_idx=4231 preempted=1 arena_bytes=183173120 log=[6157O 6158K 6159K 6160K 6161K 6162K 6163K 6164K 6165K 6166O 6167K ]
+sm120_trace: reactivate cmd=5 evicted=0 restored=0 drained=35832 m1exit=0 restore_wave=0 active_idx=4231 preempted=1 arena_bytes=54853632 log=[6423O 6424K 6425K 6426K 6427K 6428K 6429K 6430K 6431K 6432O 6433K ]

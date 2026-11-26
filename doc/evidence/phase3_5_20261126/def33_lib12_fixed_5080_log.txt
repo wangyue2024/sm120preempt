@@ -1,0 +1,21 @@
+=== guarded run start 2026-11-27T07:23:03+08:00 host=<host> plan=~/p3runs/lib12f.plan ===
+NVIDIA GeForce RTX 5080, 580.95.05, 7 MiB, 0 %, 21
+>>> [L12-fixed] 07:23:03
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+L12 fixed fails=0/20
+[LIB-12 cuFFT 2D R2C+C2R 64x256x256] PASS | preempts=1 susp=0.093 ms hp=0.022 ms | max_err=0.000e+00 bad=0/4194304
+<<< [L12-fixed] rc=0 wall=6.9s
+>>> [L12-router-fixed] 07:23:10
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+L12 router-on fixed fails=0/10
+<<< [L12-router-fixed] rc=0 wall=3.4s
+>>> [S4-all] 07:23:14
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+      1 16777216
+      1 bad=0
+      1 bad=0/131072
+      1 bad=0/16777216
+      1 bad=0/4194304
+      1 sel_ok=1
+<<< [S4-all] rc=0 wall=1.2s
+=== guarded run done 2026-11-27T07:23:15+08:00 ===

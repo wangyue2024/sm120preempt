@@ -432,6 +432,8 @@ static CUresult XStreamWaitEventImpl(CUstream stream, CUevent event, unsigned in
             // the event is not recorded on an xqueue
             return Driver::StreamWaitEvent(stream, event, flags);
         }
+        // Phase 3.5: GPU-side wait instead of blocking the caller (see event_bridge.cpp).
+        if (AsyncCrossStreamWait(stream, event, flags, xevent)) return CUDA_SUCCESS;
         xevent->Wait();
         return CUDA_SUCCESS;
     }
@@ -610,6 +612,7 @@ CUresult XStreamDestroy(CUstream stream)
 {
     if (!GetCudaSingleStreamPerProcessEnabled()) {
         XDEBG("XStreamDestroy(stream: %p)", stream);
+        StreamPromotionOnDestroy(stream);
         XQueueManager::AutoDestroy(GetHwQueueHandle(stream));
         return Driver::StreamDestroy(stream);
     }
@@ -618,6 +621,7 @@ CUresult XStreamDestroy(CUstream stream)
     std::lock_guard<std::mutex> lock(g_single_stream_mutex);
     g_single_stream_ref_cnt--;
     if (g_single_stream_ref_cnt == 0) {
+        StreamPromotionOnDestroy(stream);
         XQueueManager::AutoDestroy(GetHwQueueHandle(stream));
         res = Driver::StreamDestroy(g_single_stream);
         g_single_stream = nullptr;
@@ -631,6 +635,7 @@ CUresult XStreamDestroy_v2(CUstream stream)
 {
     if (!GetCudaSingleStreamPerProcessEnabled()) {
         XDEBG("XStreamDestroy_v2(stream: %p)", stream);
+        StreamPromotionOnDestroy(stream);
         XQueueManager::AutoDestroy(GetHwQueueHandle(stream));
         return Driver::StreamDestroy_v2(stream);
     }
@@ -639,6 +644,7 @@ CUresult XStreamDestroy_v2(CUstream stream)
     std::lock_guard<std::mutex> lock(g_single_stream_mutex);
     g_single_stream_ref_cnt--;
     if (g_single_stream_ref_cnt == 0) {
+        StreamPromotionOnDestroy(stream);
         XQueueManager::AutoDestroy(GetHwQueueHandle(stream));
         res = Driver::StreamDestroy_v2(g_single_stream);
         g_single_stream = nullptr;

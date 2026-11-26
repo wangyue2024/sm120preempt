@@ -1,0 +1,133 @@
+=== guarded run start 2026-11-27T07:49:02+08:00 host=<host> plan=~/p3runs/s8r.plan ===
+NVIDIA GeForce RTX 5080, 580.95.05, 7 MiB, 0 %, 31
+>>> [S8r-1] 07:49:02
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2337066 @ 07:49:02.552909] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 20454.51it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 2337066 @ 07:49:07.077371] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2337066 @ 07:49:07.089999] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.52/10.95ms TPOT p50/p99=6.42/7.92ms hp_exact=20/20 lp_iters=160 bad=0 lp_tput=71.8% hp_duty=23%
+<<< [S8r-1] rc=0 wall=14.4s
+>>> [S8r-2] 07:49:16
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2337183 @ 07:49:16.931340] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 20422.92it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 2337183 @ 07:49:21.320376] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2337183 @ 07:49:21.332985] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.31/7.69ms TPOT p50/p99=6.24/8.64ms hp_exact=20/20 lp_iters=161 bad=0 lp_tput=72.4% hp_duty=23%
+<<< [S8r-2] rc=0 wall=14.2s
+>>> [S8r-3] 07:49:31
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2337301 @ 07:49:31.179165] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 20527.35it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 2337301 @ 07:49:35.568253] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2337301 @ 07:49:35.580691] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.49/8.75ms TPOT p50/p99=6.35/8.87ms hp_exact=20/20 lp_iters=161 bad=0 lp_tput=72.4% hp_duty=23%
+<<< [S8r-3] rc=0 wall=14.3s
+>>> [S8r-4] 07:49:45
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2337419 @ 07:49:45.449522] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 20626.56it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 2337419 @ 07:49:49.866147] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2337419 @ 07:49:49.878869] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.51/7.75ms TPOT p50/p99=6.38/9.05ms hp_exact=20/20 lp_iters=160 bad=0 lp_tput=71.9% hp_duty=23%
+<<< [S8r-4] rc=0 wall=14.2s
+>>> [S8r-5] 07:49:59
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2337533 @ 07:49:59.714441] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 20042.98it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 2337533 @ 07:50:04.097467] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2337533 @ 07:50:04.110241] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.30/7.51ms TPOT p50/p99=6.23/9.40ms hp_exact=20/20 lp_iters=161 bad=0 lp_tput=72.4% hp_duty=23%
+<<< [S8r-5] rc=0 wall=14.2s
+>>> [S8r-6] 07:50:13
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2337653 @ 07:50:13.956955] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 21077.27it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 2337653 @ 07:50:18.393861] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2337653 @ 07:50:18.406639] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.52/8.55ms TPOT p50/p99=6.43/8.75ms hp_exact=20/20 lp_iters=160 bad=0 lp_tput=71.9% hp_duty=23%
+<<< [S8r-6] rc=0 wall=14.3s
+>>> [S8r-aw0-1] 07:50:28
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2337772 @ 07:50:28.251296] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 20010.33it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 2337772 @ 07:50:32.647063] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2337772 @ 07:50:32.660013] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.41/8.06ms TPOT p50/p99=6.28/8.93ms hp_exact=20/20 lp_iters=161 bad=0 lp_tput=72.4% hp_duty=23%
+<<< [S8r-aw0-1] rc=0 wall=14.2s
+>>> [S8r-aw0-2] 07:50:42
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2337885 @ 07:50:42.512129] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 20841.44it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 2337885 @ 07:50:46.927448] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2337885 @ 07:50:46.940250] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.47/11.24ms TPOT p50/p99=6.35/9.90ms hp_exact=20/20 lp_iters=160 bad=0 lp_tput=71.9% hp_duty=23%
+<<< [S8r-aw0-2] rc=0 wall=14.3s
+>>> [S8r-aw0-3] 07:50:56
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2338000 @ 07:50:56.784241] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 20868.97it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 2338000 @ 07:51:01.200060] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2338000 @ 07:51:01.212760] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.48/7.68ms TPOT p50/p99=6.36/9.46ms hp_exact=20/20 lp_iters=160 bad=0 lp_tput=71.9% hp_duty=23%
+<<< [S8r-aw0-3] rc=0 wall=14.2s
+>>> [S8r-aw0-4] 07:51:10
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+[XSCHED INFO @ T 2338115 @ 07:51:11.051952] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 20461.40it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 2338115 @ 07:51:15.552579] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 2338115 @ 07:51:15.565621] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.69/11.26ms TPOT p50/p99=6.56/8.01ms hp_exact=20/20 lp_iters=159 bad=0 lp_tput=71.5% hp_duty=24%
+<<< [S8r-aw0-4] rc=0 wall=14.3s
+=== guarded run done 2026-11-27T07:51:25+08:00 ===

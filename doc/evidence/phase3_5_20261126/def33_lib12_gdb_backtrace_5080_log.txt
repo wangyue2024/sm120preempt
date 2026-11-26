@@ -1,0 +1,26 @@
+=== guarded run start 2026-11-27T05:14:33+08:00 host=<host> plan=~/p3runs/lib12g.plan ===
+NVIDIA GeForce RTX 5080, 580.95.05, 7 MiB, 0 %, 22
+>>> [L12-gdb] 05:14:33
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+#0  __pthread_kill_implementation (no_tid=0, signo=6, threadid=<optimized out>) at ./nptl/pthread_kill.c:44
+#1  __pthread_kill_internal (signo=6, threadid=<optimized out>) at ./nptl/pthread_kill.c:78
+#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:89
+#3  __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26
+#4  __GI_abort () at ./stdlib/abort.c:79
+#5  __libc_message_impl (fmt=fmt@entry=0x7fff9c3cf8f0 "%s\n") at ../sysdeps/posix/libc_fatal.c:134
+#6  malloc_printerr (str=str@entry=0x7fff9c3d2d78 "malloc(): invalid size (unsorted)") at ./malloc/malloc.c:5775
+#7  _int_malloc (av=av@entry=0x7fff9c404ac0 <main_arena>, bytes=bytes@entry=152) at ./malloc/malloc.c:4078
+#8  __libc_calloc (n=<optimized out>, elem_size=<optimized out>) at ./malloc/malloc.c:3754
+#22 cuxtra::cuda::ObjMemcpyHtoD(unsigned long long, void const*, unsigned long, CUstream_st*, CUctx_st*, unsigned long, unsigned long, cuxtra::etbl::CUtoolsMemObjHandle_st*) () from /tmp/xsched_instal
+#23 cuXtraMemcpyHtoD () from <xsched_install>/lib/libhalcuda.so
+#24 xsched::cuda::sm120::Sm120Arena::RestoreAll() () from <xsched_install>/lib/libhalcuda.so
+#25 xsched::cuda::sm120::Sm120TrapEngine::RestoreOriginal() () from <xsched_install>/lib/libhalcuda.so
+#26 xsched::cuda::sm120::Sm120TrapEngine::~Sm120TrapEngine() () from <xsched_install>/lib/libhalcuda.so
+#27 std::map<CUctx_st*, std::shared_ptr<xsched::cuda::sm120::Sm120TrapEngine>, std::less<CUctx_st*>, std::allocator<std::pair<CUctx_st* const, std::shared_ptr<xsched::cuda::sm120::Sm120TrapEngine> > >
+#28 __run_exit_handlers (status=0, listp=<optimized out>, run_list_atexit=run_list_atexit@entry=true, run_dtors=run_dtors@entry=true) at ./stdlib/exit.c:108
+#29 __GI_exit (status=<optimized out>) at ./stdlib/exit.c:138
+#30 __libc_start_call_main (main=main@entry=0x555555558a40 <main>, argc=argc@entry=2, argv=argv@entry=0x7fffffffe6b8) at ../sysdeps/nptl/libc_start_call_main.h:74
+#31 __libc_start_main_impl (main=0x555555558a40 <main>, argc=2, argv=0x7fffffffe6b8, init=<optimized out>, fini=<optimized out>, rtld_fini=<optimized out>, stack_end=0x7fffffffe6a8) at ../csu/libc-sta
+#32 _start ()
+<<< [L12-gdb] rc=0 wall=0.6s
+=== guarded run done 2026-11-27T05:14:33+08:00 ===

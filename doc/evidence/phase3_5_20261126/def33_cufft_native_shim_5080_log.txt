@@ -1,0 +1,18 @@
+=== guarded run start 2026-11-27T05:14:07+08:00 host=<host> plan=~/p3runs/lib12n.plan ===
+NVIDIA GeForce RTX 5080, 580.95.05, 7 MiB, 0 %, 21
+>>> [FFT-native] 05:14:07
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+FFT native fails=0/6
+<<< [FFT-native] rc=0 wall=5.7s
+>>> [FFT-shim] 05:14:13
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+FFT shim-passthrough fails=0/6
+<<< [FFT-shim] rc=0 wall=5.6s
+>>> [L12-lv1] 05:14:18
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+bash: line 1: 2310718 Aborted                 (core dumped) XSCHED_AUTO_XQUEUE_LEVEL=1 TEST_LEVEL=1 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2310728 Aborted                 (core dumped) XSCHED_AUTO_XQUEUE_LEVEL=1 TEST_LEVEL=1 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2310739 Aborted                 (core dumped) XSCHED_AUTO_XQUEUE_LEVEL=1 TEST_LEVEL=1 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+L12 lv1-env fails=3/6
+<<< [L12-lv1] rc=0 wall=2.2s
+=== guarded run done 2026-11-27T05:14:20+08:00 ===

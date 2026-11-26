@@ -21,6 +21,9 @@ XResult XHintSetScheduler(XSchedulerType scheduler, XPolicyType policy);
 /// @return kXSchedSuccess if successful, otherwise an error code.
 XResult XHintPriority(XQueueHandle xq, Priority prio);
 
+/// @brief Get the last priority hinted for an XQueue in this process (kXSchedErrorNotFound if none).
+XResult XHintGetPriority(XQueueHandle xq, Priority *prio);
+
 /// @brief Set the utilization of an XQueue.
 /// @param xq     [in] Handle to the XQueue.
 /// @param util   [in] Utilization to set. A percentage integer,

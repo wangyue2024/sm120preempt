@@ -33,6 +33,8 @@ public:
     virtual bool IsSuspended() const override { return suspended_.load(std::memory_order_acquire); }
 
     virtual void SetPreemptLevel(XPreemptLevel level) override;
+
+    virtual XPreemptLevel GetPreemptLevel() const override { return level_; }
     virtual void SetLaunchConfig(int64_t threshold, int64_t batch_size) override;
 
 private:

@@ -357,15 +357,16 @@ bool GuardianBarRedEnabled()
 std::shared_ptr<Sm120GuardianRegistry> Sm120GuardianRegistry::Instance(CUcontext ctx)
 {
     static std::mutex s_mtx;
-    static std::map<CUcontext, std::shared_ptr<Sm120GuardianRegistry>> s_map;
+    // Leaked (DEF-33): no driver calls from static destructors at process exit.
+    static auto *s_map = new std::map<CUcontext, std::shared_ptr<Sm120GuardianRegistry>>();
     std::lock_guard<std::mutex> lock(s_mtx);
-    auto it = s_map.find(ctx);
-    if (it != s_map.end()) return it->second;
+    auto it = s_map->find(ctx);
+    if (it != s_map->end()) return it->second;
 
     CUdevice dev = 0;
     CUDA_ASSERT(Driver::CtxGetDevice(&dev));
     auto reg = std::make_shared<Sm120GuardianRegistry>(ctx, dev);
-    s_map[ctx] = reg;
+    (*s_map)[ctx] = reg;
     return reg;
 }
 

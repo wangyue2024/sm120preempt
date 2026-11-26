@@ -1,0 +1,147 @@
+=== guarded run start 2026-11-26T22:03:31+01:00 host=<host> plan=~/.xsched_p3_build/abs_5060.plan ===
+NVIDIA GeForce RTX 5060, 595.99.02, 357 MiB, 9 %, 52
+>>> [ABs-lv3-1] 22:03:31
+[XSCHED INFO @ T 95651 @ 22:03:34.122401] using app-managed scheduler
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [ABs-lv3-1] rc=0 wall=9.1s
+>>> [ABs-lv3-2] 22:03:40
+[XSCHED INFO @ T 95734 @ 22:03:43.198139] using app-managed scheduler
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [ABs-lv3-2] rc=0 wall=9.0s
+>>> [ABs-lv3-3] 22:03:49
+[XSCHED INFO @ T 95810 @ 22:03:52.269124] using app-managed scheduler
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [ABs-lv3-3] rc=0 wall=9.1s
+>>> [ABs-lv3-4] 22:03:58
+[XSCHED INFO @ T 95894 @ 22:04:01.319991] using app-managed scheduler
+[NATIVE-DET] PASS | reps 85 bad 0  | late deterministic True
+<<< [ABs-lv3-4] rc=0 wall=9.0s
+>>> [ABs-lv3-5] 22:04:07
+[XSCHED INFO @ T 95969 @ 22:04:10.362657] using app-managed scheduler
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [ABs-lv3-5] rc=0 wall=9.1s
+>>> [ABs-lv3-6] 22:04:16
+[XSCHED INFO @ T 96045 @ 22:04:19.429211] using app-managed scheduler
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [ABs-lv3-6] rc=0 wall=9.0s
+>>> [ABs-lv3-7] 22:04:25
+[XSCHED INFO @ T 96128 @ 22:04:28.473393] using app-managed scheduler
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [ABs-lv3-7] rc=0 wall=9.0s
+>>> [ABs-lv3-8] 22:04:34
+[XSCHED INFO @ T 96204 @ 22:04:37.523744] using app-managed scheduler
+[NATIVE-DET] PASS | reps 85 bad 0  | late deterministic True
+<<< [ABs-lv3-8] rc=0 wall=9.0s
+>>> [ABs-lv3-9] 22:04:43
+[XSCHED INFO @ T 96287 @ 22:04:46.564692] using app-managed scheduler
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [ABs-lv3-9] rc=0 wall=9.0s
+>>> [ABs-lv3-10] 22:04:52
+[XSCHED INFO @ T 96376 @ 22:04:55.612635] using app-managed scheduler
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [ABs-lv3-10] rc=0 wall=9.0s
+>>> [ABs-lv3-11] 22:05:01
+[XSCHED INFO @ T 96452 @ 22:05:04.662194] using app-managed scheduler
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [ABs-lv3-11] rc=0 wall=9.1s
+>>> [ABs-lv3-12] 22:05:10
+[XSCHED INFO @ T 96527 @ 22:05:13.746903] using app-managed scheduler
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [ABs-lv3-12] rc=0 wall=9.0s
+>>> [ABs-lv3-13] 22:05:19
+[XSCHED INFO @ T 96610 @ 22:05:22.798256] using app-managed scheduler
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [ABs-lv3-13] rc=0 wall=9.0s
+>>> [ABs-lv3-14] 22:05:28
+[XSCHED INFO @ T 96693 @ 22:05:31.876384] using app-managed scheduler
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [ABs-lv3-14] rc=0 wall=9.0s
+>>> [ABs-lv3-15] 22:05:37
+[XSCHED INFO @ T 96769 @ 22:05:40.902318] using app-managed scheduler
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [ABs-lv3-15] rc=0 wall=9.0s
+>>> [ABs-lv3-16] 22:05:46
+[XSCHED INFO @ T 96852 @ 22:05:49.937734] using app-managed scheduler
+[NATIVE-DET] PASS | reps 85 bad 0  | late deterministic True
+<<< [ABs-lv3-16] rc=0 wall=9.0s
+>>> [ABs-lv3-17] 22:05:56
+[XSCHED INFO @ T 96937 @ 22:05:58.971603] using app-managed scheduler
+[NATIVE-DET] PASS | reps 85 bad 0  | late deterministic True
+<<< [ABs-lv3-17] rc=0 wall=9.0s
+>>> [ABs-lv3-18] 22:06:05
+[XSCHED INFO @ T 97012 @ 22:06:08.008934] using app-managed scheduler
+[NATIVE-DET] PASS | reps 85 bad 0  | late deterministic True
+<<< [ABs-lv3-18] rc=0 wall=9.0s
+>>> [ABs-lv3-19] 22:06:14
+[XSCHED INFO @ T 97096 @ 22:06:17.063617] using app-managed scheduler
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [ABs-lv3-19] rc=0 wall=9.0s
+>>> [ABs-lv3-20] 22:06:23
+[XSCHED INFO @ T 97179 @ 22:06:26.159665] using app-managed scheduler
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [ABs-lv3-20] rc=0 wall=9.1s
+>>> [ABs-lv3-21] 22:06:32
+[XSCHED INFO @ T 97255 @ 22:06:35.220373] using app-managed scheduler
+[NATIVE-DET] PASS | reps 85 bad 0  | late deterministic True
+<<< [ABs-lv3-21] rc=0 wall=9.0s
+>>> [ABs-lv3-22] 22:06:41
+[XSCHED INFO @ T 97331 @ 22:06:44.291806] using app-managed scheduler
+[NATIVE-DET] PASS | reps 85 bad 0  | late deterministic True
+<<< [ABs-lv3-22] rc=0 wall=9.0s
+>>> [ABs-lv3-23] 22:06:50
+[XSCHED INFO @ T 97415 @ 22:06:53.327491] using app-managed scheduler
+[NATIVE-DET] PASS | reps 85 bad 0  | late deterministic True
+<<< [ABs-lv3-23] rc=0 wall=9.0s
+>>> [ABs-lv3-24] 22:06:59
+[XSCHED INFO @ T 97499 @ 22:07:02.404555] using app-managed scheduler
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [ABs-lv3-24] rc=0 wall=9.1s
+>>> [ABs-none-1] 22:07:08
+[XSCHED INFO @ T 97575 @ 22:07:08.582842] using app-managed scheduler
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [ABs-none-1] rc=0 wall=6.2s
+>>> [ABs-none-2] 22:07:14
+[XSCHED INFO @ T 97634 @ 22:07:14.831995] using app-managed scheduler
+[NATIVE-DET] PASS | reps 85 bad 0  | late deterministic True
+<<< [ABs-none-2] rc=0 wall=6.2s
+>>> [ABs-none-3] 22:07:20
+[XSCHED INFO @ T 97693 @ 22:07:21.035693] using app-managed scheduler
+[NATIVE-DET] PASS | reps 85 bad 0  | late deterministic True
+<<< [ABs-none-3] rc=0 wall=6.2s
+>>> [ABs-none-4] 22:07:27
+[XSCHED INFO @ T 97745 @ 22:07:27.240667] using app-managed scheduler
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [ABs-none-4] rc=0 wall=6.2s
+>>> [ABs-none-5] 22:07:33
+[XSCHED INFO @ T 97798 @ 22:07:33.469714] using app-managed scheduler
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [ABs-none-5] rc=0 wall=6.2s
+>>> [ABs-none-6] 22:07:39
+[XSCHED INFO @ T 97857 @ 22:07:39.697925] using app-managed scheduler
+[NATIVE-DET] PASS | reps 85 bad 0  | late deterministic True
+<<< [ABs-none-6] rc=0 wall=6.2s
+>>> [ABs-none-7] 22:07:45
+[XSCHED INFO @ T 97910 @ 22:07:45.918979] using app-managed scheduler
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [ABs-none-7] rc=0 wall=6.2s
+>>> [ABs-none-8] 22:07:52
+[XSCHED INFO @ T 97971 @ 22:07:52.145117] using app-managed scheduler
+[NATIVE-DET] PASS | reps 85 bad 0  | late deterministic True
+<<< [ABs-none-8] rc=0 wall=6.2s
+>>> [ABs-none-9] 22:07:58
+[XSCHED INFO @ T 98030 @ 22:07:58.368934] using app-managed scheduler
+[NATIVE-DET] PASS | reps 85 bad 0  | late deterministic True
+<<< [ABs-none-9] rc=0 wall=6.2s
+>>> [ABs-none-10] 22:08:04
+[XSCHED INFO @ T 98082 @ 22:08:04.572531] using app-managed scheduler
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [ABs-none-10] rc=0 wall=6.2s
+>>> [ABs-none-11] 22:08:10
+[XSCHED INFO @ T 98134 @ 22:08:10.791390] using app-managed scheduler
+[NATIVE-DET] PASS | reps 85 bad 0  | late deterministic True
+<<< [ABs-none-11] rc=0 wall=6.2s
+>>> [ABs-none-12] 22:08:16
+[XSCHED INFO @ T 98187 @ 22:08:17.008527] using app-managed scheduler
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [ABs-none-12] rc=0 wall=6.2s
+=== guarded run done 2026-11-26T22:08:23+01:00 ===

@@ -1,0 +1,58 @@
+Thread 83 (Thread 0x78315a6036c0 (LWP 2263655) "python"):
+#0  __futex_abstimed_wait_common (cancel=false, private=<optimized out>, abstime=0x0, clockid=0, expected=3, futex_word=0xe535f38) at ./nptl/futex-internal.c:103
+#1  __GI___futex_abstimed_wait64 (futex_word=futex_word@entry=0xe535f38, expected=expected@entry=3, clockid=clockid@entry=0, abstime=abstime@entry=0x0, private=<optimized out>) at ./nptl/futex-internal.c:128
+#2  0x00007834676a294a in __pthread_rwlock_rdlock_full64 (abstime=0x0, clockid=0, rwlock=0xe535f30) at ./nptl/pthread_rwlock_common.c:460
+#3  ___pthread_rwlock_rdlock (rwlock=0xe535f30) at ./nptl/pthread_rwlock_rdlock.c:26
+#4  0x00007833683d5f3f in ?? () from /lib/x86_64-linux-gnu/libcuda.so
+#5  0x00007833683d63ce in ?? () from /lib/x86_64-linux-gnu/libcuda.so
+#6  0x00007833685a9697 in ?? () from /lib/x86_64-linux-gnu/libcuda.so
+#7  0x000078336859d6c5 in cuLaunchKernel () from /lib/x86_64-linux-gnu/libcuda.so
+#8  0x00007834669757cd in xsched::cuda::CudaKernelLaunchCommand::Launch(CUstream_st*) () from <xsched_install>/lib/libcuda.so.1
+#9  0x000078346656f3da in xsched::cuda::CudaCommand::LaunchWrapper(CUstream_st*) () from <xsched_install>/lib/libhalcuda.so
+#10 0x0000783466596c68 in xsched::cuda::CudaQueueLv3Trap::Launch(std::shared_ptr<xsched::preempt::HwCommand>) () from <xsched_install>/lib/libhalcuda.so
+#11 0x00007834664d914a in xsched::preempt::LaunchWorker::LaunchLocked(std::shared_ptr<xsched::preempt::HwCommand>) () from <xsched_install>/lib/libpreempt.so
+#12 0x00007834664dc9ec in xsched::preempt::LaunchWorker::LaunchHwCommand(std::shared_ptr<xsched::preempt::HwCommand>) () from <xsched_install>/lib/libpreempt.so
+#13 0x00007834664ddf6f in xsched::preempt::LaunchWorker::WorkerLoop() () from <xsched_install>/lib/libpreempt.so
+#14 0x000078343fcecdb4 in ?? () from /usr/lib/x86_64-linux-gnu/libstdc++.so.6
+#15 0x000078346769cb64 in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:447
+#16 0x0000783467729e8c in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+Thread 2 (Thread 0x782fc0ffd6c0 (LWP 2263769) "python"):
+#0  0x0000783467698e31 in __futex_abstimed_wait_common64 (private=0, cancel=true, abstime=0x0, op=393, expected=0, futex_word=0x409856f0) at ./nptl/futex-internal.c:57
+#1  __futex_abstimed_wait_common (cancel=true, private=0, abstime=0x0, clockid=0, expected=0, futex_word=0x409856f0) at ./nptl/futex-internal.c:87
+#2  __GI___futex_abstimed_wait_cancelable64 (futex_word=futex_word@entry=0x409856f0, expected=expected@entry=0, clockid=clockid@entry=0, abstime=abstime@entry=0x0, private=private@entry=0) at ./nptl/futex-internal.c:139
+#3  0x000078346769b8ad in __pthread_cond_wait_common (abstime=0x0, clockid=0, mutex=0x409856a0, cond=0x409856c8) at ./nptl/pthread_cond_wait.c:503
+#4  ___pthread_cond_wait (cond=0x409856c8, mutex=0x409856a0) at ./nptl/pthread_cond_wait.c:627
+#5  0x00007834664dff0c in xsched::preempt::XCommand::WaitUntil(xsched::preempt::XCommandState) () from <xsched_install>/lib/libpreempt.so
+#6  0x00007834664d014b in xsched::preempt::AsyncXQueue::Wait(std::shared_ptr<xsched::preempt::HwCommand>) () from <xsched_install>/lib/libpreempt.so
+#7  0x00007834664c0c00 in xsched::preempt::HwCommand::Wait() () from <xsched_install>/lib/libpreempt.so
+#8  0x0000783466965208 in xsched::cuda::(anonymous namespace)::Run(std::shared_ptr<xsched::cuda::(anonymous namespace)::Bridge>) () from <xsched_install>/lib/libcuda.so.1
+#9  0x0000783466965523 in std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(std::shared_ptr<xsched::cuda::(anonymous namespace)::Bridge>), std::shared_ptr<xsched::cuda::(anonymous namespace)::Bridge> > > >::_M_run() () from <xsched_install>/lib/libcuda.so.1
+#10 0x000078343fcecdb4 in ?? () from /usr/lib/x86_64-linux-gnu/libstdc++.so.6
+#11 0x000078346769cb64 in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:447
+#12 0x0000783467729e8c in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+Thread 1 (Thread 0x783467929300 (LWP 2263624) "python"):
+#0  0x000078336919d1b8 in ?? () from /lib/x86_64-linux-gnu/libcuda.so
+#1  0x000078336842b9f4 in ?? () from /lib/x86_64-linux-gnu/libcuda.so
+#2  0x000078336919b749 in ?? () from /lib/x86_64-linux-gnu/libcuda.so
+#3  0x00007833684fe418 in ?? () from /lib/x86_64-linux-gnu/libcuda.so
+#4  0x00007833684febcf in ?? () from /lib/x86_64-linux-gnu/libcuda.so
+#5  0x00007833683c871c in ?? () from /lib/x86_64-linux-gnu/libcuda.so
+#6  0x000078336853be6a in ?? () from /lib/x86_64-linux-gnu/libcuda.so
+#7  0x000078336852b1e0 in cuModuleLoadData () from /lib/x86_64-linux-gnu/libcuda.so
+#8  0x00007833cc9d393c in loadBinary () from /tmp/p3_root_cache/triton/DLQU3NOBVY4JY6J44EL4FX4TATG26X3NOBK4CBRJJCRLBLCBPWXQ/cuda_utils.cpython-312-x86_64-linux-gnu.so
+#9  0x0000000000582190 in ?? ()
+#10 0x0000000000548fb5 in _PyObject_MakeTpCall ()
+#11 0x00000000005d710f in _PyEval_EvalFrameDefault ()
+#12 0x000000000054caed in ?? ()
+#13 0x00000000005db2ee in _PyEval_EvalFrameDefault ()
+#14 0x000000000054cbb4 in ?? ()
+#15 0x000000000054b1d5 in PyObject_Call ()
+#16 0x00000000005db2ee in _PyEval_EvalFrameDefault ()
+#17 0x000000000054cb52 in ?? ()
+#18 0x00000000005db2ee in _PyEval_EvalFrameDefault ()
+#19 0x000000000054a8ca in _PyObject_Call_Prepend ()
+#20 0x000000000059e0ff in ?? ()
+#21 0x0000000000599bd3 in ?? ()
+#22 0x000000000054907e in _PyObject_MakeTpCall ()
+#23 0x00000000005d710f in _PyEval_EvalFrameDefault ()
+#24 0x000000000054a802 in _PyObject_Call_Prepend ()

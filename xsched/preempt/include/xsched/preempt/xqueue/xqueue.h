@@ -35,6 +35,8 @@ public:
     virtual void Suspend(int64_t flags) = 0;
     virtual void Resume(int64_t flags) = 0;
     virtual bool IsSuspended() const { return false; }
+    /// @brief The current preemption level (kPreemptLevelUnknown if the implementation has none).
+    virtual XPreemptLevel GetPreemptLevel() const { return kPreemptLevelUnknown; }
 
     /// @brief Set the preempt level of the XQueue. NOT thread-safe, make sure there is
     /// NO other operations on the XQueue when calling this function.

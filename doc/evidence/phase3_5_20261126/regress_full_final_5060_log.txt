@@ -1,0 +1,2221 @@
+=== guarded run start 2026-11-27T00:23:33+01:00 host=<host> plan=~/.xsched_p3_build/regress_5060.plan ===
+NVIDIA GeForce RTX 5060, 595.99.02, 362 MiB, 11 %, 48
+>>> [SYN-partial] 00:23:33
+[XSCHED INFO @ T 120601 @ 00:23:33.940146] using app-managed scheduler
+[XSCHED INFO @ T 120601 @ 00:23:34.068651] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 120601 @ 00:23:34.113115] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[P3-PARTIAL K0 uniform] PASS | runs=5 ok=5 np=3 susp_avg=0.372 ms | blocks=60 thr=256 base=3301637 step=51588
+[P3-PARTIAL K1 half_exit] PASS | runs=5 ok=5 np=3 susp_avg=0.114 ms | blocks=60 thr=256 base=3301637 step=51588
+[P3-PARTIAL K2 staggered_exit] PASS | runs=5 ok=5 np=3 susp_avg=0.357 ms | blocks=60 thr=256 base=3301637 step=51588
+[P3-PARTIAL K3 staggered_reconv] PASS | runs=5 ok=5 np=3 susp_avg=0.308 ms | blocks=60 thr=256 base=3301637 step=51588
+<<< [SYN-partial] rc=0 wall=1.0s
+>>> [SYN-convbar-np3] 00:23:34
+[XSCHED INFO @ T 120634 @ 00:23:34.984129] using app-managed scheduler
+[XSCHED INFO @ T 120634 @ 00:23:35.067908] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 120634 @ 00:23:35.104288] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[P3-CONVBAR C0 shallow] PASS | runs=3 ok=3 np=3 outer=9100 blocks=60 thr=256 chain=1 gap_us=0
+[P3-CONVBAR C1 deep] PASS | runs=3 ok=3 np=3 outer=319 blocks=60 thr=256 chain=1 gap_us=0
+[P3-CONVBAR D1 depth1] PASS | runs=3 ok=3 np=3 outer=82474 blocks=60 thr=256 chain=1 gap_us=0
+[P3-CONVBAR D2 depth2] PASS | runs=3 ok=3 np=3 outer=46674 blocks=60 thr=256 chain=1 gap_us=0
+[P3-CONVBAR D3 depth3] PASS | runs=3 ok=3 np=3 outer=17215 blocks=60 thr=256 chain=1 gap_us=0
+[P3-CONVBAR D4 depth4] PASS | runs=3 ok=3 np=3 outer=5172 blocks=60 thr=256 chain=1 gap_us=0
+[P3-CONVBAR D5 depth5] PASS | runs=3 ok=3 np=3 outer=1371 blocks=60 thr=256 chain=1 gap_us=0
+[P3-CONVBAR D6 depth6] PASS | runs=3 ok=3 np=3 outer=357 blocks=60 thr=256 chain=1 gap_us=0
+[P3-CONVBAR R0 regs+0] PASS | runs=3 ok=3 np=3 outer=25031 blocks=60 thr=256 chain=1 gap_us=0
+[P3-CONVBAR R1 regs+4] PASS | runs=3 ok=3 np=3 outer=21786 blocks=60 thr=256 chain=1 gap_us=0
+[P3-CONVBAR R2 regs+16] PASS | runs=3 ok=3 np=3 outer=9514 blocks=60 thr=256 chain=1 gap_us=0
+[P3-CONVBAR R3 regs+48] PASS | runs=3 ok=3 np=3 outer=3988 blocks=60 thr=256 chain=1 gap_us=0
+<<< [SYN-convbar-np3] rc=0 wall=2.1s
+>>> [SYN-stress-g2] 00:23:37
+[XSCHED INFO @ T 120669 @ 00:23:37.072272] using app-managed scheduler
+[XSCHED INFO @ T 120669 @ 00:23:37.155412] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 120669 @ 00:23:37.191113] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[P3-CONVBAR C0 shallow] PASS | runs=3 ok=3 np=10 outer=929 blocks=60 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR C1 deep] PASS | runs=3 ok=3 np=10 outer=31 blocks=60 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D1 depth1] PASS | runs=3 ok=3 np=10 outer=8695 blocks=60 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D2 depth2] PASS | runs=3 ok=3 np=10 outer=5344 blocks=60 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D3 depth3] PASS | runs=3 ok=3 np=10 outer=1842 blocks=60 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D4 depth4] PASS | runs=3 ok=3 np=10 outer=517 blocks=60 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D5 depth5] PASS | runs=3 ok=3 np=10 outer=137 blocks=60 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D6 depth6] PASS | runs=3 ok=3 np=10 outer=33 blocks=60 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R0 regs+0] PASS | runs=3 ok=3 np=10 outer=2637 blocks=60 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R1 regs+4] PASS | runs=3 ok=3 np=10 outer=2086 blocks=60 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R2 regs+16] PASS | runs=3 ok=3 np=10 outer=965 blocks=60 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R3 regs+48] PASS | runs=3 ok=3 np=10 outer=403 blocks=60 thr=256 chain=6 gap_us=1000
+<<< [SYN-stress-g2] rc=0 wall=1.4s
+>>> [SYN-stress-g8] 00:23:38
+[XSCHED INFO @ T 120708 @ 00:23:38.492975] using app-managed scheduler
+[XSCHED INFO @ T 120708 @ 00:23:38.576440] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 120708 @ 00:23:38.612997] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[P3-CONVBAR C0 shallow] PASS | runs=3 ok=3 np=10 outer=547 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR C1 deep] PASS | runs=3 ok=3 np=10 outer=10 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D1 depth1] PASS | runs=3 ok=3 np=10 outer=5383 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D2 depth2] PASS | runs=3 ok=3 np=10 outer=2584 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D3 depth3] PASS | runs=3 ok=3 np=10 outer=728 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D4 depth4] PASS | runs=3 ok=3 np=10 outer=190 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D5 depth5] PASS | runs=3 ok=3 np=10 outer=49 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D6 depth6] PASS | runs=3 ok=3 np=10 outer=12 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R0 regs+0] PASS | runs=3 ok=3 np=10 outer=856 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R1 regs+4] PASS | runs=3 ok=3 np=10 outer=701 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R2 regs+16] PASS | runs=3 ok=3 np=10 outer=265 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R3 regs+48] PASS | runs=3 ok=3 np=10 outer=99 blocks=240 thr=256 chain=6 gap_us=1000
+<<< [SYN-stress-g8] rc=0 wall=1.6s
+>>> [SYN-stress-gap300] 00:23:40
+[XSCHED INFO @ T 120742 @ 00:23:40.091485] using app-managed scheduler
+[XSCHED INFO @ T 120742 @ 00:23:40.175947] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 120742 @ 00:23:40.212641] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[P3-CONVBAR C0 shallow] PASS | runs=3 ok=3 np=8 outer=5386 blocks=240 thr=256 chain=4 gap_us=300
+[P3-CONVBAR C1 deep] PASS | runs=3 ok=3 np=8 outer=105 blocks=240 thr=256 chain=4 gap_us=300
+[P3-CONVBAR D1 depth1] PASS | runs=3 ok=3 np=8 outer=51314 blocks=240 thr=256 chain=4 gap_us=300
+[P3-CONVBAR D2 depth2] PASS | runs=3 ok=3 np=8 outer=24140 blocks=240 thr=256 chain=4 gap_us=300
+[P3-CONVBAR D3 depth3] PASS | runs=3 ok=3 np=8 outer=7113 blocks=240 thr=256 chain=4 gap_us=300
+[P3-CONVBAR D4 depth4] PASS | runs=3 ok=3 np=8 outer=1883 blocks=240 thr=256 chain=4 gap_us=300
+[P3-CONVBAR D5 depth5] PASS | runs=3 ok=3 np=8 outer=471 blocks=240 thr=256 chain=4 gap_us=300
+[P3-CONVBAR D6 depth6] PASS | runs=3 ok=3 np=8 outer=126 blocks=240 thr=256 chain=4 gap_us=300
+[P3-CONVBAR R0 regs+0] PASS | runs=3 ok=3 np=8 outer=8024 blocks=240 thr=256 chain=4 gap_us=300
+[P3-CONVBAR R1 regs+4] PASS | runs=3 ok=3 np=8 outer=6925 blocks=240 thr=256 chain=4 gap_us=300
+[P3-CONVBAR R2 regs+16] PASS | runs=3 ok=3 np=8 outer=2622 blocks=240 thr=256 chain=4 gap_us=300
+[P3-CONVBAR R3 regs+48] PASS | runs=3 ok=3 np=8 outer=1045 blocks=240 thr=256 chain=4 gap_us=300
+<<< [SYN-stress-gap300] rc=0 wall=7.3s
+>>> [SYN-percall-lv1] 00:23:47
+[XSCHED INFO @ T 120786 @ 00:23:47.403113] using app-managed scheduler
+[XSCHED INFO @ T 120786 @ 00:23:47.485837] level-3 sm120 trap backend enabled (default)
+[P3-PERCALL-CHECK] last_tiny=1999 last_busy=199 (expect 199) busy_kernel_us=274.4 (expect ~300) clk_khz=2527000 cycles=758100
+[P3-PERCALL] PASS mode=lv1 sync1_p50=5.69 sync1_p90=6.46 sync4_p50=11.78 sync4_p90=14.67 async_us=1.84 long_p50=277.65 long_p90=278.89 long_us=300 gap_us=50 last=1999
+<<< [SYN-percall-lv1] rc=0 wall=0.3s
+>>> [SYN-percall-lv3] 00:23:47
+[XSCHED INFO @ T 120816 @ 00:23:47.684083] using app-managed scheduler
+[XSCHED INFO @ T 120816 @ 00:23:47.766190] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 120816 @ 00:23:47.803623] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[P3-PERCALL-CHECK] last_tiny=1999 last_busy=199 (expect 199) busy_kernel_us=291.9 (expect ~300) clk_khz=2527000 cycles=758100
+[P3-PERCALL] PASS mode=lv3 sync1_p50=6.54 sync1_p90=7.55 sync4_p50=12.69 sync4_p90=15.72 async_us=2.06 long_p50=278.57 long_p90=283.65 long_us=300 gap_us=50 last=1999
+<<< [SYN-percall-lv3] rc=0 wall=0.3s
+>>> [SYN-xq-idle] 00:23:48
+[XSCHED INFO @ T 120848 @ 00:23:48.114358] using app-managed scheduler
+[XSCHED INFO @ T 120848 @ 00:23:48.824964] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 120848 @ 00:23:48.923505] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 120848 @ 00:23:48.959461] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XQ-IDLE lv1 latency] idle within 50 ms after 200/200 synchronizes; time to idle p50 24.1 us, max 28.9 us
+[XQ-IDLE lv1 single] PASS
+[XQ-IDLE lv1 burst] PASS
+[XQ-IDLE lv1 repeat] PASS
+[XQ-IDLE lv1 ready-again] PASS
+[XQ-IDLE lv1 idle-again] PASS
+[XQ-IDLE lv3 latency] idle within 50 ms after 200/200 synchronizes; time to idle p50 24.0 us, max 37.1 us
+[XQ-IDLE lv3 single] PASS
+[XQ-IDLE lv3 burst] PASS
+[XQ-IDLE lv3 repeat] PASS
+[XQ-IDLE lv3 ready-again] PASS
+[XQ-IDLE lv3 idle-again] PASS
+[XQ-IDLE all] PASS
+<<< [SYN-xq-idle] rc=0 wall=1.2s
+>>> [SYN-graph-preempt] 00:23:49
+[XSCHED INFO @ T 120893 @ 00:23:49.377561] using app-managed scheduler
+[XSCHED INFO @ T 120893 @ 00:23:53.101497] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 120893 @ 00:23:53.137179] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 120893 @ 00:23:53.140169] CUDA graph 0x335158f0 flattened for in-graph preemption: 125 commands (108 kernels)
+[GRAPH-PREEMPT lv3 flatten=1] PASS | replay native 26.712 xq 27.140 ms | susp p50 0.112 p99 1.034 max 1.034 ms | HP p50 0.402 p99 1.308 ms | preempts 15 | exact True (no-preempt True, deterministic True) | {'flat_launches': 83, 'whole_launches': 0, 'flat_cmds': 10375, 'unflattenable': 0, 'kept_whole_short': 0}
+<<< [SYN-graph-preempt] rc=0 wall=6.9s
+>>> [SYN-event-bridge-lv3] 00:23:56
+[XSCHED INFO @ T 120956 @ 00:23:56.339084] using app-managed scheduler
+[XSCHED INFO @ T 120956 @ 00:23:57.216397] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 120956 @ 00:23:57.252343] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 120956 @ 00:23:57.325271] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 120956 @ 00:23:57.325547] stream 0x2a655390 waits on an event of a level-2/3 XQueue: promoted to a level-1 XQueue so the wait does not block the caller (XSCHED_CUDA_ASYNC_EVENT_WAIT=0 disables)
+[EVENT-BRIDGE lv3 mode=1] PASS | iters 30 corrupted 0 | work 34.1 ms | wait_event caller blocked p50 4 us max 299 us | native deterministic True | {'lv1_gpu_wait': 0, 'promoted_waits': 1, 'blocking': 0, 'promotions': 1}
+<<< [SYN-event-bridge-lv3] rc=0 wall=2.5s
+>>> [SYN-event-bridge-lv1] 00:23:58
+[XSCHED INFO @ T 121034 @ 00:23:58.855225] using app-managed scheduler
+[XSCHED INFO @ T 121034 @ 00:23:59.754246] level-3 sm120 trap backend enabled (default)
+[EVENT-BRIDGE lv1 mode=1] PASS | iters 20 corrupted 0 | work 33.6 ms | wait_event caller blocked p50 4 us max 186 us | native deterministic True | {'lv1_gpu_wait': 20, 'promoted_waits': 0, 'blocking': 0, 'promotions': 0}
+<<< [SYN-event-bridge-lv1] rc=0 wall=2.0s
+>>> [SYN-event-bridge-modload] 00:24:00
+[XSCHED INFO @ T 121099 @ 00:24:00.902700] using app-managed scheduler
+[XSCHED INFO @ T 121099 @ 00:24:01.779781] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121099 @ 00:24:01.815577] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 121099 @ 00:24:01.889502] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121099 @ 00:24:01.889785] stream 0x1ac2e720 waits on an event of a level-2/3 XQueue: promoted to a level-1 XQueue so the wait does not block the caller (XSCHED_CUDA_ASYNC_EVENT_WAIT=0 disables)
+[EVENT-BRIDGE lv3 mode=1 module-load] PASS | iters 10 corrupted 0 | work 34.0 ms | wait_event caller blocked p50 4 us max 306 us | native deterministic True | {'lv1_gpu_wait': 0, 'promoted_waits': 1, 'blocking': 0, 'promotions': 1}
+<<< [SYN-event-bridge-modload] rc=0 wall=1.7s
+>>> [SYN-graph-relaunch-whole] 00:24:02
+[XSCHED INFO @ T 121155 @ 00:24:02.605258] using app-managed scheduler
+[XSCHED INFO @ T 121155 @ 00:24:03.478021] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121155 @ 00:24:03.515257] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 121155 @ 00:24:03.554159] CUDA graph cannot support trap-based level-3 preemption, falling back to level-1 @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:429
+[GRAPH-RELAUNCH flatten=0] PASS | graph 10.7 ms | iters 60 counter 60 | wrong graph outputs 0 | suspensions 52
+<<< [SYN-graph-relaunch-whole] rc=0 wall=2.0s
+>>> [SYN-graph-relaunch-flat] 00:24:04
+[XSCHED INFO @ T 121201 @ 00:24:04.661573] using app-managed scheduler
+[XSCHED INFO @ T 121201 @ 00:24:05.504655] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121201 @ 00:24:05.541424] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 121201 @ 00:24:05.580920] CUDA graph 0x3a3c9de0 flattened for in-graph preemption: 17 commands (9 kernels)
+[GRAPH-RELAUNCH flatten=1] PASS | graph 11.0 ms | iters 60 counter 60 | wrong graph outputs 0 | suspensions 90
+<<< [SYN-graph-relaunch-flat] rc=0 wall=2.1s
+>>> [SYN-event-bridge-hazard] 00:24:06
+[XSCHED INFO @ T 121247 @ 00:24:06.809847] using app-managed scheduler
+[XSCHED INFO @ T 121247 @ 00:24:07.702634] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121247 @ 00:24:07.738681] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[EVENT-BRIDGE lv3 mode=2] PASS | iters 10 corrupted 10 | work 34.4 ms | wait_event caller blocked p50 3 us max 166 us | native deterministic True | {'lv1_gpu_wait': 10, 'promoted_waits': 0, 'blocking': 0, 'promotions': 0}
+  first bad iter 0: 16777216/16777216 elements differ, max |diff| 0.0886, nan 0, Y==gold now True
+<<< [SYN-event-bridge-hazard] rc=0 wall=1.8s
+>>> [SYN-stress-trim] 00:24:08
+[XSCHED INFO @ T 121302 @ 00:24:08.513796] using app-managed scheduler
+[XSCHED INFO @ T 121302 @ 00:24:08.593347] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121302 @ 00:24:08.630209] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[P3-CONVBAR C0 shallow] PASS | runs=3 ok=3 np=10 outer=548 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR C1 deep] PASS | runs=3 ok=3 np=10 outer=10 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D1 depth1] PASS | runs=3 ok=3 np=10 outer=6060 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D2 depth2] PASS | runs=3 ok=3 np=10 outer=2596 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D3 depth3] PASS | runs=3 ok=3 np=10 outer=728 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D4 depth4] PASS | runs=3 ok=3 np=10 outer=192 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D5 depth5] PASS | runs=3 ok=3 np=10 outer=48 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR D6 depth6] PASS | runs=3 ok=3 np=10 outer=12 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R0 regs+0] PASS | runs=3 ok=3 np=10 outer=855 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R1 regs+4] PASS | runs=3 ok=3 np=10 outer=712 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R2 regs+16] PASS | runs=3 ok=3 np=10 outer=266 blocks=240 thr=256 chain=6 gap_us=1000
+[P3-CONVBAR R3 regs+48] PASS | runs=3 ok=3 np=10 outer=105 blocks=240 thr=256 chain=6 gap_us=1000
+<<< [SYN-stress-trim] rc=0 wall=1.6s
+>>> [S1-LIB-01] 00:24:10
+[XSCHED INFO @ T 121335 @ 00:24:10.162738] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-01
+[XSCHED INFO @ T 121335 @ 00:24:10.246498] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121335 @ 00:24:10.282422] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.186ms avg_hp=0.362ms total=6.07ms hp_ok=1]
+[LIB-01] cuBLAS SGEMM 3072x3072 beta=0.0: max_err=0.000000e+00 mismatch=0/9437184 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB-01] rc=0 wall=0.4s
+>>> [S1-LIB-02] 00:24:10
+[XSCHED INFO @ T 121367 @ 00:24:10.615051] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-02
+[XSCHED INFO @ T 121367 @ 00:24:10.699497] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121367 @ 00:24:10.736101] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.184ms avg_hp=0.311ms total=5.97ms hp_ok=1]
+[LIB-02] cuBLAS SGEMM 3072x3072 beta=1.0: max_err=0.000000e+00 mismatch=0/9437184 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB-02] rc=0 wall=0.4s
+>>> [S1-LIB-03] 00:24:11
+[XSCHED INFO @ T 121399 @ 00:24:11.066074] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-03
+[XSCHED INFO @ T 121399 @ 00:24:11.148659] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121399 @ 00:24:11.186009] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.172ms avg_hp=0.427ms total=4.71ms hp_ok=1]
+[LIB-03] cuBLAS GemmEx FP16 TC 4096x4096 beta=1.0: max_err=0.000000e+00 mismatch=0/16777216 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB-03] rc=0 wall=0.5s
+>>> [S1-LIB-04] 00:24:11
+[XSCHED INFO @ T 121431 @ 00:24:11.585377] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-04
+[XSCHED INFO @ T 121431 @ 00:24:11.668751] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121431 @ 00:24:11.704977] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.818ms avg_hp=0.269ms total=4.79ms hp_ok=1]
+[LIB-04] cuBLAS GemmEx BF16 TC 4096x4096 beta=1.0: max_err=0.000000e+00 mismatch=0/16777216 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB-04] rc=0 wall=0.5s
+>>> [S1-LIB-05] 00:24:12
+[XSCHED INFO @ T 121463 @ 00:24:12.085610] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-05
+[XSCHED INFO @ T 121463 @ 00:24:12.170441] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121463 @ 00:24:12.207081] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.169ms avg_hp=0.256ms total=4.36ms hp_ok=1]
+[LIB-05] cuBLASLt FP16 TC 4096x4096 beta=1.0: max_err=0.000000e+00 mismatch=0/16777216 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB-05] rc=0 wall=0.5s
+>>> [S1-LIB-06] 00:24:12
+[XSCHED INFO @ T 121495 @ 00:24:12.606331] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-06
+[XSCHED INFO @ T 121495 @ 00:24:12.692404] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121495 @ 00:24:12.729740] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.234ms avg_hp=0.308ms total=6.07ms hp_ok=1]
+[LIB-06] cuFFT In-Place C2C (65536 x 256, 4 passes): max_err=0.000000e+00 mismatch=0/16777216 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB-06] rc=0 wall=0.6s
+>>> [S1-LIB-07] 00:24:13
+[XSCHED INFO @ T 121527 @ 00:24:13.177676] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-07
+[XSCHED INFO @ T 121527 @ 00:24:13.263644] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121527 @ 00:24:13.300704] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=1/2 avg_susp=0.047ms avg_hp=0.590ms total=1.81ms hp_ok=1]
+[LIB-07] cuSPARSE SpMM (4096x512 nnz=524288 beta=1.0): max_err=1.430511e-06 mismatch=0/2097152 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB-07] rc=0 wall=0.3s
+>>> [S1-HW-01] 00:24:13
+[XSCHED INFO @ T 121558 @ 00:24:13.504251] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-01
+[XSCHED INFO @ T 121558 @ 00:24:13.590145] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121558 @ 00:24:13.627034] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=1/2 avg_susp=0.065ms avg_hp=0.033ms total=4.29ms hp_ok=1]
+[HW-01] PTX TensorCore mma.sync (non-idemp): mismatch=0/61440 cnt=450240/450240 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-HW-01] rc=0 wall=0.3s
+>>> [S1-HW-02] 00:24:13
+[XSCHED INFO @ T 121590 @ 00:24:13.785144] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-02
+[XSCHED INFO @ T 121590 @ 00:24:13.871416] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121590 @ 00:24:13.908183] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.294ms avg_hp=0.024ms total=12.36ms hp_ok=1]
+[HW-02] PTX cp.async (LDGSTS) pipeline: mismatch=0/15360 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-HW-02] rc=0 wall=0.3s
+>>> [S1-HW-03] 00:24:14
+[XSCHED INFO @ T 121622 @ 00:24:14.089030] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-03
+[XSCHED INFO @ T 121622 @ 00:24:14.176530] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121622 @ 00:24:14.213285] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 121628 @ 00:24:14.227521] sm120_guardian: detected SM120 SYNCS/mbarrier in func=0x5f887a992690 (regs=19 static_smem=1040) -> safe level-1 boundary
+[XSCHED WARN @ T 121628 @ 00:24:14.227530] SM120 hardware mbarrier (SYNCS) kernel detected, routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:512
+    [preempts=1/2 avg_susp=12.230ms avg_hp=0.033ms total=16.46ms hp_ok=1]
+[HW-03] PTX SMEM mbarrier (arrive/try_wait): mismatch=0/15360 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-HW-03] rc=0 wall=0.3s
+>>> [S1-HW-04] 00:24:14
+[XSCHED INFO @ T 121653 @ 00:24:14.375999] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-04
+[XSCHED INFO @ T 121653 @ 00:24:14.462605] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121653 @ 00:24:14.499648] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 121659 @ 00:24:14.522583] CUDA graph 0x5e0a9cc0b760 flattened for in-graph preemption: 4 commands (4 kernels)
+    [preempts=2/2 avg_susp=0.194ms avg_hp=0.024ms total=21.80ms hp_ok=1]
+[HW-04] CUDA Graph (4-node, 21.80ms): max_err=0.000000e+00 susp=0.194ms (preempted inside the graph) -> PASS (in-graph)
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-HW-04] rc=0 wall=0.3s
+>>> [S1-HW-05] 00:24:14
+[XSCHED INFO @ T 121685 @ 00:24:14.695603] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-05
+[XSCHED INFO @ T 121685 @ 00:24:14.783350] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121685 @ 00:24:14.821829] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[HW-05] Idle Queue Suspend/Resume Safety: mismatch=0/4096 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-HW-05] rc=0 wall=0.3s
+>>> [S1-HW-06] 00:24:14
+[XSCHED INFO @ T 121715 @ 00:24:14.968327] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-06
+[XSCHED INFO @ T 121715 @ 00:24:15.055961] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121715 @ 00:24:15.092407] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 121722 @ 00:24:15.105064] Thread block cluster (cluster=2, blocks=60, sm=30), routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:497
+    [preempts=1/2 avg_susp=10.070ms avg_hp=0.193ms total=14.62ms hp_ok=1]
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-HW-06] rc=0 wall=0.3s
+>>> [S1-HW-07] 00:24:15
+[XSCHED INFO @ T 121747 @ 00:24:15.246281] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-07
+[XSCHED INFO @ T 121747 @ 00:24:15.331403] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121747 @ 00:24:15.367826] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 121753 @ 00:24:15.392843] Cooperative kernel requires whole-grid residency, routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:476
+    [preempts=1/2 avg_susp=20.576ms avg_hp=0.035ms total=24.80ms hp_ok=1]
+[HW-07] Cooperative Groups (grid.sync): mismatch=0/3840 susp=20.576ms (Shim bypass check) -> PASS (Shim-bypass)
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-HW-07] rc=0 wall=0.3s
+>>> [S1-LIB-08] 00:24:15
+[XSCHED INFO @ T 121778 @ 00:24:15.542250] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 121778 @ 00:24:15.628877] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121778 @ 00:24:15.665159] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.218ms avg_hp=0.019ms total=2.07ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB-08] rc=0 wall=0.4s
+>>> [S1-LIB08-r1] 00:24:15
+[XSCHED INFO @ T 121810 @ 00:24:15.955764] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 121810 @ 00:24:16.042511] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121810 @ 00:24:16.079051] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.092ms avg_hp=0.023ms total=2.06ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r1] rc=0 wall=0.4s
+>>> [S1-LIB08-r2] 00:24:16
+[XSCHED INFO @ T 121842 @ 00:24:16.360325] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 121842 @ 00:24:16.447211] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121842 @ 00:24:16.483724] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.109ms avg_hp=0.023ms total=2.07ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r2] rc=0 wall=0.4s
+>>> [S1-LIB08-r3] 00:24:16
+[XSCHED INFO @ T 121874 @ 00:24:16.770035] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 121874 @ 00:24:16.857686] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121874 @ 00:24:16.894444] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.078ms avg_hp=0.021ms total=2.00ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r3] rc=0 wall=0.4s
+>>> [S1-LIB08-r4] 00:24:17
+[XSCHED INFO @ T 121906 @ 00:24:17.187347] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 121906 @ 00:24:17.274347] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121906 @ 00:24:17.310673] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.077ms avg_hp=0.022ms total=2.01ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r4] rc=0 wall=0.4s
+>>> [S1-LIB08-r5] 00:24:17
+[XSCHED INFO @ T 121937 @ 00:24:17.591748] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 121937 @ 00:24:17.678608] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121937 @ 00:24:17.714874] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.192ms avg_hp=0.133ms total=2.66ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r5] rc=0 wall=0.4s
+>>> [S1-LIB08-r6] 00:24:17
+[XSCHED INFO @ T 121969 @ 00:24:17.999673] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 121969 @ 00:24:18.087036] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 121969 @ 00:24:18.123521] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.113ms avg_hp=0.021ms total=2.07ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r6] rc=0 wall=0.4s
+>>> [S1-LIB08-r7] 00:24:18
+[XSCHED INFO @ T 122001 @ 00:24:18.409219] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122001 @ 00:24:18.497133] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122001 @ 00:24:18.533760] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.065ms avg_hp=0.023ms total=1.99ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r7] rc=0 wall=0.4s
+>>> [S1-LIB08-r8] 00:24:18
+[XSCHED INFO @ T 122033 @ 00:24:18.812778] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122033 @ 00:24:18.898017] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122033 @ 00:24:18.934125] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.116ms avg_hp=0.021ms total=2.34ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r8] rc=0 wall=0.4s
+>>> [S1-LIB08-r9] 00:24:19
+[XSCHED INFO @ T 122065 @ 00:24:19.217546] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122065 @ 00:24:19.303529] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122065 @ 00:24:19.340279] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.081ms avg_hp=0.025ms total=2.02ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r9] rc=0 wall=0.4s
+>>> [S1-LIB08-r10] 00:24:19
+[XSCHED INFO @ T 122103 @ 00:24:19.624498] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122103 @ 00:24:19.710927] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122103 @ 00:24:19.747519] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.101ms avg_hp=0.022ms total=2.06ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r10] rc=0 wall=0.4s
+>>> [S1-LIB08-r11] 00:24:19
+[XSCHED INFO @ T 122135 @ 00:24:20.029413] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122135 @ 00:24:20.116522] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122135 @ 00:24:20.153233] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.078ms avg_hp=0.023ms total=2.01ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r11] rc=0 wall=0.4s
+>>> [S1-LIB08-r12] 00:24:20
+[XSCHED INFO @ T 122167 @ 00:24:20.436600] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122167 @ 00:24:20.522177] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122167 @ 00:24:20.558830] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.147ms avg_hp=0.022ms total=2.13ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r12] rc=0 wall=0.4s
+>>> [S1-LIB08-r13] 00:24:20
+[XSCHED INFO @ T 122199 @ 00:24:20.841117] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122199 @ 00:24:20.928486] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122199 @ 00:24:20.965060] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.206ms avg_hp=0.076ms total=2.26ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r13] rc=0 wall=0.4s
+>>> [S1-LIB08-r14] 00:24:21
+[XSCHED INFO @ T 122232 @ 00:24:21.248518] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122232 @ 00:24:21.335579] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122232 @ 00:24:21.372170] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.073ms avg_hp=0.021ms total=1.99ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r14] rc=0 wall=0.4s
+>>> [S1-LIB08-r15] 00:24:21
+[XSCHED INFO @ T 122263 @ 00:24:21.653552] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122263 @ 00:24:21.739169] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122263 @ 00:24:21.776173] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.069ms avg_hp=0.022ms total=1.98ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r15] rc=0 wall=0.4s
+>>> [S1-LIB08-r16] 00:24:22
+[XSCHED INFO @ T 122295 @ 00:24:22.056891] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122295 @ 00:24:22.141841] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122295 @ 00:24:22.178585] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.127ms avg_hp=0.021ms total=2.11ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r16] rc=0 wall=0.4s
+>>> [S1-LIB08-r17] 00:24:22
+[XSCHED INFO @ T 122327 @ 00:24:22.460935] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122327 @ 00:24:22.547681] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122327 @ 00:24:22.584014] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.102ms avg_hp=0.024ms total=2.05ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r17] rc=0 wall=0.4s
+>>> [S1-LIB08-r18] 00:24:22
+[XSCHED INFO @ T 122359 @ 00:24:22.866595] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122359 @ 00:24:22.951337] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122359 @ 00:24:22.987840] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.075ms avg_hp=0.018ms total=1.98ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r18] rc=0 wall=0.4s
+>>> [S1-LIB08-r19] 00:24:23
+[XSCHED INFO @ T 122391 @ 00:24:23.265916] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122391 @ 00:24:23.351331] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122391 @ 00:24:23.387638] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.070ms avg_hp=0.021ms total=1.97ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r19] rc=0 wall=0.4s
+>>> [S1-LIB08-r20] 00:24:23
+[XSCHED INFO @ T 122422 @ 00:24:23.670076] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122422 @ 00:24:23.755567] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122422 @ 00:24:23.792759] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.098ms avg_hp=0.023ms total=2.06ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r20] rc=0 wall=0.4s
+>>> [S1-LIB08-r21] 00:24:24
+[XSCHED INFO @ T 122454 @ 00:24:24.081381] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122454 @ 00:24:24.168537] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122454 @ 00:24:24.205220] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.080ms avg_hp=0.023ms total=2.02ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r21] rc=0 wall=0.4s
+>>> [S1-LIB08-r22] 00:24:24
+[XSCHED INFO @ T 122486 @ 00:24:24.488166] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122486 @ 00:24:24.573149] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122486 @ 00:24:24.609733] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.104ms avg_hp=0.021ms total=2.03ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r22] rc=0 wall=0.4s
+>>> [S1-LIB08-r23] 00:24:24
+[XSCHED INFO @ T 122518 @ 00:24:24.894769] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122518 @ 00:24:24.981980] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122518 @ 00:24:25.019764] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.346ms avg_hp=0.021ms total=2.34ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r23] rc=0 wall=0.4s
+>>> [S1-LIB08-r24] 00:24:25
+[XSCHED INFO @ T 122550 @ 00:24:25.303350] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122550 @ 00:24:25.389124] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122550 @ 00:24:25.425810] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.092ms avg_hp=0.023ms total=2.03ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r24] rc=0 wall=0.4s
+>>> [S1-LIB08-r25] 00:24:25
+[XSCHED INFO @ T 122581 @ 00:24:25.712748] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122581 @ 00:24:25.799793] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122581 @ 00:24:25.836981] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.080ms avg_hp=0.022ms total=2.02ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r25] rc=0 wall=0.4s
+>>> [S1-LIB08-r26] 00:24:26
+[XSCHED INFO @ T 122620 @ 00:24:26.120112] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122620 @ 00:24:26.207659] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122620 @ 00:24:26.244597] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.095ms avg_hp=0.022ms total=2.04ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r26] rc=0 wall=0.4s
+>>> [S1-LIB08-r27] 00:24:26
+[XSCHED INFO @ T 122652 @ 00:24:26.529548] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122652 @ 00:24:26.616673] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122652 @ 00:24:26.654592] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.127ms avg_hp=0.021ms total=2.10ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r27] rc=0 wall=0.4s
+>>> [S1-LIB08-r28] 00:24:26
+[XSCHED INFO @ T 122684 @ 00:24:26.941938] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122684 @ 00:24:27.028993] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122684 @ 00:24:27.066208] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.100ms avg_hp=0.021ms total=2.04ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r28] rc=0 wall=0.4s
+>>> [S1-LIB08-r29] 00:24:27
+[XSCHED INFO @ T 122716 @ 00:24:27.352368] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122716 @ 00:24:27.438721] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122716 @ 00:24:27.475665] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.073ms avg_hp=0.022ms total=2.00ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r29] rc=0 wall=0.4s
+>>> [S1-LIB08-r30] 00:24:27
+[XSCHED INFO @ T 122747 @ 00:24:27.760180] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=LIB-08
+[XSCHED INFO @ T 122747 @ 00:24:27.847670] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122747 @ 00:24:27.884328] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+    [preempts=2/2 avg_susp=0.092ms avg_hp=0.019ms total=2.02ms hp_ok=1]
+[LIB-08] CUB DeviceRadixSort (8M pairs): mismatch=0/8388608 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [S1-LIB08-r30] rc=0 wall=0.4s
+>>> [S4-LIB-09] 00:24:28
+[XSCHED INFO @ T 122779 @ 00:24:28.158584] using app-managed scheduler
+[XSCHED INFO @ T 122779 @ 00:24:28.248179] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122779 @ 00:24:28.285260] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[LIB-09 cuSOLVER LU+Solve 2048x2048] PASS | preempts=2 susp=0.204 ms hp=0.330 ms | info=0 max_err=0.000e+00 bad=0/131072
+PHASE3_CUDA_LIBS_ALL_PASS
+<<< [S4-LIB-09] rc=0 wall=0.7s
+>>> [S4-LIB-10] 00:24:28
+[XSCHED INFO @ T 122812 @ 00:24:28.905541] using app-managed scheduler
+[XSCHED INFO @ T 122812 @ 00:24:28.996461] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122812 @ 00:24:29.032790] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[LIB-10 cuSOLVER Cholesky 3072x3072] PASS | preempts=1 susp=0.617 ms hp=0.394 ms | info=0 max_err=0.000e+00 bad=0
+PHASE3_CUDA_LIBS_ALL_PASS
+<<< [S4-LIB-10] rc=0 wall=0.4s
+>>> [S4-LIB-11] 00:24:29
+[XSCHED INFO @ T 122844 @ 00:24:29.298370] using app-managed scheduler
+[XSCHED INFO @ T 122844 @ 00:24:29.388888] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122844 @ 00:24:29.425678] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[LIB-11 cuRAND Stateful XORWOW+Philox 60x8M] PASS | preempts=2+2 susp=0.085/0.181 ms | bad_bits=0+0 / 16777216
+PHASE3_CUDA_LIBS_ALL_PASS
+<<< [S4-LIB-11] rc=0 wall=0.4s
+>>> [S4-LIB-12] 00:24:29
+[XSCHED INFO @ T 122876 @ 00:24:29.766771] using app-managed scheduler
+[XSCHED INFO @ T 122876 @ 00:24:29.855940] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122876 @ 00:24:29.892821] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[LIB-12 cuFFT 2D R2C+C2R 64x256x256] PASS | preempts=1 susp=0.140 ms hp=0.035 ms | max_err=0.000e+00 bad=0/4194304
+PHASE3_CUDA_LIBS_ALL_PASS
+<<< [S4-LIB-12] rc=0 wall=0.4s
+>>> [S4-LIB-13] 00:24:30
+[XSCHED INFO @ T 122908 @ 00:24:30.182058] using app-managed scheduler
+[XSCHED INFO @ T 122908 @ 00:24:30.272036] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122908 @ 00:24:30.308640] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[LIB-13 CUB LookBack Scan+Reduce+Select 16M] PASS | preempts=2 susp=0.203 ms hp=0.032 ms | bad=0 sum_ok=1 sel_ok=1
+PHASE3_CUDA_LIBS_ALL_PASS
+<<< [S4-LIB-13] rc=0 wall=0.4s
+>>> [S4-LIB-14] 00:24:30
+[XSCHED INFO @ T 122940 @ 00:24:30.647327] using app-managed scheduler
+[XSCHED INFO @ T 122940 @ 00:24:30.737975] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122940 @ 00:24:30.775070] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[LIB-14 cuBLASLt FP8-E4M3 4096^3 beta=1] PASS | preempts=2 susp=0.139 ms hp=0.349 ms | max_err=0.000e+00 bad=0/16777216
+PHASE3_CUDA_LIBS_ALL_PASS
+<<< [S4-LIB-14] rc=0 wall=0.5s
+>>> [S5-dnn01] 00:24:31
+[XSCHED INFO @ T 122972 @ 00:24:31.196545] using app-managed scheduler
+[XSCHED INFO @ T 122972 @ 00:24:32.376468] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 122972 @ 00:24:32.414003] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[DNN-01 ViT-B/16 BF16 B=16] PASS | preempts=3 susp_ms=[0.054, 4.193, 9.607] hp_ms=[1.044, 0.103, 0.096] max_err=0.000e+00
+<<< [S5-dnn01] rc=0 wall=2.6s
+>>> [S5-dnn02] 00:24:33
+[XSCHED INFO @ T 123024 @ 00:24:33.827744] using app-managed scheduler
+[XSCHED INFO @ T 123024 @ 00:24:35.027124] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123024 @ 00:24:35.063899] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[DNN-02 Swin-B + ConvNeXt-NHWC] PASS | swin_preempts=3 susp=[0.058, 0.154, 0.145] err=0.000e+00 | cnxt_preempts=3 susp=[0.042, 0.077, 0.09] err=0.000e+00
+<<< [S5-dnn02] rc=0 wall=8.6s
+>>> [S5-dnn03] 00:24:42
+[XSCHED INFO @ T 123092 @ 00:24:42.436419] using app-managed scheduler
+[XSCHED INFO @ T 123092 @ 00:24:43.636532] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123092 @ 00:24:43.673465] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[DNN-03 DeepLabV3 + RoIAlign + NMS] PASS | preempts=3 susp=[0.053, 0.04, 0.085] err_seg=0.000e+00 err_roi=0.000e+00 nms_exact=True
+<<< [S5-dnn03] rc=0 wall=3.2s
+>>> [S5-dnn04] 00:24:45
+[XSCHED INFO @ T 123142 @ 00:24:45.696530] using app-managed scheduler
+[XSCHED INFO @ T 123142 @ 00:24:46.946309] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123142 @ 00:24:46.984255] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[DNN-04 AMP-BF16 + 4xGradAccum + FusedAdamW] PASS | preempts=4 susp=[0.016, 0.063, 0.027, 0.039] loss_err=0.000e+00 max_w_err=0.000e+00
+<<< [S5-dnn04] rc=0 wall=4.1s
+>>> [S5-dnn05] 00:24:49
+[XSCHED INFO @ T 123225 @ 00:24:49.777716] using app-managed scheduler
+[XSCHED INFO @ T 123225 @ 00:24:50.952137] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123225 @ 00:24:50.988423] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[DNN-05 20-Step Convergence (26 preempts)] PASS | susp_p50=0.107 ms max_loss_diff=0.000e+00 max_w_diff=0.000e+00
+<<< [S5-dnn05] rc=0 wall=2.5s
+>>> [S5-dnn06] 00:24:52
+[XSCHED INFO @ T 123274 @ 00:24:52.345575] using app-managed scheduler
+[XSCHED INFO @ T 123274 @ 00:24:53.522421] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123274 @ 00:24:53.558785] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[DNN-06 torch.compile(inductor, default)] PASS | preempts=3 susp=[1.025, 0.99, 0.963] max_err=0.000e+00
+<<< [S5-dnn06] rc=0 wall=4.7s
+>>> [S5-dnn07] 00:24:56
+[XSCHED INFO @ T 123371 @ 00:24:57.016306] using app-managed scheduler
+[XSCHED INFO @ T 123371 @ 00:24:58.181067] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123371 @ 00:24:58.217207] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 123371 @ 00:24:59.145016] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123371 @ 00:24:59.146091] stream 0x21142060 waits on an event of a level-2/3 XQueue: promoted to a level-1 XQueue so the wait does not block the caller (XSCHED_CUDA_ASYNC_EVENT_WAIT=0 disables)
+[XSCHED INFO @ T 123371 @ 00:24:59.290320] CUDA graph 0x27d54a10 flattened for in-graph preemption: 16 commands (16 kernels)
+[DNN-07 torch.compile(reduce-overhead/CUDAGraph)] PASS | preempts=2 susp=[0.575, 0.447] max_err=0.000e+00
+<<< [S5-dnn07] rc=0 wall=4.2s
+>>> [S5-dnn08] 00:25:01
+[XSCHED INFO @ T 123469 @ 00:25:01.204992] using app-managed scheduler
+[XSCHED INFO @ T 123469 @ 00:25:02.369996] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123469 @ 00:25:02.406507] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 123469 @ 00:25:03.901494] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123469 @ 00:25:03.901702] stream 0x32192f10 waits on an event of a level-2/3 XQueue: promoted to a level-1 XQueue so the wait does not block the caller (XSCHED_CUDA_ASYNC_EVENT_WAIT=0 disables)
+[XSCHED INFO @ T 123469 @ 00:25:03.901717] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123469 @ 00:25:03.901870] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123469 @ 00:25:03.902052] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123469 @ 00:25:03.902199] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123469 @ 00:25:03.902363] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123469 @ 00:25:03.902503] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123469 @ 00:25:03.902678] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123469 @ 00:25:03.902797] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123469 @ 00:25:03.902920] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123469 @ 00:25:03.903038] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123469 @ 00:25:03.903197] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123517 @ 00:25:04.035628] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123517 @ 00:25:04.035799] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123517 @ 00:25:04.035936] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123517 @ 00:25:04.036171] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123517 @ 00:25:04.036369] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123517 @ 00:25:04.036501] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123517 @ 00:25:04.036641] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123517 @ 00:25:04.036806] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123517 @ 00:25:04.036924] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123517 @ 00:25:04.037051] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123517 @ 00:25:04.037179] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123517 @ 00:25:04.037597] level-3 sm120 trap backend enabled (default)
+There are modules in UNet2DModel that should be kept in float32: []. Casting directly with `to()` can lead to inconsistent results; set `torch_dtype` in `from_pretrained()` instead to keep these modules in float32.
+[DNN-08 cuDNN-LSTM + Diffusers-UNet2D 10-Step] PASS | lstm_p=3 susp=[0.053, 0.012, 0.003] err=0.000e+00 | diff_p=4 susp=[0.057, 0.003, 0.023, 0.021] err=0.000e+00
+<<< [S5-dnn08] rc=0 wall=5.2s
+>>> [S6-llm01] 00:25:06
+[XSCHED INFO @ T 123560 @ 00:25:06.425780] using app-managed scheduler
+[XSCHED INFO @ T 123560 @ 00:25:08.521428] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123560 @ 00:25:08.559255] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+[LLM-01 Qwen2-8L Prefill T=1024 BF16] PASS | preempts=4 susp=[0.136, 0.936, 0.094, 0.096] logit_err=0.000e+00 kv_err=0.000e+00
+<<< [S6-llm01] rc=0 wall=6.3s
+>>> [S6-llm02] 00:25:12
+[XSCHED INFO @ T 123645 @ 00:25:12.701066] using app-managed scheduler
+[XSCHED INFO @ T 123645 @ 00:25:14.789567] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123645 @ 00:25:14.826223] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[LLM-02 Qwen2-6L 32-Token Decode+KVCache] PASS | preempts=6 susp_p50=0.107 ms exact_toks=32/32 logit_err=0.000e+00
+<<< [S6-llm02] rc=0 wall=6.2s
+>>> [S6-llm03] 00:25:18
+[XSCHED INFO @ T 123710 @ 00:25:18.912971] using app-managed scheduler
+[XSCHED INFO @ T 123710 @ 00:25:20.991032] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123710 @ 00:25:21.027502] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[LLM-03 PEFT LoRA SFT Qwen2-4L (r=16)] PASS | preempts=6 susp_p50=0.085 ms loss_err=0.000e+00 lora_w_err=0.000e+00
+<<< [S6-llm03] rc=0 wall=8.2s
+>>> [S6-llm04] 00:25:27
+[XSCHED INFO @ T 123800 @ 00:25:27.126553] using app-managed scheduler
+[XSCHED INFO @ T 123800 @ 00:25:29.248574] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123800 @ 00:25:29.285568] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[LLM-04 Quantized FP8+INT8+Triton-W4A16] PASS | preempts=4 susp=[0.211, 0.181, 0.152, 0.165] e_fp8=0.000e+00 e_int8=0 e_w4a16=0.000e+00
+<<< [S6-llm04] rc=0 wall=3.3s
+>>> [S6-llm05] 00:25:30
+[XSCHED INFO @ T 123863 @ 00:25:30.434440] using app-managed scheduler
+[XSCHED INFO @ T 123863 @ 00:25:32.517651] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123863 @ 00:25:32.554109] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[LLM-05 Triton PagedAttention + DynamicBuckets] PASS | preempts=5 susp_p50=0.119 ms e_paged=0.000e+00 e_dyn=0.000e+00
+<<< [S6-llm05] rc=0 wall=4.8s
+>>> [S6-llm08] 00:25:35
+[XSCHED INFO @ T 123945 @ 00:25:35.260127] using app-managed scheduler
+[XSCHED INFO @ T 123945 @ 00:25:37.352959] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 123945 @ 00:25:37.390558] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 123945 @ 00:25:37.390667] level-3 sm120 trap backend enabled (default)
+[LLM-08 Multi-Stream 2xLP+1xHP Concurrent] PASS | p1=2 susp1=[0.075, 1.218] | p2=2 susp2=[0.158, 0.423] | e1=0.000e+00 e2=0.000e+00
+<<< [S6-llm08] rc=0 wall=5.2s
+>>> [S6-llm06:m5] 00:25:40
+[XSCHED INFO @ T 124011 @ 00:25:40.467016] using app-managed scheduler
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 124011 @ 00:25:45.031657] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 124011 @ 00:25:45.068708] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[LLM-06 QoS Prefill+Decode mode=m5] PASS | HP_TPOT P50=3.411ms P99=4.184ms SLO<=10ms=100.0% | SUSP_P50=0.097ms | LP_iters=19 LP_ret=114.2% | lp_err=0.000e+00 hp_err=0.000e+00
+<<< [S6-llm06:m5] rc=0 wall=6.5s
+>>> [S6-llm07:m5] 00:25:46
+[XSCHED INFO @ T 124077 @ 00:25:46.989374] using app-managed scheduler
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 124077 @ 00:25:50.685137] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 124077 @ 00:25:50.722483] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[LLM-07 QoS LoRA-Train+Decode mode=m5] PASS | HP_TPOT P50=2.541ms P99=2.897ms SLO<=8ms=100.0% | SUSP_P50=0.089ms | LP_steps=17 LP_ret=114.9% | hp_err=0.000e+00
+<<< [S6-llm07:m5] rc=0 wall=6.4s
+>>> [S6-llm08-trim] 00:25:53
+[XSCHED INFO @ T 124155 @ 00:25:53.409069] using app-managed scheduler
+[XSCHED INFO @ T 124155 @ 00:25:55.482258] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 124155 @ 00:25:55.519063] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 124155 @ 00:25:55.519177] level-3 sm120 trap backend enabled (default)
+[LLM-08 Multi-Stream 2xLP+1xHP Concurrent] PASS | p1=2 susp1=[0.066, 1.357] | p2=2 susp2=[0.091, 0.124] | e1=0.000e+00 e2=0.000e+00
+<<< [S6-llm08-trim] rc=0 wall=5.2s
+>>> [S7-gemm_bf16_4k-native] 00:25:58
+[OPS gemm_bf16_4k mode=native] PASS batch=3473.6us single=3403.5us susp_p50=-ms hp_p50=0.17ms cov=- ok=5/5 
+<<< [S7-gemm_bf16_4k-native] rc=0 wall=2.1s
+>>> [S7-gemm_bf16_4k-shim] 00:26:00
+[XSCHED INFO @ T 124271 @ 00:26:00.680505] using app-managed scheduler
+[OPS gemm_bf16_4k mode=shim] PASS batch=3472.6us single=3404.4us susp_p50=-ms hp_p50=0.19ms cov=- ok=5/5 
+<<< [S7-gemm_bf16_4k-shim] rc=0 wall=2.1s
+>>> [S7-gemm_bf16_4k-lv1] 00:26:02
+[XSCHED INFO @ T 124320 @ 00:26:02.795685] using app-managed scheduler
+[XSCHED INFO @ T 124320 @ 00:26:03.702130] level-3 sm120 trap backend enabled (default)
+[OPS gemm_bf16_4k mode=lv1] PASS batch=3484.7us single=3412.2us susp_p50=8.860ms hp_p50=8.97ms cov=- ok=5/5 
+<<< [S7-gemm_bf16_4k-lv1] rc=0 wall=2.1s
+>>> [S7-gemm_bf16_4k-lv3] 00:26:04
+[XSCHED INFO @ T 124370 @ 00:26:04.888100] using app-managed scheduler
+[XSCHED INFO @ T 124370 @ 00:26:05.788600] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 124370 @ 00:26:05.824602] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS gemm_bf16_4k mode=lv3] PASS batch=3530.5us single=3459.5us susp_p50=0.126ms hp_p50=0.25ms cov=100% ok=5/5 
+<<< [S7-gemm_bf16_4k-lv3] rc=0 wall=2.2s
+>>> [S7-gemm_bf16_4k-lv3m5] 00:26:07
+[XSCHED INFO @ T 124420 @ 00:26:07.111031] using app-managed scheduler
+[XSCHED INFO @ T 124420 @ 00:26:08.049995] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 124420 @ 00:26:08.086542] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS gemm_bf16_4k mode=lv3] PASS batch=3530.0us single=3437.1us susp_p50=0.129ms hp_p50=0.28ms cov=100% ok=5/5 
+<<< [S7-gemm_bf16_4k-lv3m5] rc=0 wall=2.2s
+>>> [S7-gemm_bf16_decode-native] 00:26:09
+[OPS gemm_bf16_decode mode=native] PASS batch=315.6us single=322.0us susp_p50=-ms hp_p50=0.13ms cov=- ok=5/5 
+<<< [S7-gemm_bf16_decode-native] rc=0 wall=1.9s
+>>> [S7-gemm_bf16_decode-shim] 00:26:11
+[XSCHED INFO @ T 124534 @ 00:26:11.336795] using app-managed scheduler
+[OPS gemm_bf16_decode mode=shim] PASS batch=315.2us single=324.6us susp_p50=-ms hp_p50=0.14ms cov=- ok=5/5 
+<<< [S7-gemm_bf16_decode-shim] rc=0 wall=2.0s
+>>> [S7-gemm_bf16_decode-lv1] 00:26:13
+[XSCHED INFO @ T 124583 @ 00:26:13.312941] using app-managed scheduler
+[XSCHED INFO @ T 124583 @ 00:26:14.201820] level-3 sm120 trap backend enabled (default)
+[OPS gemm_bf16_decode mode=lv1] PASS batch=317.7us single=328.0us susp_p50=0.559ms hp_p50=0.69ms cov=- ok=5/5 
+<<< [S7-gemm_bf16_decode-lv1] rc=0 wall=1.9s
+>>> [S7-gemm_bf16_decode-lv3] 00:26:15
+[XSCHED INFO @ T 124633 @ 00:26:15.274386] using app-managed scheduler
+[XSCHED INFO @ T 124633 @ 00:26:16.166765] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 124633 @ 00:26:16.202712] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS gemm_bf16_decode mode=lv3] PASS batch=327.4us single=340.7us susp_p50=0.093ms hp_p50=0.23ms cov=100% ok=5/5 
+<<< [S7-gemm_bf16_decode-lv3] rc=0 wall=2.1s
+>>> [S7-gemm_bf16_decode-lv3m5] 00:26:17
+[XSCHED INFO @ T 124690 @ 00:26:17.402686] using app-managed scheduler
+[XSCHED INFO @ T 124690 @ 00:26:18.308516] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 124690 @ 00:26:18.344469] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS gemm_bf16_decode mode=lv3] PASS batch=326.4us single=337.6us susp_p50=0.091ms hp_p50=0.23ms cov=100% ok=5/5 
+<<< [S7-gemm_bf16_decode-lv3m5] rc=0 wall=2.1s
+>>> [S7-linear_bias_ffn-native] 00:26:19
+[OPS linear_bias_ffn mode=native] PASS batch=4610.4us single=4471.6us susp_p50=-ms hp_p50=0.26ms cov=- ok=5/5 
+<<< [S7-linear_bias_ffn-native] rc=0 wall=2.1s
+>>> [S7-linear_bias_ffn-shim] 00:26:21
+[XSCHED INFO @ T 124796 @ 00:26:21.698252] using app-managed scheduler
+[OPS linear_bias_ffn mode=shim] PASS batch=4558.3us single=4474.9us susp_p50=-ms hp_p50=0.27ms cov=- ok=5/5 
+<<< [S7-linear_bias_ffn-shim] rc=0 wall=2.1s
+>>> [S7-linear_bias_ffn-lv1] 00:26:23
+[XSCHED INFO @ T 124852 @ 00:26:23.853949] using app-managed scheduler
+[XSCHED INFO @ T 124852 @ 00:26:24.785512] level-3 sm120 trap backend enabled (default)
+[OPS linear_bias_ffn mode=lv1] PASS batch=4572.5us single=4596.7us susp_p50=10.966ms hp_p50=11.13ms cov=- ok=5/5 
+<<< [S7-linear_bias_ffn-lv1] rc=0 wall=2.1s
+>>> [S7-linear_bias_ffn-lv3] 00:26:25
+[XSCHED INFO @ T 124903 @ 00:26:25.995612] using app-managed scheduler
+[XSCHED INFO @ T 124903 @ 00:26:26.931003] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 124903 @ 00:26:26.967000] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS linear_bias_ffn mode=lv3] PASS batch=4617.9us single=4496.2us susp_p50=0.150ms hp_p50=0.31ms cov=100% ok=5/5 
+<<< [S7-linear_bias_ffn-lv3] rc=0 wall=2.3s
+>>> [S7-linear_bias_ffn-lv3m5] 00:26:28
+[XSCHED INFO @ T 124953 @ 00:26:28.286053] using app-managed scheduler
+[XSCHED INFO @ T 124953 @ 00:26:29.219604] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 124953 @ 00:26:29.256059] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS linear_bias_ffn mode=lv3] PASS batch=4557.6us single=4504.6us susp_p50=0.152ms hp_p50=0.29ms cov=100% ok=5/5 
+<<< [S7-linear_bias_ffn-lv3m5] rc=0 wall=2.3s
+>>> [S7-gemm_fp8_e4m3-native] 00:26:30
+[OPS gemm_fp8_e4m3 mode=native] PASS batch=1724.4us single=1695.3us susp_p50=-ms hp_p50=0.18ms cov=- ok=5/5 
+<<< [S7-gemm_fp8_e4m3-native] rc=0 wall=2.1s
+>>> [S7-gemm_fp8_e4m3-shim] 00:26:32
+[XSCHED INFO @ T 125053 @ 00:26:32.648181] using app-managed scheduler
+[OPS gemm_fp8_e4m3 mode=shim] PASS batch=1715.4us single=1698.8us susp_p50=-ms hp_p50=0.16ms cov=- ok=5/5 
+<<< [S7-gemm_fp8_e4m3-shim] rc=0 wall=2.1s
+>>> [S7-gemm_fp8_e4m3-lv1] 00:26:34
+[XSCHED INFO @ T 125102 @ 00:26:34.724929] using app-managed scheduler
+[XSCHED INFO @ T 125102 @ 00:26:35.629306] level-3 sm120 trap backend enabled (default)
+[OPS gemm_fp8_e4m3 mode=lv1] PASS batch=1716.8us single=1709.6us susp_p50=4.247ms hp_p50=4.42ms cov=- ok=5/5 
+<<< [S7-gemm_fp8_e4m3-lv1] rc=0 wall=2.1s
+>>> [S7-gemm_fp8_e4m3-lv3] 00:26:36
+[XSCHED INFO @ T 125152 @ 00:26:36.802993] using app-managed scheduler
+[XSCHED INFO @ T 125152 @ 00:26:37.701325] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 125152 @ 00:26:37.737678] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS gemm_fp8_e4m3 mode=lv3] PASS batch=1735.3us single=1714.7us susp_p50=0.111ms hp_p50=0.23ms cov=100% ok=5/5 
+<<< [S7-gemm_fp8_e4m3-lv3] rc=0 wall=2.2s
+>>> [S7-gemm_fp8_e4m3-lv3m5] 00:26:38
+[XSCHED INFO @ T 125209 @ 00:26:39.011571] using app-managed scheduler
+[XSCHED INFO @ T 125209 @ 00:26:39.920446] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 125209 @ 00:26:39.956107] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS gemm_fp8_e4m3 mode=lv3] PASS batch=1715.3us single=1715.2us susp_p50=0.145ms hp_p50=0.32ms cov=100% ok=5/5 
+<<< [S7-gemm_fp8_e4m3-lv3m5] rc=0 wall=2.2s
+>>> [S7-moe_bmm_8x-native] 00:26:41
+[OPS moe_bmm_8x mode=native] PASS batch=1214.1us single=1149.6us susp_p50=-ms hp_p50=0.13ms cov=- ok=5/5 
+<<< [S7-moe_bmm_8x-native] rc=0 wall=2.0s
+>>> [S7-moe_bmm_8x-shim] 00:26:43
+[XSCHED INFO @ T 125309 @ 00:26:43.214469] using app-managed scheduler
+[OPS moe_bmm_8x mode=shim] PASS batch=1208.5us single=1152.1us susp_p50=-ms hp_p50=0.14ms cov=- ok=5/5 
+<<< [S7-moe_bmm_8x-shim] rc=0 wall=2.0s
+>>> [S7-moe_bmm_8x-lv1] 00:26:45
+[XSCHED INFO @ T 125358 @ 00:26:45.237693] using app-managed scheduler
+[XSCHED INFO @ T 125358 @ 00:26:46.144880] level-3 sm120 trap backend enabled (default)
+[OPS moe_bmm_8x mode=lv1] PASS batch=1218.8us single=1158.9us susp_p50=3.031ms hp_p50=3.20ms cov=- ok=5/5 
+<<< [S7-moe_bmm_8x-lv1] rc=0 wall=2.0s
+>>> [S7-moe_bmm_8x-lv3] 00:26:47
+[XSCHED INFO @ T 125408 @ 00:26:47.259884] using app-managed scheduler
+[XSCHED INFO @ T 125408 @ 00:26:48.165371] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 125408 @ 00:26:48.201730] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS moe_bmm_8x mode=lv3] PASS batch=1225.8us single=1162.1us susp_p50=0.100ms hp_p50=0.25ms cov=100% ok=5/5 
+<<< [S7-moe_bmm_8x-lv3] rc=0 wall=2.1s
+>>> [S7-moe_bmm_8x-lv3m5] 00:26:49
+[XSCHED INFO @ T 125458 @ 00:26:49.417636] using app-managed scheduler
+[XSCHED INFO @ T 125458 @ 00:26:50.316302] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 125458 @ 00:26:50.352190] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS moe_bmm_8x mode=lv3] PASS batch=1209.3us single=1165.7us susp_p50=0.105ms hp_p50=0.24ms cov=100% ok=5/5 
+<<< [S7-moe_bmm_8x-lv3m5] rc=0 wall=2.1s
+>>> [S7-int8_mm-native] 00:26:51
+[OPS int8_mm mode=native] PASS batch=1726.6us single=1704.8us susp_p50=-ms hp_p50=0.23ms cov=- ok=5/5 
+<<< [S7-int8_mm-native] rc=0 wall=2.1s
+>>> [S7-int8_mm-shim] 00:26:53
+[XSCHED INFO @ T 125571 @ 00:26:53.671881] using app-managed scheduler
+[OPS int8_mm mode=shim] PASS batch=1732.2us single=1703.0us susp_p50=-ms hp_p50=0.23ms cov=- ok=5/5 
+<<< [S7-int8_mm-shim] rc=0 wall=2.0s
+>>> [S7-int8_mm-lv1] 00:26:55
+[XSCHED INFO @ T 125620 @ 00:26:55.728265] using app-managed scheduler
+[XSCHED INFO @ T 125620 @ 00:26:56.664933] level-3 sm120 trap backend enabled (default)
+[OPS int8_mm mode=lv1] PASS batch=1736.0us single=1710.2us susp_p50=3.999ms hp_p50=4.09ms cov=- ok=5/5 
+<<< [S7-int8_mm-lv1] rc=0 wall=2.1s
+>>> [S7-int8_mm-lv3] 00:26:57
+[XSCHED INFO @ T 125671 @ 00:26:57.828889] using app-managed scheduler
+[XSCHED INFO @ T 125671 @ 00:26:58.739625] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 125671 @ 00:26:58.776037] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS int8_mm mode=lv3] PASS batch=1733.1us single=1713.3us susp_p50=0.143ms hp_p50=0.29ms cov=100% ok=5/5 
+<<< [S7-int8_mm-lv3] rc=0 wall=2.2s
+>>> [S7-int8_mm-lv3m5] 00:26:59
+[XSCHED INFO @ T 125722 @ 00:27:00.038534] using app-managed scheduler
+[XSCHED INFO @ T 125722 @ 00:27:00.956256] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 125722 @ 00:27:00.992330] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS int8_mm mode=lv3] PASS batch=1746.9us single=1715.1us susp_p50=0.149ms hp_p50=0.29ms cov=100% ok=5/5 
+<<< [S7-int8_mm-lv3m5] rc=0 wall=2.2s
+>>> [S7-sdpa_prefill_causal-native] 00:27:02
+[OPS sdpa_prefill_causal mode=native] PASS batch=1108.1us single=1089.6us susp_p50=-ms hp_p50=0.15ms cov=- ok=5/5 
+<<< [S7-sdpa_prefill_causal-native] rc=0 wall=2.0s
+>>> [S7-sdpa_prefill_causal-shim] 00:27:04
+[XSCHED INFO @ T 125828 @ 00:27:04.284718] using app-managed scheduler
+[OPS sdpa_prefill_causal mode=shim] PASS batch=1114.3us single=1091.9us susp_p50=-ms hp_p50=0.15ms cov=- ok=5/5 
+<<< [S7-sdpa_prefill_causal-shim] rc=0 wall=2.0s
+>>> [S7-sdpa_prefill_causal-lv1] 00:27:06
+[XSCHED INFO @ T 125877 @ 00:27:06.312362] using app-managed scheduler
+[XSCHED INFO @ T 125877 @ 00:27:07.200306] level-3 sm120 trap backend enabled (default)
+[OPS sdpa_prefill_causal mode=lv1] PASS batch=1108.1us single=1099.8us susp_p50=2.770ms hp_p50=2.87ms cov=- ok=5/5 
+<<< [S7-sdpa_prefill_causal-lv1] rc=0 wall=2.0s
+>>> [S7-sdpa_prefill_causal-lv3] 00:27:08
+[XSCHED INFO @ T 125927 @ 00:27:08.332042] using app-managed scheduler
+[XSCHED INFO @ T 125927 @ 00:27:09.224483] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 125927 @ 00:27:09.260548] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS sdpa_prefill_causal mode=lv3] PASS batch=1128.3us single=1109.4us susp_p50=0.092ms hp_p50=0.21ms cov=100% ok=5/5 
+<<< [S7-sdpa_prefill_causal-lv3] rc=0 wall=2.1s
+>>> [S7-sdpa_prefill_causal-lv3m5] 00:27:10
+[XSCHED INFO @ T 125977 @ 00:27:10.488738] using app-managed scheduler
+[XSCHED INFO @ T 125977 @ 00:27:11.376988] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 125977 @ 00:27:11.413993] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS sdpa_prefill_causal mode=lv3] PASS batch=1122.0us single=1116.6us susp_p50=0.110ms hp_p50=0.26ms cov=100% ok=5/5 
+<<< [S7-sdpa_prefill_causal-lv3m5] rc=0 wall=2.1s
+>>> [S7-sdpa_decode_kv4k-native] 00:27:12
+[OPS sdpa_decode_kv4k mode=native] PASS batch=1981.9us single=1950.3us susp_p50=-ms hp_p50=0.21ms cov=- ok=5/5 
+<<< [S7-sdpa_decode_kv4k-native] rc=0 wall=2.0s
+>>> [S7-sdpa_decode_kv4k-shim] 00:27:14
+[XSCHED INFO @ T 126172 @ 00:27:14.670257] using app-managed scheduler
+[OPS sdpa_decode_kv4k mode=shim] PASS batch=2002.7us single=1951.8us susp_p50=-ms hp_p50=0.21ms cov=- ok=5/5 
+<<< [S7-sdpa_decode_kv4k-shim] rc=0 wall=2.0s
+>>> [S7-sdpa_decode_kv4k-lv1] 00:27:16
+[XSCHED INFO @ T 126221 @ 00:27:16.702196] using app-managed scheduler
+[XSCHED INFO @ T 126221 @ 00:27:17.608974] level-3 sm120 trap backend enabled (default)
+[OPS sdpa_decode_kv4k mode=lv1] PASS batch=1981.6us single=1957.3us susp_p50=6.027ms hp_p50=6.18ms cov=- ok=5/5 
+<<< [S7-sdpa_decode_kv4k-lv1] rc=0 wall=2.0s
+>>> [S7-sdpa_decode_kv4k-lv3] 00:27:18
+[XSCHED INFO @ T 126271 @ 00:27:18.732416] using app-managed scheduler
+[XSCHED INFO @ T 126271 @ 00:27:19.611947] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 126271 @ 00:27:19.647609] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS sdpa_decode_kv4k mode=lv3] PASS batch=1996.3us single=1969.4us susp_p50=0.144ms hp_p50=0.29ms cov=100% ok=5/5 
+<<< [S7-sdpa_decode_kv4k-lv3] rc=0 wall=2.1s
+>>> [S7-sdpa_decode_kv4k-lv3m5] 00:27:20
+[XSCHED INFO @ T 126328 @ 00:27:20.866476] using app-managed scheduler
+[XSCHED INFO @ T 126328 @ 00:27:21.776867] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 126328 @ 00:27:21.813441] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS sdpa_decode_kv4k mode=lv3] PASS batch=2006.2us single=1968.3us susp_p50=0.149ms hp_p50=0.30ms cov=100% ok=5/5 
+<<< [S7-sdpa_decode_kv4k-lv3m5] rc=0 wall=2.2s
+>>> [S7-rope_apply-native] 00:27:22
+[OPS rope_apply mode=native] PASS batch=1104.6us single=1091.2us susp_p50=-ms hp_p50=0.16ms cov=- ok=5/5 
+<<< [S7-rope_apply-native] rc=0 wall=2.1s
+>>> [S7-rope_apply-shim] 00:27:25
+[XSCHED INFO @ T 126427 @ 00:27:25.189128] using app-managed scheduler
+[OPS rope_apply mode=shim] PASS batch=1110.7us single=1089.5us susp_p50=-ms hp_p50=0.19ms cov=- ok=5/5 
+<<< [S7-rope_apply-shim] rc=0 wall=2.2s
+>>> [S7-rope_apply-lv1] 00:27:27
+[XSCHED INFO @ T 126571 @ 00:27:27.383645] using app-managed scheduler
+[XSCHED INFO @ T 126571 @ 00:27:28.364091] level-3 sm120 trap backend enabled (default)
+[OPS rope_apply mode=lv1] PASS batch=1108.6us single=1096.6us susp_p50=1.804ms hp_p50=1.96ms cov=- ok=5/5 
+<<< [S7-rope_apply-lv1] rc=0 wall=2.1s
+>>> [S7-rope_apply-lv3] 00:27:29
+[XSCHED INFO @ T 126621 @ 00:27:29.550322] using app-managed scheduler
+[XSCHED INFO @ T 126621 @ 00:27:30.513817] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 126621 @ 00:27:30.550410] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS rope_apply mode=lv3] PASS batch=1184.0us single=1187.2us susp_p50=0.250ms hp_p50=0.42ms cov=100% ok=5/5 
+<<< [S7-rope_apply-lv3] rc=0 wall=2.3s
+>>> [S7-rope_apply-lv3m5] 00:27:31
+[XSCHED INFO @ T 126672 @ 00:27:31.906665] using app-managed scheduler
+[XSCHED INFO @ T 126672 @ 00:27:32.867583] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 126672 @ 00:27:32.904374] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS rope_apply mode=lv3] PASS batch=1196.2us single=1184.4us susp_p50=0.274ms hp_p50=0.40ms cov=100% ok=5/5 
+<<< [S7-rope_apply-lv3m5] rc=0 wall=2.3s
+>>> [S7-rmsnorm-native] 00:27:34
+[OPS rmsnorm mode=native] PASS batch=351.9us single=356.3us susp_p50=-ms hp_p50=0.16ms cov=- ok=5/5 
+<<< [S7-rmsnorm-native] rc=0 wall=2.7s
+>>> [S7-rmsnorm-shim] 00:27:36
+[XSCHED INFO @ T 126773 @ 00:27:36.974103] using app-managed scheduler
+[OPS rmsnorm mode=shim] PASS batch=352.0us single=354.4us susp_p50=-ms hp_p50=0.16ms cov=- ok=5/5 
+<<< [S7-rmsnorm-shim] rc=0 wall=2.7s
+>>> [S7-rmsnorm-lv1] 00:27:39
+[XSCHED INFO @ T 126830 @ 00:27:39.664621] using app-managed scheduler
+[XSCHED INFO @ T 126830 @ 00:27:40.612001] level-3 sm120 trap backend enabled (default)
+[OPS rmsnorm mode=lv1] PASS batch=353.1us single=360.4us susp_p50=2.190ms hp_p50=2.33ms cov=- ok=5/5 
+<<< [S7-rmsnorm-lv1] rc=0 wall=2.7s
+>>> [S7-rmsnorm-lv3] 00:27:42
+[XSCHED INFO @ T 126881 @ 00:27:42.356447] using app-managed scheduler
+[XSCHED INFO @ T 126881 @ 00:27:43.306541] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 126881 @ 00:27:43.342153] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS rmsnorm mode=lv3] PASS batch=355.8us single=366.6us susp_p50=0.192ms hp_p50=0.35ms cov=100% ok=5/5 
+<<< [S7-rmsnorm-lv3] rc=0 wall=2.8s
+>>> [S7-rmsnorm-lv3m5] 00:27:45
+[XSCHED INFO @ T 126933 @ 00:27:45.190243] using app-managed scheduler
+[XSCHED INFO @ T 126933 @ 00:27:46.152942] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 126933 @ 00:27:46.189834] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS rmsnorm mode=lv3] PASS batch=355.7us single=363.4us susp_p50=0.202ms hp_p50=0.35ms cov=100% ok=5/5 
+<<< [S7-rmsnorm-lv3m5] rc=0 wall=2.8s
+>>> [S7-layernorm-native] 00:27:47
+[OPS layernorm mode=native] PASS batch=358.2us single=360.1us susp_p50=-ms hp_p50=0.15ms cov=- ok=5/5 
+<<< [S7-layernorm-native] rc=0 wall=2.7s
+>>> [S7-layernorm-shim] 00:27:50
+[XSCHED INFO @ T 127155 @ 00:27:50.718034] using app-managed scheduler
+[OPS layernorm mode=shim] PASS batch=360.0us single=359.6us susp_p50=-ms hp_p50=0.16ms cov=- ok=5/5 
+<<< [S7-layernorm-shim] rc=0 wall=2.7s
+>>> [S7-layernorm-lv1] 00:27:53
+[XSCHED INFO @ T 127205 @ 00:27:53.412364] using app-managed scheduler
+[XSCHED INFO @ T 127205 @ 00:27:54.399093] level-3 sm120 trap backend enabled (default)
+[OPS layernorm mode=lv1] PASS batch=356.8us single=364.4us susp_p50=1.971ms hp_p50=2.13ms cov=- ok=5/5 
+<<< [S7-layernorm-lv1] rc=0 wall=2.7s
+>>> [S7-layernorm-lv3] 00:27:56
+[XSCHED INFO @ T 127257 @ 00:27:56.134007] using app-managed scheduler
+[XSCHED INFO @ T 127257 @ 00:27:57.105566] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 127257 @ 00:27:57.141309] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS layernorm mode=lv3] PASS batch=357.1us single=369.1us susp_p50=0.244ms hp_p50=0.43ms cov=100% ok=5/5 
+<<< [S7-layernorm-lv3] rc=0 wall=2.8s
+>>> [S7-layernorm-lv3m5] 00:27:58
+[XSCHED INFO @ T 127309 @ 00:27:58.990508] using app-managed scheduler
+[XSCHED INFO @ T 127309 @ 00:27:59.936165] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 127309 @ 00:27:59.971834] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS layernorm mode=lv3] PASS batch=358.4us single=367.1us susp_p50=0.242ms hp_p50=0.40ms cov=100% ok=5/5 
+<<< [S7-layernorm-lv3m5] rc=0 wall=2.8s
+>>> [S7-softmax-native] 00:28:01
+[OPS softmax mode=native] PASS batch=818.4us single=811.5us susp_p50=-ms hp_p50=0.12ms cov=- ok=5/5 
+<<< [S7-softmax-native] rc=0 wall=2.7s
+>>> [S7-softmax-shim] 00:28:04
+[XSCHED INFO @ T 127510 @ 00:28:04.527146] using app-managed scheduler
+[OPS softmax mode=shim] PASS batch=824.9us single=814.1us susp_p50=-ms hp_p50=0.17ms cov=- ok=5/5 
+<<< [S7-softmax-shim] rc=0 wall=2.7s
+>>> [S7-softmax-lv1] 00:28:07
+[XSCHED INFO @ T 127560 @ 00:28:07.254589] using app-managed scheduler
+[XSCHED INFO @ T 127560 @ 00:28:08.292768] level-3 sm120 trap backend enabled (default)
+[OPS softmax mode=lv1] PASS batch=823.2us single=817.3us susp_p50=4.128ms hp_p50=4.31ms cov=- ok=5/5 
+<<< [S7-softmax-lv1] rc=0 wall=2.7s
+>>> [S7-softmax-lv3] 00:28:09
+[XSCHED INFO @ T 127633 @ 00:28:09.984500] using app-managed scheduler
+[XSCHED INFO @ T 127633 @ 00:28:11.050162] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 127633 @ 00:28:11.086403] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS softmax mode=lv3] PASS batch=838.6us single=826.7us susp_p50=0.259ms hp_p50=0.44ms cov=100% ok=5/5 
+<<< [S7-softmax-lv3] rc=0 wall=2.9s
+>>> [S7-softmax-lv3m5] 00:28:12
+[XSCHED INFO @ T 127685 @ 00:28:12.871956] using app-managed scheduler
+[XSCHED INFO @ T 127685 @ 00:28:13.910071] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 127685 @ 00:28:13.946056] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS softmax mode=lv3] PASS batch=830.4us single=827.9us susp_p50=0.283ms hp_p50=0.43ms cov=100% ok=5/5 
+<<< [S7-softmax-lv3m5] rc=0 wall=2.8s
+>>> [S7-swiglu-native] 00:28:15
+[OPS swiglu mode=native] PASS batch=2339.4us single=2294.7us susp_p50=-ms hp_p50=0.17ms cov=- ok=5/5 
+<<< [S7-swiglu-native] rc=0 wall=2.5s
+>>> [S7-swiglu-shim] 00:28:18
+[XSCHED INFO @ T 127786 @ 00:28:18.234002] using app-managed scheduler
+[OPS swiglu mode=shim] PASS batch=2324.0us single=2292.6us susp_p50=-ms hp_p50=0.15ms cov=- ok=5/5 
+<<< [S7-swiglu-shim] rc=0 wall=2.5s
+>>> [S7-swiglu-lv1] 00:28:20
+[XSCHED INFO @ T 127933 @ 00:28:20.779443] using app-managed scheduler
+[XSCHED INFO @ T 127933 @ 00:28:21.883826] level-3 sm120 trap backend enabled (default)
+[OPS swiglu mode=lv1] PASS batch=2326.7us single=2298.5us susp_p50=6.915ms hp_p50=7.08ms cov=- ok=5/5 
+<<< [S7-swiglu-lv1] rc=0 wall=2.5s
+>>> [S7-swiglu-lv3] 00:28:23
+[XSCHED INFO @ T 127984 @ 00:28:23.308162] using app-managed scheduler
+[XSCHED INFO @ T 127984 @ 00:28:24.437878] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 127984 @ 00:28:24.474297] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS swiglu mode=lv3] PASS batch=2358.5us single=2300.9us susp_p50=0.625ms hp_p50=0.79ms cov=100% ok=5/5 
+<<< [S7-swiglu-lv3] rc=0 wall=2.7s
+>>> [S7-swiglu-lv3m5] 00:28:25
+[XSCHED INFO @ T 128035 @ 00:28:26.000730] using app-managed scheduler
+[XSCHED INFO @ T 128035 @ 00:28:27.121960] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 128035 @ 00:28:27.157671] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS swiglu mode=lv3] PASS batch=2344.5us single=2308.4us susp_p50=0.595ms hp_p50=0.80ms cov=100% ok=5/5 
+<<< [S7-swiglu-lv3m5] rc=0 wall=2.7s
+>>> [S7-gelu_tanh-native] 00:28:28
+[OPS gelu_tanh mode=native] PASS batch=955.4us single=940.9us susp_p50=-ms hp_p50=0.16ms cov=- ok=5/5 
+<<< [S7-gelu_tanh-native] rc=0 wall=2.9s
+>>> [S7-gelu_tanh-shim] 00:28:31
+[XSCHED INFO @ T 128285 @ 00:28:31.626212] using app-managed scheduler
+[OPS gelu_tanh mode=shim] PASS batch=954.0us single=937.1us susp_p50=-ms hp_p50=0.16ms cov=- ok=5/5 
+<<< [S7-gelu_tanh-shim] rc=0 wall=2.9s
+>>> [S7-gelu_tanh-lv1] 00:28:34
+[XSCHED INFO @ T 128342 @ 00:28:34.508926] using app-managed scheduler
+[XSCHED INFO @ T 128342 @ 00:28:35.628711] level-3 sm120 trap backend enabled (default)
+[OPS gelu_tanh mode=lv1] PASS batch=950.6us single=942.3us susp_p50=4.141ms hp_p50=4.26ms cov=- ok=5/5 
+<<< [S7-gelu_tanh-lv1] rc=0 wall=2.9s
+>>> [S7-gelu_tanh-lv3] 00:28:37
+[XSCHED INFO @ T 128394 @ 00:28:37.401145] using app-managed scheduler
+[XSCHED INFO @ T 128394 @ 00:28:38.523928] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 128394 @ 00:28:38.559864] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS gelu_tanh mode=lv3] PASS batch=949.9us single=943.1us susp_p50=0.417ms hp_p50=0.70ms cov=100% ok=5/5 
+<<< [S7-gelu_tanh-lv3] rc=0 wall=3.0s
+>>> [S7-gelu_tanh-lv3m5] 00:28:40
+[XSCHED INFO @ T 128446 @ 00:28:40.453651] using app-managed scheduler
+[XSCHED INFO @ T 128446 @ 00:28:41.575024] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 128446 @ 00:28:41.611801] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS gelu_tanh mode=lv3] PASS batch=954.4us single=944.0us susp_p50=0.417ms hp_p50=0.66ms cov=100% ok=5/5 
+<<< [S7-gelu_tanh-lv3m5] rc=0 wall=3.0s
+>>> [S7-cross_entropy-native] 00:28:43
+[OPS cross_entropy mode=native] PASS batch=2804.8us single=2770.5us susp_p50=-ms hp_p50=0.12ms cov=- ok=5/5 
+<<< [S7-cross_entropy-native] rc=0 wall=2.0s
+>>> [S7-cross_entropy-shim] 00:28:45
+[XSCHED INFO @ T 128547 @ 00:28:45.541001] using app-managed scheduler
+[OPS cross_entropy mode=shim] PASS batch=2815.0us single=2769.1us susp_p50=-ms hp_p50=0.12ms cov=- ok=5/5 
+<<< [S7-cross_entropy-shim] rc=0 wall=2.0s
+>>> [S7-cross_entropy-lv1] 00:28:47
+[XSCHED INFO @ T 128596 @ 00:28:47.554635] using app-managed scheduler
+[XSCHED INFO @ T 128596 @ 00:28:48.456009] level-3 sm120 trap backend enabled (default)
+[OPS cross_entropy mode=lv1] PASS batch=2821.0us single=2770.2us susp_p50=7.456ms hp_p50=7.55ms cov=- ok=5/5 
+<<< [S7-cross_entropy-lv1] rc=0 wall=2.0s
+>>> [S7-cross_entropy-lv3] 00:28:49
+[XSCHED INFO @ T 128653 @ 00:28:49.603712] using app-managed scheduler
+[XSCHED INFO @ T 128653 @ 00:28:50.503771] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 128653 @ 00:28:50.539373] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS cross_entropy mode=lv3] PASS batch=2811.0us single=2773.1us susp_p50=0.270ms hp_p50=0.40ms cov=100% ok=5/5 
+<<< [S7-cross_entropy-lv3] rc=0 wall=2.2s
+>>> [S7-cross_entropy-lv3m5] 00:28:51
+[XSCHED INFO @ T 128713 @ 00:28:51.776370] using app-managed scheduler
+[XSCHED INFO @ T 128713 @ 00:28:52.669768] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 128713 @ 00:28:52.705632] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS cross_entropy mode=lv3] PASS batch=2809.8us single=2774.0us susp_p50=0.253ms hp_p50=0.41ms cov=100% ok=5/5 
+<<< [S7-cross_entropy-lv3m5] rc=0 wall=2.1s
+>>> [S7-triton_rmsnorm-native] 00:28:53
+[OPS triton_rmsnorm mode=native] PASS batch=354.2us single=356.3us susp_p50=-ms hp_p50=0.17ms cov=- ok=5/5 
+<<< [S7-triton_rmsnorm-native] rc=0 wall=2.9s
+>>> [S7-triton_rmsnorm-shim] 00:28:56
+[XSCHED INFO @ T 128818 @ 00:28:56.846390] using app-managed scheduler
+[OPS triton_rmsnorm mode=shim] PASS batch=351.9us single=357.3us susp_p50=-ms hp_p50=0.15ms cov=- ok=5/5 
+<<< [S7-triton_rmsnorm-shim] rc=0 wall=2.9s
+>>> [S7-triton_rmsnorm-lv1] 00:28:59
+[XSCHED INFO @ T 128884 @ 00:28:59.768738] using app-managed scheduler
+[XSCHED INFO @ T 128884 @ 00:29:00.960877] level-3 sm120 trap backend enabled (default)
+[OPS triton_rmsnorm mode=lv1] PASS batch=355.4us single=360.9us susp_p50=2.069ms hp_p50=2.19ms cov=- ok=5/5 
+<<< [S7-triton_rmsnorm-lv1] rc=0 wall=2.9s
+>>> [S7-triton_rmsnorm-lv3] 00:29:02
+[XSCHED INFO @ T 128940 @ 00:29:02.695390] using app-managed scheduler
+[XSCHED INFO @ T 128940 @ 00:29:03.866585] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 128940 @ 00:29:03.902399] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS triton_rmsnorm mode=lv3] PASS batch=356.6us single=364.5us susp_p50=0.218ms hp_p50=0.40ms cov=100% ok=5/5 
+<<< [S7-triton_rmsnorm-lv3] rc=0 wall=3.0s
+>>> [S7-triton_rmsnorm-lv3m5] 00:29:05
+[XSCHED INFO @ T 128996 @ 00:29:05.744245] using app-managed scheduler
+[XSCHED INFO @ T 128996 @ 00:29:06.909430] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 128996 @ 00:29:06.945751] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS triton_rmsnorm mode=lv3] PASS batch=356.2us single=366.5us susp_p50=0.223ms hp_p50=0.38ms cov=100% ok=5/5 
+<<< [S7-triton_rmsnorm-lv3m5] rc=0 wall=3.0s
+>>> [S7-conv3x3_nhwc-native] 00:29:08
+[OPS conv3x3_nhwc mode=native] PASS batch=3110.0us single=3016.1us susp_p50=-ms hp_p50=0.14ms cov=- ok=5/5 
+<<< [S7-conv3x3_nhwc-native] rc=0 wall=2.2s
+>>> [S7-conv3x3_nhwc-shim] 00:29:10
+[XSCHED INFO @ T 129108 @ 00:29:11.007283] using app-managed scheduler
+[OPS conv3x3_nhwc mode=shim] PASS batch=3108.8us single=3027.3us susp_p50=-ms hp_p50=0.16ms cov=- ok=5/5 
+<<< [S7-conv3x3_nhwc-shim] rc=0 wall=2.2s
+>>> [S7-conv3x3_nhwc-lv1] 00:29:13
+[XSCHED INFO @ T 129158 @ 00:29:13.215654] using app-managed scheduler
+[XSCHED INFO @ T 129158 @ 00:29:14.196539] level-3 sm120 trap backend enabled (default)
+[OPS conv3x3_nhwc mode=lv1] PASS batch=3088.9us single=3027.6us susp_p50=7.608ms hp_p50=7.75ms cov=- ok=5/5 
+<<< [S7-conv3x3_nhwc-lv1] rc=0 wall=2.2s
+>>> [S7-conv3x3_nhwc-lv3] 00:29:15
+[XSCHED INFO @ T 129208 @ 00:29:15.418343] using app-managed scheduler
+[XSCHED INFO @ T 129208 @ 00:29:16.405993] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 129208 @ 00:29:16.442233] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS conv3x3_nhwc mode=lv3] PASS batch=3117.8us single=3049.9us susp_p50=0.155ms hp_p50=0.29ms cov=100% ok=5/5 
+<<< [S7-conv3x3_nhwc-lv3] rc=0 wall=2.3s
+>>> [S7-conv3x3_nhwc-lv3m5] 00:29:17
+[XSCHED INFO @ T 129261 @ 00:29:17.765622] using app-managed scheduler
+[XSCHED INFO @ T 129261 @ 00:29:18.745103] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 129261 @ 00:29:18.780880] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS conv3x3_nhwc mode=lv3] PASS batch=3116.2us single=3047.5us susp_p50=0.151ms hp_p50=0.28ms cov=100% ok=5/5 
+<<< [S7-conv3x3_nhwc-lv3m5] rc=0 wall=2.3s
+>>> [S7-conv1x1_nchw_fp32-native] 00:29:20
+[OPS conv1x1_nchw_fp32 mode=native] PASS batch=1632.1us single=1608.4us susp_p50=-ms hp_p50=0.15ms cov=- ok=5/5 
+<<< [S7-conv1x1_nchw_fp32-native] rc=0 wall=2.4s
+>>> [S7-conv1x1_nchw_fp32-shim] 00:29:22
+[XSCHED INFO @ T 129369 @ 00:29:22.491069] using app-managed scheduler
+[OPS conv1x1_nchw_fp32 mode=shim] PASS batch=1632.9us single=1624.1us susp_p50=-ms hp_p50=0.17ms cov=- ok=5/5 
+<<< [S7-conv1x1_nchw_fp32-shim] rc=0 wall=2.4s
+>>> [S7-conv1x1_nchw_fp32-lv1] 00:29:24
+[XSCHED INFO @ T 129419 @ 00:29:24.905570] using app-managed scheduler
+[XSCHED INFO @ T 129419 @ 00:29:25.989065] level-3 sm120 trap backend enabled (default)
+[OPS conv1x1_nchw_fp32 mode=lv1] PASS batch=1637.2us single=1614.3us susp_p50=5.204ms hp_p50=5.41ms cov=- ok=5/5 
+<<< [S7-conv1x1_nchw_fp32-lv1] rc=0 wall=2.4s
+>>> [S7-conv1x1_nchw_fp32-lv3] 00:29:27
+[XSCHED INFO @ T 129469 @ 00:29:27.303084] using app-managed scheduler
+[XSCHED INFO @ T 129469 @ 00:29:28.422576] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 129469 @ 00:29:28.459313] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS conv1x1_nchw_fp32 mode=lv3] PASS batch=1652.4us single=1651.5us susp_p50=0.168ms hp_p50=0.30ms cov=100% ok=5/5 
+<<< [S7-conv1x1_nchw_fp32-lv3] rc=0 wall=2.6s
+>>> [S7-conv1x1_nchw_fp32-lv3m5] 00:29:29
+[XSCHED INFO @ T 129520 @ 00:29:29.881713] using app-managed scheduler
+[XSCHED INFO @ T 129520 @ 00:29:30.991447] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 129520 @ 00:29:31.027426] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS conv1x1_nchw_fp32 mode=lv3] PASS batch=1665.2us single=1643.8us susp_p50=0.179ms hp_p50=0.31ms cov=100% ok=5/5 
+<<< [S7-conv1x1_nchw_fp32-lv3m5] rc=0 wall=2.6s
+>>> [S7-batchnorm_train-native] 00:29:32
+[OPS batchnorm_train mode=native] PASS batch=838.7us single=829.3us susp_p50=-ms hp_p50=0.15ms cov=- ok=5/5 
+<<< [S7-batchnorm_train-native] rc=0 wall=1.9s
+>>> [S7-batchnorm_train-shim] 00:29:34
+[XSCHED INFO @ T 129620 @ 00:29:34.417469] using app-managed scheduler
+[OPS batchnorm_train mode=shim] PASS batch=839.5us single=829.8us susp_p50=-ms hp_p50=0.13ms cov=- ok=5/5 
+<<< [S7-batchnorm_train-shim] rc=0 wall=1.9s
+>>> [S7-batchnorm_train-lv1] 00:29:36
+[XSCHED INFO @ T 129669 @ 00:29:36.354807] using app-managed scheduler
+[XSCHED INFO @ T 129669 @ 00:29:37.239485] level-3 sm120 trap backend enabled (default)
+[OPS batchnorm_train mode=lv1] PASS batch=835.9us single=834.5us susp_p50=3.310ms hp_p50=3.40ms cov=- ok=5/5 
+<<< [S7-batchnorm_train-lv1] rc=0 wall=1.9s
+>>> [S7-batchnorm_train-lv3] 00:29:38
+[XSCHED INFO @ T 129721 @ 00:29:38.302582] using app-managed scheduler
+[XSCHED INFO @ T 129721 @ 00:29:39.174867] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 129721 @ 00:29:39.210944] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS batchnorm_train mode=lv3] PASS batch=849.4us single=847.8us susp_p50=0.343ms hp_p50=0.56ms cov=100% ok=5/5 
+<<< [S7-batchnorm_train-lv3] rc=0 wall=2.0s
+>>> [S7-batchnorm_train-lv3m5] 00:29:40
+[XSCHED INFO @ T 129771 @ 00:29:40.354690] using app-managed scheduler
+[XSCHED INFO @ T 129771 @ 00:29:41.230662] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 129771 @ 00:29:41.267691] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS batchnorm_train mode=lv3] PASS batch=851.2us single=849.2us susp_p50=0.377ms hp_p50=0.51ms cov=100% ok=5/5 
+<<< [S7-batchnorm_train-lv3m5] rc=0 wall=2.0s
+>>> [S7-reduce_sum-native] 00:29:42
+[OPS reduce_sum mode=native] PASS batch=648.2us single=644.5us susp_p50=-ms hp_p50=0.15ms cov=- ok=5/5 
+<<< [S7-reduce_sum-native] rc=0 wall=1.9s
+>>> [S7-reduce_sum-shim] 00:29:44
+[XSCHED INFO @ T 129870 @ 00:29:44.361545] using app-managed scheduler
+[OPS reduce_sum mode=shim] PASS batch=649.3us single=644.4us susp_p50=-ms hp_p50=0.15ms cov=- ok=5/5 
+<<< [S7-reduce_sum-shim] rc=0 wall=1.9s
+>>> [S7-reduce_sum-lv1] 00:29:46
+[XSCHED INFO @ T 129919 @ 00:29:46.328316] using app-managed scheduler
+[XSCHED INFO @ T 129919 @ 00:29:47.209214] level-3 sm120 trap backend enabled (default)
+[OPS reduce_sum mode=lv1] PASS batch=656.5us single=649.1us susp_p50=1.718ms hp_p50=1.99ms cov=- ok=5/5 
+<<< [S7-reduce_sum-lv1] rc=0 wall=1.9s
+>>> [S7-reduce_sum-lv3] 00:29:48
+[XSCHED INFO @ T 129969 @ 00:29:48.280679] using app-managed scheduler
+[XSCHED INFO @ T 129969 @ 00:29:49.173170] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 129969 @ 00:29:49.209112] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS reduce_sum mode=lv3] PASS batch=652.7us single=652.9us susp_p50=0.220ms hp_p50=0.34ms cov=100% ok=5/5 
+<<< [S7-reduce_sum-lv3] rc=0 wall=2.1s
+>>> [S7-reduce_sum-lv3m5] 00:29:50
+[XSCHED INFO @ T 130026 @ 00:29:50.407139] using app-managed scheduler
+[XSCHED INFO @ T 130026 @ 00:29:51.279754] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 130026 @ 00:29:51.316315] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS reduce_sum mode=lv3] PASS batch=651.4us single=654.5us susp_p50=0.222ms hp_p50=0.36ms cov=100% ok=5/5 
+<<< [S7-reduce_sum-lv3m5] rc=0 wall=2.1s
+>>> [S7-cumsum_64m-native] 00:29:52
+[OPS cumsum_64m mode=native] PASS batch=5129.3us single=5017.1us susp_p50=-ms hp_p50=0.14ms cov=- ok=5/5 
+<<< [S7-cumsum_64m-native] rc=0 wall=3.0s
+>>> [S7-cumsum_64m-shim] 00:29:55
+[XSCHED INFO @ T 130127 @ 00:29:55.546305] using app-managed scheduler
+[OPS cumsum_64m mode=shim] PASS batch=5110.8us single=5019.7us susp_p50=-ms hp_p50=0.15ms cov=- ok=5/5 
+<<< [S7-cumsum_64m-shim] rc=0 wall=3.0s
+>>> [S7-cumsum_64m-lv1] 00:29:58
+[XSCHED INFO @ T 130181 @ 00:29:58.584815] using app-managed scheduler
+[XSCHED INFO @ T 130181 @ 00:30:00.122643] level-3 sm120 trap backend enabled (default)
+[OPS cumsum_64m mode=lv1] PASS batch=5176.5us single=5034.5us susp_p50=13.530ms hp_p50=13.68ms cov=- ok=5/5 
+<<< [S7-cumsum_64m-lv1] rc=0 wall=3.0s
+>>> [S7-cumsum_64m-lv3] 00:30:01
+[XSCHED INFO @ T 130238 @ 00:30:01.641691] using app-managed scheduler
+[XSCHED INFO @ T 130238 @ 00:30:03.178042] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 130238 @ 00:30:03.213836] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS cumsum_64m mode=lv3] PASS batch=5191.0us single=5040.6us susp_p50=0.638ms hp_p50=0.83ms cov=100% ok=5/5 
+<<< [S7-cumsum_64m-lv3] rc=0 wall=3.2s
+>>> [S7-cumsum_64m-lv3m5] 00:30:04
+[XSCHED INFO @ T 130290 @ 00:30:04.874266] using app-managed scheduler
+[XSCHED INFO @ T 130290 @ 00:30:06.415295] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 130290 @ 00:30:06.451198] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS cumsum_64m mode=lv3] PASS batch=5149.1us single=5050.0us susp_p50=0.675ms hp_p50=0.79ms cov=100% ok=5/5 
+<<< [S7-cumsum_64m-lv3m5] rc=0 wall=3.2s
+>>> [S7-sort_16m-native] 00:30:08
+[OPS sort_16m mode=native] PASS batch=5240.0us single=5140.1us susp_p50=-ms hp_p50=0.15ms cov=- ok=5/5 
+<<< [S7-sort_16m-native] rc=0 wall=2.2s
+>>> [S7-sort_16m-shim] 00:30:10
+[XSCHED INFO @ T 130400 @ 00:30:10.293530] using app-managed scheduler
+[OPS sort_16m mode=shim] PASS batch=5250.5us single=5133.6us susp_p50=-ms hp_p50=0.17ms cov=- ok=5/5 
+<<< [S7-sort_16m-shim] rc=0 wall=2.2s
+>>> [S7-sort_16m-lv1] 00:30:12
+[XSCHED INFO @ T 130449 @ 00:30:12.477910] using app-managed scheduler
+[XSCHED INFO @ T 130449 @ 00:30:13.439157] level-3 sm120 trap backend enabled (default)
+[OPS sort_16m mode=lv1] PASS batch=5234.0us single=5149.7us susp_p50=3.532ms hp_p50=3.64ms cov=- ok=5/5 
+<<< [S7-sort_16m-lv1] rc=0 wall=2.2s
+>>> [S7-sort_16m-lv3] 00:30:14
+[XSCHED INFO @ T 130500 @ 00:30:14.667467] using app-managed scheduler
+[XSCHED INFO @ T 130500 @ 00:30:15.633179] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 130500 @ 00:30:15.669167] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS sort_16m mode=lv3] PASS batch=5553.0us single=5457.3us susp_p50=0.148ms hp_p50=0.28ms cov=100% ok=5/5 
+<<< [S7-sort_16m-lv3] rc=0 wall=2.4s
+>>> [S7-sort_16m-lv3m5] 00:30:17
+[XSCHED INFO @ T 130551 @ 00:30:17.098780] using app-managed scheduler
+[XSCHED INFO @ T 130551 @ 00:30:18.070874] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 130551 @ 00:30:18.106745] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS sort_16m mode=lv3] PASS batch=5509.8us single=5445.6us susp_p50=0.153ms hp_p50=0.30ms cov=100% ok=5/5 
+<<< [S7-sort_16m-lv3m5] rc=0 wall=2.4s
+>>> [S7-topk_sampling-native] 00:30:19
+[OPS topk_sampling mode=native] PASS batch=2500.7us single=2433.3us susp_p50=-ms hp_p50=0.15ms cov=- ok=5/5 
+<<< [S7-topk_sampling-native] rc=0 wall=2.0s
+>>> [S7-topk_sampling-shim] 00:30:21
+[XSCHED INFO @ T 130660 @ 00:30:21.556461] using app-managed scheduler
+[OPS topk_sampling mode=shim] PASS batch=2499.4us single=2441.0us susp_p50=-ms hp_p50=0.15ms cov=- ok=5/5 
+<<< [S7-topk_sampling-shim] rc=0 wall=2.0s
+>>> [S7-topk_sampling-lv1] 00:30:23
+[XSCHED INFO @ T 130709 @ 00:30:23.620499] using app-managed scheduler
+[XSCHED INFO @ T 130709 @ 00:30:24.517312] level-3 sm120 trap backend enabled (default)
+[OPS topk_sampling mode=lv1] PASS batch=2466.3us single=2465.9us susp_p50=1.063ms hp_p50=1.25ms cov=- ok=5/5 
+<<< [S7-topk_sampling-lv1] rc=0 wall=2.0s
+>>> [S7-topk_sampling-lv3] 00:30:25
+[XSCHED INFO @ T 130759 @ 00:30:25.643753] using app-managed scheduler
+[XSCHED INFO @ T 130759 @ 00:30:26.560420] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 130759 @ 00:30:26.596558] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS topk_sampling mode=lv3] PASS batch=2580.4us single=2560.4us susp_p50=0.208ms hp_p50=0.34ms cov=100% ok=5/5 
+<<< [S7-topk_sampling-lv3] rc=0 wall=2.3s
+>>> [S7-topk_sampling-lv3m5] 00:30:27
+[XSCHED INFO @ T 130810 @ 00:30:27.984208] using app-managed scheduler
+[XSCHED INFO @ T 130810 @ 00:30:28.875437] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 130810 @ 00:30:28.911687] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS topk_sampling mode=lv3] PASS batch=2582.9us single=2563.5us susp_p50=0.222ms hp_p50=0.37ms cov=100% ok=5/5 
+<<< [S7-topk_sampling-lv3m5] rc=0 wall=2.3s
+>>> [S7-embedding-native] 00:30:30
+[OPS embedding mode=native] PASS batch=351.2us single=353.3us susp_p50=-ms hp_p50=0.17ms cov=- ok=5/5 
+<<< [S7-embedding-native] rc=0 wall=2.7s
+>>> [S7-embedding-shim] 00:30:32
+[XSCHED INFO @ T 130911 @ 00:30:32.990885] using app-managed scheduler
+[OPS embedding mode=shim] PASS batch=350.0us single=355.3us susp_p50=-ms hp_p50=0.17ms cov=- ok=5/5 
+<<< [S7-embedding-shim] rc=0 wall=2.7s
+>>> [S7-embedding-lv1] 00:30:35
+[XSCHED INFO @ T 130961 @ 00:30:35.689115] using app-managed scheduler
+[XSCHED INFO @ T 130961 @ 00:30:36.672618] level-3 sm120 trap backend enabled (default)
+[OPS embedding mode=lv1] PASS batch=352.7us single=357.5us susp_p50=1.951ms hp_p50=2.07ms cov=- ok=5/5 
+<<< [S7-embedding-lv1] rc=0 wall=2.7s
+>>> [S7-embedding-lv3] 00:30:38
+[XSCHED INFO @ T 131015 @ 00:30:38.424448] using app-managed scheduler
+[XSCHED INFO @ T 131015 @ 00:30:39.383038] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 131015 @ 00:30:39.422504] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS embedding mode=lv3] PASS batch=352.7us single=368.0us susp_p50=0.223ms hp_p50=0.36ms cov=100% ok=5/5 
+<<< [S7-embedding-lv3] rc=0 wall=2.8s
+>>> [S7-embedding-lv3m5] 00:30:41
+[XSCHED INFO @ T 131066 @ 00:30:41.278371] using app-managed scheduler
+[XSCHED INFO @ T 131066 @ 00:30:42.233831] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 131066 @ 00:30:42.270092] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS embedding mode=lv3] PASS batch=352.1us single=364.3us susp_p50=0.228ms hp_p50=0.39ms cov=100% ok=5/5 
+<<< [S7-embedding-lv3m5] rc=0 wall=2.8s
+>>> [S7-index_add_int32-native] 00:30:44
+[OPS index_add_int32 mode=native] PASS batch=8017.4us single=7988.3us susp_p50=-ms hp_p50=4.73ms cov=- ok=5/5 
+<<< [S7-index_add_int32-native] rc=0 wall=2.3s
+>>> [S7-index_add_int32-shim] 00:30:46
+[XSCHED INFO @ T 131167 @ 00:30:46.401638] using app-managed scheduler
+[OPS index_add_int32 mode=shim] PASS batch=8021.2us single=7979.0us susp_p50=-ms hp_p50=4.69ms cov=- ok=5/5 
+<<< [S7-index_add_int32-shim] rc=0 wall=2.3s
+>>> [S7-index_add_int32-lv1] 00:30:48
+[XSCHED INFO @ T 131217 @ 00:30:48.705054] using app-managed scheduler
+[XSCHED INFO @ T 131217 @ 00:30:49.695246] level-3 sm120 trap backend enabled (default)
+[OPS index_add_int32 mode=lv1] PASS batch=7982.1us single=7917.1us susp_p50=0.002ms hp_p50=0.08ms cov=- ok=5/5 
+<<< [S7-index_add_int32-lv1] rc=0 wall=2.4s
+>>> [S7-index_add_int32-lv3] 00:30:51
+[XSCHED INFO @ T 131275 @ 00:30:51.084711] using app-managed scheduler
+[XSCHED INFO @ T 131275 @ 00:30:52.050821] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 131275 @ 00:30:52.086677] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS index_add_int32 mode=lv3] PASS batch=8055.1us single=8063.9us susp_p50=0.126ms hp_p50=0.24ms cov=100% ok=5/5 
+<<< [S7-index_add_int32-lv3] rc=0 wall=2.3s
+>>> [S7-index_add_int32-lv3m5] 00:30:53
+[XSCHED INFO @ T 131325 @ 00:30:53.430088] using app-managed scheduler
+[XSCHED INFO @ T 131325 @ 00:30:54.391444] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 131325 @ 00:30:54.427000] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS index_add_int32 mode=lv3] PASS batch=7979.2us single=7991.6us susp_p50=0.130ms hp_p50=0.24ms cov=100% ok=5/5 
+<<< [S7-index_add_int32-lv3m5] rc=0 wall=2.4s
+>>> [S7-cast_bool_to_i64-native] 00:30:55
+[OPS cast_bool_to_i64 mode=native] PASS batch=886.9us single=871.2us susp_p50=-ms hp_p50=0.26ms cov=- ok=5/5 
+<<< [S7-cast_bool_to_i64-native] rc=0 wall=3.1s
+>>> [S7-cast_bool_to_i64-shim] 00:30:58
+[XSCHED INFO @ T 131431 @ 00:30:58.978655] using app-managed scheduler
+[OPS cast_bool_to_i64 mode=shim] PASS batch=880.1us single=872.7us susp_p50=-ms hp_p50=0.29ms cov=- ok=5/5 
+<<< [S7-cast_bool_to_i64-shim] rc=0 wall=3.1s
+>>> [S7-cast_bool_to_i64-lv1] 00:31:02
+[XSCHED INFO @ T 131489 @ 00:31:02.095531] using app-managed scheduler
+[XSCHED INFO @ T 131489 @ 00:31:03.322276] level-3 sm120 trap backend enabled (default)
+[OPS cast_bool_to_i64 mode=lv1] PASS batch=885.6us single=877.0us susp_p50=5.680ms hp_p50=5.79ms cov=- ok=5/5 
+<<< [S7-cast_bool_to_i64-lv1] rc=0 wall=3.1s
+>>> [S7-cast_bool_to_i64-lv3] 00:31:05
+[XSCHED INFO @ T 131542 @ 00:31:05.219298] using app-managed scheduler
+[XSCHED INFO @ T 131542 @ 00:31:06.410640] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 131542 @ 00:31:06.446749] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS cast_bool_to_i64 mode=lv3] PASS batch=884.2us single=883.0us susp_p50=0.241ms hp_p50=0.40ms cov=100% ok=5/5 
+<<< [S7-cast_bool_to_i64-lv3] rc=0 wall=3.2s
+>>> [S7-cast_bool_to_i64-lv3m5] 00:31:08
+[XSCHED INFO @ T 131594 @ 00:31:08.463420] using app-managed scheduler
+[XSCHED INFO @ T 131594 @ 00:31:09.656081] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 131594 @ 00:31:09.692264] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS cast_bool_to_i64 mode=lv3] PASS batch=884.8us single=879.0us susp_p50=0.281ms hp_p50=0.44ms cov=100% ok=5/5 
+<<< [S7-cast_bool_to_i64-lv3m5] rc=0 wall=3.2s
+>>> [S7-transpose_copy-native] 00:31:11
+[OPS transpose_copy mode=native] PASS batch=2340.0us single=2290.9us susp_p50=-ms hp_p50=0.16ms cov=- ok=5/5 
+<<< [S7-transpose_copy-native] rc=0 wall=2.4s
+>>> [S7-transpose_copy-shim] 00:31:14
+[XSCHED INFO @ T 131696 @ 00:31:14.090397] using app-managed scheduler
+[OPS transpose_copy mode=shim] PASS batch=2330.1us single=2291.7us susp_p50=-ms hp_p50=0.16ms cov=- ok=5/5 
+<<< [S7-transpose_copy-shim] rc=0 wall=2.4s
+>>> [S7-transpose_copy-lv1] 00:31:16
+[XSCHED INFO @ T 131746 @ 00:31:16.481410] using app-managed scheduler
+[XSCHED INFO @ T 131746 @ 00:31:17.536084] level-3 sm120 trap backend enabled (default)
+[OPS transpose_copy mode=lv1] PASS batch=2332.7us single=2299.0us susp_p50=8.573ms hp_p50=8.82ms cov=- ok=5/5 
+<<< [S7-transpose_copy-lv1] rc=0 wall=2.4s
+>>> [S7-transpose_copy-lv3] 00:31:18
+[XSCHED INFO @ T 131798 @ 00:31:18.884827] using app-managed scheduler
+[XSCHED INFO @ T 131798 @ 00:31:19.919016] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 131798 @ 00:31:19.954634] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS transpose_copy mode=lv3] PASS batch=2388.0us single=2347.8us susp_p50=0.463ms hp_p50=0.58ms cov=100% ok=5/5 
+<<< [S7-transpose_copy-lv3] rc=0 wall=2.5s
+>>> [S7-transpose_copy-lv3m5] 00:31:21
+[XSCHED INFO @ T 131856 @ 00:31:21.405889] using app-managed scheduler
+[XSCHED INFO @ T 131856 @ 00:31:22.440224] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 131856 @ 00:31:22.476377] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS transpose_copy mode=lv3] PASS batch=2378.0us single=2334.2us susp_p50=0.887ms hp_p50=1.01ms cov=100% ok=5/5 
+<<< [S7-transpose_copy-lv3m5] rc=0 wall=2.5s
+>>> [S7-adamw_fused_32m-native] 00:31:23
+[OPS adamw_fused_32m mode=native] PASS batch=2478.7us single=2448.0us susp_p50=-ms hp_p50=0.32ms cov=- ok=5/5 
+<<< [S7-adamw_fused_32m-native] rc=0 wall=3.5s
+>>> [S7-adamw_fused_32m-shim] 00:31:27
+[XSCHED INFO @ T 131966 @ 00:31:27.415971] using app-managed scheduler
+[OPS adamw_fused_32m mode=shim] PASS batch=2472.7us single=2475.9us susp_p50=-ms hp_p50=0.26ms cov=- ok=5/5 
+<<< [S7-adamw_fused_32m-shim] rc=0 wall=3.5s
+>>> [S7-adamw_fused_32m-lv1] 00:31:30
+[XSCHED INFO @ T 132018 @ 00:31:30.922231] using app-managed scheduler
+[XSCHED INFO @ T 132018 @ 00:31:32.679487] level-3 sm120 trap backend enabled (default)
+[OPS adamw_fused_32m mode=lv1] PASS batch=2468.4us single=2474.7us susp_p50=9.469ms hp_p50=9.56ms cov=- ok=5/5 
+<<< [S7-adamw_fused_32m-lv1] rc=0 wall=3.5s
+>>> [S7-adamw_fused_32m-lv3] 00:31:34
+[XSCHED INFO @ T 132071 @ 00:31:34.430009] using app-managed scheduler
+[XSCHED INFO @ T 132071 @ 00:31:36.233222] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 132071 @ 00:31:36.269952] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS adamw_fused_32m mode=lv3] PASS batch=2483.6us single=2468.3us susp_p50=0.206ms hp_p50=0.36ms cov=100% ok=5/5 
+<<< [S7-adamw_fused_32m-lv3] rc=0 wall=3.6s
+>>> [S7-adamw_fused_32m-lv3m5] 00:31:38
+[XSCHED INFO @ T 132126 @ 00:31:38.096243] using app-managed scheduler
+[XSCHED INFO @ T 132126 @ 00:31:39.849630] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 132126 @ 00:31:39.885419] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS adamw_fused_32m mode=lv3] PASS batch=2483.4us single=2472.4us susp_p50=0.267ms hp_p50=0.42ms cov=100% ok=5/5 
+<<< [S7-adamw_fused_32m-lv3m5] rc=0 wall=3.6s
+>>> [S7-linear_bwd_accum-native] 00:31:41
+~/.venv_sm120/lib/python3.12/site-packages/torch/autograd/graph.py:869: UserWarning: Attempting to run cuBLAS, but there was no current CUDA context! Attempting to set the primary context... (Triggered internally at /pytorch/aten/src/ATen/cuda/CublasHandlePool.cpp:335.)
+  return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[OPS linear_bwd_accum mode=native] PASS batch=3810.8us single=3759.1us susp_p50=-ms hp_p50=0.28ms cov=- ok=5/5 
+<<< [S7-linear_bwd_accum-native] rc=0 wall=2.3s
+>>> [S7-linear_bwd_accum-shim] 00:31:43
+[XSCHED INFO @ T 132230 @ 00:31:44.046513] using app-managed scheduler
+~/.venv_sm120/lib/python3.12/site-packages/torch/autograd/graph.py:869: UserWarning: Attempting to run cuBLAS, but there was no current CUDA context! Attempting to set the primary context... (Triggered internally at /pytorch/aten/src/ATen/cuda/CublasHandlePool.cpp:335.)
+  return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[OPS linear_bwd_accum mode=shim] PASS batch=3789.6us single=3777.4us susp_p50=-ms hp_p50=0.24ms cov=- ok=5/5 
+<<< [S7-linear_bwd_accum-shim] rc=0 wall=2.3s
+>>> [S7-linear_bwd_accum-lv1] 00:31:46
+[XSCHED INFO @ T 132281 @ 00:31:46.370022] using app-managed scheduler
+~/.venv_sm120/lib/python3.12/site-packages/torch/autograd/graph.py:869: UserWarning: Attempting to run cuBLAS, but there was no current CUDA context! Attempting to set the primary context... (Triggered internally at /pytorch/aten/src/ATen/cuda/CublasHandlePool.cpp:335.)
+  return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[XSCHED INFO @ T 132281 @ 00:31:47.451325] level-3 sm120 trap backend enabled (default)
+[OPS linear_bwd_accum mode=lv1] PASS batch=3834.4us single=3798.5us susp_p50=15.942ms hp_p50=16.04ms cov=- ok=5/5 
+<<< [S7-linear_bwd_accum-lv1] rc=0 wall=2.3s
+>>> [S7-linear_bwd_accum-lv3] 00:31:48
+[XSCHED INFO @ T 132332 @ 00:31:48.706313] using app-managed scheduler
+~/.venv_sm120/lib/python3.12/site-packages/torch/autograd/graph.py:869: UserWarning: Attempting to run cuBLAS, but there was no current CUDA context! Attempting to set the primary context... (Triggered internally at /pytorch/aten/src/ATen/cuda/CublasHandlePool.cpp:335.)
+  return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[XSCHED INFO @ T 132332 @ 00:31:49.794632] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 132332 @ 00:31:49.830803] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS linear_bwd_accum mode=lv3] PASS batch=3861.2us single=3821.7us susp_p50=0.300ms hp_p50=0.45ms cov=100% ok=5/5 
+<<< [S7-linear_bwd_accum-lv3] rc=0 wall=2.5s
+>>> [S7-linear_bwd_accum-lv3m5] 00:31:51
+[XSCHED INFO @ T 132391 @ 00:31:51.184107] using app-managed scheduler
+~/.venv_sm120/lib/python3.12/site-packages/torch/autograd/graph.py:869: UserWarning: Attempting to run cuBLAS, but there was no current CUDA context! Attempting to set the primary context... (Triggered internally at /pytorch/aten/src/ATen/cuda/CublasHandlePool.cpp:335.)
+  return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[XSCHED INFO @ T 132391 @ 00:31:52.263575] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 132391 @ 00:31:52.299164] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[OPS linear_bwd_accum mode=lv3] PASS batch=3876.8us single=3814.5us susp_p50=0.315ms hp_p50=0.45ms cov=100% ok=5/5 
+<<< [S7-linear_bwd_accum-lv3m5] rc=0 wall=2.4s
+>>> [S8-ppl-solo] 00:31:53
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 21415.71it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[SERVE mode=solo policy=- lp=ppl] PASS TTFT p50/p99=11.82/12.43ms TPOT p50/p99=10.10/10.89ms hp_exact=20/20 lp_iters=0 bad=0 lp_tput=- hp_duty=-
+<<< [S8-ppl-solo] rc=0 wall=15.6s
+>>> [S8-ppl-native] 00:32:09
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 19630.23it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[SERVE mode=native policy=- lp=ppl] PASS TTFT p50/p99=13.58/17.45ms TPOT p50/p99=11.69/15.11ms hp_exact=20/20 lp_iters=201 bad=0 lp_tput=93.1% hp_duty=38%
+<<< [S8-ppl-native] rc=0 wall=16.0s
+>>> [S8-ppl-lv1-request] 00:32:25
+[XSCHED INFO @ T 132655 @ 00:32:25.267169] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 21267.06it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 132655 @ 00:32:30.963313] level-3 sm120 trap backend enabled (default)
+[SERVE mode=lv1 policy=request lp=ppl] PASS TTFT p50/p99=10.14/26.12ms TPOT p50/p99=8.80/9.37ms hp_exact=20/20 lp_iters=150 bad=0 lp_tput=70.9% hp_duty=31%
+<<< [S8-ppl-lv1-request] rc=0 wall=15.8s
+>>> [S8-ppl-lv1-prefill] 00:32:41
+[XSCHED INFO @ T 132766 @ 00:32:41.116696] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 21462.95it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 132766 @ 00:32:46.864173] level-3 sm120 trap backend enabled (default)
+[SERVE mode=lv1 policy=prefill lp=ppl] PASS TTFT p50/p99=13.06/25.54ms TPOT p50/p99=11.67/19.33ms hp_exact=20/20 lp_iters=198 bad=0 lp_tput=90.2% hp_duty=40%
+<<< [S8-ppl-lv1-prefill] rc=0 wall=16.2s
+>>> [S8-ppl-lv1-slo] 00:32:57
+[XSCHED INFO @ T 132877 @ 00:32:57.326050] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 19769.98it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 132877 @ 00:33:03.107110] level-3 sm120 trap backend enabled (default)
+[SERVE mode=lv1 policy=slo lp=ppl] PASS TTFT p50/p99=12.08/18.42ms TPOT p50/p99=8.97/16.42ms hp_exact=20/20 lp_iters=156 bad=0 lp_tput=72.7% hp_duty=34%
+<<< [S8-ppl-lv1-slo] rc=0 wall=16.0s
+>>> [S8-ppl-lv3-request] 00:33:13
+[XSCHED INFO @ T 132986 @ 00:33:13.341537] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 20829.66it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 132986 @ 00:33:19.104260] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 132986 @ 00:33:19.140602] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[SERVE mode=lv3 policy=request lp=ppl] PASS TTFT p50/p99=10.53/16.51ms TPOT p50/p99=9.04/9.63ms hp_exact=20/20 lp_iters=124 bad=0 lp_tput=58.4% hp_duty=31%
+<<< [S8-ppl-lv3-request] rc=0 wall=16.0s
+>>> [S8-ppl-lv3-prefill] 00:33:29
+[XSCHED INFO @ T 133097 @ 00:33:29.353240] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 21156.82it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 133097 @ 00:33:35.135790] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 133097 @ 00:33:35.172500] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[SERVE mode=lv3 policy=prefill lp=ppl] PASS TTFT p50/p99=10.57/17.17ms TPOT p50/p99=12.27/18.49ms hp_exact=20/20 lp_iters=169 bad=0 lp_tput=77.1% hp_duty=41%
+<<< [S8-ppl-lv3-prefill] rc=0 wall=16.3s
+>>> [S8-ppl-lv3-slo] 00:33:45
+[XSCHED INFO @ T 133201 @ 00:33:45.671899] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 18771.67it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 133201 @ 00:33:51.454346] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 133201 @ 00:33:51.490962] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[SERVE mode=lv3 policy=slo lp=ppl] PASS TTFT p50/p99=10.79/11.91ms TPOT p50/p99=9.08/14.56ms hp_exact=20/20 lp_iters=128 bad=0 lp_tput=60.2% hp_duty=33%
+<<< [S8-ppl-lv3-slo] rc=0 wall=16.0s
+>>> [S8-prefill-solo] 00:34:01
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 21582.53it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[SERVE mode=solo policy=- lp=prefill] PASS TTFT p50/p99=11.74/12.29ms TPOT p50/p99=10.04/10.63ms hp_exact=20/20 lp_iters=0 bad=0 lp_tput=- hp_duty=-
+<<< [S8-prefill-solo] rc=0 wall=15.9s
+>>> [S8-prefill-native] 00:34:17
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 18870.11it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[SERVE mode=native policy=- lp=prefill] PASS TTFT p50/p99=12.53/13.42ms TPOT p50/p99=9.82/14.54ms hp_exact=20/20 lp_iters=77 bad=0 lp_tput=93.1% hp_duty=35%
+<<< [S8-prefill-native] rc=0 wall=16.3s
+>>> [S8-prefill-lv1-request] 00:34:33
+[XSCHED INFO @ T 133529 @ 00:34:33.975449] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 18915.30it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 133529 @ 00:34:40.086930] level-3 sm120 trap backend enabled (default)
+[SERVE mode=lv1 policy=request lp=prefill] PASS TTFT p50/p99=11.12/17.97ms TPOT p50/p99=9.06/9.59ms hp_exact=20/20 lp_iters=58 bad=0 lp_tput=71.0% hp_duty=32%
+<<< [S8-prefill-lv1-request] rc=0 wall=16.3s
+>>> [S8-prefill-lv1-prefill] 00:34:50
+[XSCHED INFO @ T 133642 @ 00:34:50.284125] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 19531.26it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 133642 @ 00:34:56.464287] level-3 sm120 trap backend enabled (default)
+[SERVE mode=lv1 policy=prefill lp=prefill] PASS TTFT p50/p99=11.74/14.17ms TPOT p50/p99=10.14/16.27ms hp_exact=20/20 lp_iters=76 bad=0 lp_tput=91.7% hp_duty=36%
+<<< [S8-prefill-lv1-prefill] rc=0 wall=16.5s
+>>> [S8-prefill-lv1-slo] 00:35:06
+[XSCHED INFO @ T 133776 @ 00:35:06.834447] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 20020.54it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 133776 @ 00:35:12.960374] level-3 sm120 trap backend enabled (default)
+[SERVE mode=lv1 policy=slo lp=prefill] PASS TTFT p50/p99=12.09/14.58ms TPOT p50/p99=8.98/12.28ms hp_exact=20/20 lp_iters=62 bad=0 lp_tput=75.3% hp_duty=33%
+<<< [S8-prefill-lv1-slo] rc=0 wall=16.4s
+>>> [S8-prefill-lv3-request] 00:35:23
+[XSCHED INFO @ T 133895 @ 00:35:23.266167] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 19330.13it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 133895 @ 00:35:29.408437] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 133895 @ 00:35:29.444727] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[SERVE mode=lv3 policy=request lp=prefill] PASS TTFT p50/p99=10.67/15.12ms TPOT p50/p99=8.98/9.46ms hp_exact=20/20 lp_iters=50 bad=0 lp_tput=61.5% hp_duty=31%
+<<< [S8-prefill-lv3-request] rc=0 wall=16.4s
+>>> [S8-prefill-lv3-prefill] 00:35:39
+[XSCHED INFO @ T 134006 @ 00:35:39.639837] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 19403.52it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 134006 @ 00:35:45.807294] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 134006 @ 00:35:45.844069] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[SERVE mode=lv3 policy=prefill lp=prefill] PASS TTFT p50/p99=10.66/16.82ms TPOT p50/p99=10.21/16.82ms hp_exact=20/20 lp_iters=67 bad=0 lp_tput=80.9% hp_duty=36%
+<<< [S8-prefill-lv3-prefill] rc=0 wall=16.6s
+>>> [S8-prefill-lv3-slo] 00:35:56
+[XSCHED INFO @ T 134123 @ 00:35:56.216649] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 21260.00it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 134123 @ 00:36:02.433707] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 134123 @ 00:36:02.470648] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=10.80/13.99ms TPOT p50/p99=9.02/12.81ms hp_exact=20/20 lp_iters=52 bad=0 lp_tput=63.4% hp_duty=32%
+<<< [S8-prefill-lv3-slo] rc=0 wall=16.5s
+>>> [S9-ppl-solo] 00:36:12
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 18862.50it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[S8-MP solo    ppl] PASS | TPOT p50 10.01 p99 10.67 (solo 8.59) ms | TTFT p50 11.70 | susp p50 - ms | LP -% | HP duty 34% | exact HP 20/20 LP bad None | 
+<<< [S9-ppl-solo] rc=0 wall=15.5s
+>>> [S9-ppl-native] 00:36:28
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 20761.05it/s]
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 19627.70it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[S8-MP native  ppl] PASS | TPOT p50 11.72 p99 12.33 (solo 8.48) ms | TTFT p50 12.51 | susp p50 - ms | LP 82% | HP duty 39% | exact HP 20/20 LP bad 0 | 
+<<< [S9-ppl-native] rc=0 wall=19.1s
+>>> [S9-ppl-req-lv1] 00:36:47
+[XSCHED INFO @ T 134499 @ 00:36:47.386089] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 21797.57it/s]
+[XSCHED INFO @ T 134499 @ 00:36:50.244254] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 134556 @ 00:36:50.322968] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 19931.96it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[S8-MP req-lv1 ppl] PASS | TPOT p50 8.86 p99 9.55 (solo 8.90) ms | TTFT p50 11.62 | susp p50 0.645 ms | LP 69% | HP duty 32% | exact HP 20/20 LP bad 0 | 
+<<< [S9-ppl-req-lv1] rc=0 wall=18.9s
+>>> [S9-ppl-req-lv3] 00:37:06
+[XSCHED INFO @ T 134661 @ 00:37:06.322194] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 23157.07it/s]
+[XSCHED INFO @ T 134661 @ 00:37:09.179495] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 134661 @ 00:37:09.215726] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 134712 @ 00:37:09.293521] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 20624.46it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[S8-MP req-lv3 ppl] PASS | TPOT p50 9.03 p99 9.58 (solo 9.01) ms | TTFT p50 10.83 | susp p50 0.172 ms | LP 59% | HP duty 31% | exact HP 20/20 LP bad 0 | 
+<<< [S9-ppl-req-lv3] rc=0 wall=19.0s
+>>> [S9-ppl-glb-lv1] 00:37:25
+[XSCHED INFO @ T 134838 @ 00:37:26.320526] using global scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 20569.70it/s]
+[XSCHED INFO @ T 134838 @ 00:37:29.247169] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 134890 @ 00:37:29.326056] using global scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 20299.20it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 134890 @ 00:37:34.863370] level-3 sm120 trap backend enabled (default)
+[S8-MP glb-lv1 ppl] PASS | TPOT p50 8.46 p99 21.40 (solo 8.90) ms | TTFT p50 10.81 | susp p50 - ms | LP 71% | HP duty 31% | exact HP 20/20 LP bad 0 | 
+<<< [S9-ppl-glb-lv1] rc=0 wall=19.9s
+>>> [S9-ppl-glb-lv3] 00:37:45
+[XSCHED INFO @ T 135012 @ 00:37:46.287770] using global scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 19964.68it/s]
+[XSCHED INFO @ T 135012 @ 00:37:49.203502] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135012 @ 00:37:49.239752] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED INFO @ T 135064 @ 00:37:49.317968] using global scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 18137.94it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 135064 @ 00:37:54.893353] level-3 sm120 trap backend enabled (default)
+[S8-MP glb-lv3 ppl] PASS | TPOT p50 8.58 p99 10.40 (solo 8.94) ms | TTFT p50 10.55 | susp p50 - ms | LP 60% | HP duty 31% | exact HP 20/20 LP bad 0 | 
+<<< [S9-ppl-glb-lv3] rc=0 wall=20.0s
+>>> [ACC-C1-np2] 00:38:05
+[XSCHED INFO @ T 135176 @ 00:38:05.219326] using app-managed scheduler
+[XSCHED INFO @ T 135176 @ 00:38:05.300255] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135176 @ 00:38:05.336677] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[P3-CONVBAR C1 deep] PASS | runs=10 ok=10 np=2 outer=312 blocks=60 thr=256 chain=1 gap_us=0
+<<< [ACC-C1-np2] rc=0 wall=0.6s
+>>> [ACC-C1-np3] 00:38:05
+[XSCHED INFO @ T 135208 @ 00:38:05.881885] using app-managed scheduler
+[XSCHED INFO @ T 135208 @ 00:38:05.966916] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135208 @ 00:38:06.003996] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[P3-CONVBAR C1 deep] PASS | runs=10 ok=10 np=3 outer=311 blocks=60 thr=256 chain=1 gap_us=0
+<<< [ACC-C1-np3] rc=0 wall=0.6s
+>>> [ACC-chain12] 00:38:06
+[XSCHED INFO @ T 135239 @ 00:38:06.548236] using app-managed scheduler
+[XSCHED INFO @ T 135239 @ 00:38:06.632226] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135239 @ 00:38:06.670286] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[P3-CONVBAR C1 deep] PASS | runs=3 ok=3 np=3 outer=311 blocks=60 thr=256 chain=12 gap_us=0
+<<< [ACC-chain12] rc=0 wall=2.1s
+>>> [ACC-HW06-r1] 00:38:08
+[XSCHED INFO @ T 135273 @ 00:38:08.722725] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-06
+[XSCHED INFO @ T 135273 @ 00:38:08.805511] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135273 @ 00:38:08.842317] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 135279 @ 00:38:08.855194] Thread block cluster (cluster=2, blocks=60, sm=30), routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:497
+    [preempts=1/2 avg_susp=9.697ms avg_hp=0.031ms total=13.92ms hp_ok=1]
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [ACC-HW06-r1] rc=0 wall=0.3s
+>>> [ACC-HW06-r2] 00:38:08
+[XSCHED INFO @ T 135305 @ 00:38:08.998772] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-06
+[XSCHED INFO @ T 135305 @ 00:38:09.084646] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135305 @ 00:38:09.122405] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 135311 @ 00:38:09.135044] Thread block cluster (cluster=2, blocks=60, sm=30), routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:497
+    [preempts=1/2 avg_susp=9.935ms avg_hp=0.048ms total=14.19ms hp_ok=1]
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [ACC-HW06-r2] rc=0 wall=0.3s
+>>> [ACC-HW06-r3] 00:38:09
+[XSCHED INFO @ T 135336 @ 00:38:09.276820] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-06
+[XSCHED INFO @ T 135336 @ 00:38:09.358906] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135336 @ 00:38:09.395418] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 135343 @ 00:38:09.408886] Thread block cluster (cluster=2, blocks=60, sm=30), routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:497
+    [preempts=1/2 avg_susp=9.697ms avg_hp=0.020ms total=13.91ms hp_ok=1]
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [ACC-HW06-r3] rc=0 wall=0.3s
+>>> [ACC-HW06-r4] 00:38:09
+[XSCHED INFO @ T 135368 @ 00:38:09.549410] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-06
+[XSCHED INFO @ T 135368 @ 00:38:09.633106] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135368 @ 00:38:09.670271] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 135374 @ 00:38:09.682893] Thread block cluster (cluster=2, blocks=60, sm=30), routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:497
+    [preempts=1/2 avg_susp=10.511ms avg_hp=0.033ms total=14.74ms hp_ok=1]
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [ACC-HW06-r4] rc=0 wall=0.3s
+>>> [ACC-HW06-r5] 00:38:09
+[XSCHED INFO @ T 135399 @ 00:38:09.825273] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-06
+[XSCHED INFO @ T 135399 @ 00:38:09.909899] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135399 @ 00:38:09.947122] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 135406 @ 00:38:09.959871] Thread block cluster (cluster=2, blocks=60, sm=30), routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:497
+    [preempts=1/2 avg_susp=8.834ms avg_hp=0.031ms total=13.06ms hp_ok=1]
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [ACC-HW06-r5] rc=0 wall=0.3s
+>>> [ACC-HW06-r6] 00:38:10
+[XSCHED INFO @ T 135431 @ 00:38:10.101250] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-06
+[XSCHED INFO @ T 135431 @ 00:38:10.185466] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135431 @ 00:38:10.221961] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 135437 @ 00:38:10.234965] Thread block cluster (cluster=2, blocks=60, sm=30), routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:497
+    [preempts=1/2 avg_susp=10.255ms avg_hp=0.033ms total=14.46ms hp_ok=1]
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [ACC-HW06-r6] rc=0 wall=0.3s
+>>> [ACC-HW06-r7] 00:38:10
+[XSCHED INFO @ T 135462 @ 00:38:10.373038] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-06
+[XSCHED INFO @ T 135462 @ 00:38:10.456537] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135462 @ 00:38:10.492535] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 135469 @ 00:38:10.505430] Thread block cluster (cluster=2, blocks=60, sm=30), routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:497
+    [preempts=1/2 avg_susp=8.840ms avg_hp=0.031ms total=13.06ms hp_ok=1]
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [ACC-HW06-r7] rc=0 wall=0.3s
+>>> [ACC-HW06-r8] 00:38:10
+[XSCHED INFO @ T 135494 @ 00:38:10.644538] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-06
+[XSCHED INFO @ T 135494 @ 00:38:10.733203] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135494 @ 00:38:10.769412] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 135500 @ 00:38:10.782501] Thread block cluster (cluster=2, blocks=60, sm=30), routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:497
+    [preempts=1/2 avg_susp=9.809ms avg_hp=0.029ms total=14.03ms hp_ok=1]
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [ACC-HW06-r8] rc=0 wall=0.3s
+>>> [ACC-HW06-r9] 00:38:10
+[XSCHED INFO @ T 135525 @ 00:38:10.924891] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-06
+[XSCHED INFO @ T 135525 @ 00:38:11.010474] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135525 @ 00:38:11.047161] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 135532 @ 00:38:11.059782] Thread block cluster (cluster=2, blocks=60, sm=30), routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:497
+    [preempts=1/2 avg_susp=10.356ms avg_hp=0.033ms total=14.58ms hp_ok=1]
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [ACC-HW06-r9] rc=0 wall=0.3s
+>>> [ACC-HW06-r10] 00:38:11
+[XSCHED INFO @ T 135557 @ 00:38:11.203143] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-06
+[XSCHED INFO @ T 135557 @ 00:38:11.290040] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135557 @ 00:38:11.326704] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 135563 @ 00:38:11.339565] Thread block cluster (cluster=2, blocks=60, sm=30), routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:497
+    [preempts=1/2 avg_susp=8.997ms avg_hp=0.144ms total=13.39ms hp_ok=1]
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [ACC-HW06-r10] rc=0 wall=0.3s
+>>> [ACC-HW06-r11] 00:38:11
+[XSCHED INFO @ T 135589 @ 00:38:11.479274] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-06
+[XSCHED INFO @ T 135589 @ 00:38:11.564980] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135589 @ 00:38:11.601369] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 135595 @ 00:38:11.613993] Thread block cluster (cluster=2, blocks=60, sm=30), routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:497
+    [preempts=1/2 avg_susp=10.068ms avg_hp=0.032ms total=14.29ms hp_ok=1]
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [ACC-HW06-r11] rc=0 wall=0.3s
+>>> [ACC-HW06-r12] 00:38:11
+[XSCHED INFO @ T 135620 @ 00:38:11.756138] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-06
+[XSCHED INFO @ T 135620 @ 00:38:11.843378] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135620 @ 00:38:11.879834] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 135626 @ 00:38:11.892904] Thread block cluster (cluster=2, blocks=60, sm=30), routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:497
+    [preempts=1/2 avg_susp=9.659ms avg_hp=0.032ms total=13.89ms hp_ok=1]
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [ACC-HW06-r12] rc=0 wall=0.3s
+>>> [ACC-HW06-r13] 00:38:11
+[XSCHED INFO @ T 135652 @ 00:38:12.038627] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-06
+[XSCHED INFO @ T 135652 @ 00:38:12.126516] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135652 @ 00:38:12.163118] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 135658 @ 00:38:12.176680] Thread block cluster (cluster=2, blocks=60, sm=30), routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:497
+    [preempts=1/2 avg_susp=10.051ms avg_hp=0.034ms total=14.29ms hp_ok=1]
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [ACC-HW06-r13] rc=0 wall=0.3s
+>>> [ACC-HW06-r14] 00:38:12
+[XSCHED INFO @ T 135683 @ 00:38:12.320225] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-06
+[XSCHED INFO @ T 135683 @ 00:38:12.408101] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135683 @ 00:38:12.446659] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 135690 @ 00:38:12.459301] Thread block cluster (cluster=2, blocks=60, sm=30), routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:497
+    [preempts=1/2 avg_susp=10.064ms avg_hp=0.034ms total=14.30ms hp_ok=1]
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [ACC-HW06-r14] rc=0 wall=0.3s
+>>> [ACC-HW06-r15] 00:38:12
+[XSCHED INFO @ T 135715 @ 00:38:12.606819] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-06
+[XSCHED INFO @ T 135715 @ 00:38:12.692760] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135715 @ 00:38:12.729846] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 135721 @ 00:38:12.742941] Thread block cluster (cluster=2, blocks=60, sm=30), routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:497
+    [preempts=1/2 avg_susp=8.846ms avg_hp=0.032ms total=13.11ms hp_ok=1]
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [ACC-HW06-r15] rc=0 wall=0.3s
+>>> [ACC-HW06-r16] 00:38:12
+[XSCHED INFO @ T 135746 @ 00:38:12.881308] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-06
+[XSCHED INFO @ T 135746 @ 00:38:12.968966] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135746 @ 00:38:13.005577] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 135753 @ 00:38:13.018264] Thread block cluster (cluster=2, blocks=60, sm=30), routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:497
+    [preempts=1/2 avg_susp=9.944ms avg_hp=0.031ms total=14.17ms hp_ok=1]
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [ACC-HW06-r16] rc=0 wall=0.3s
+>>> [ACC-HW06-r17] 00:38:13
+[XSCHED INFO @ T 135778 @ 00:38:13.160074] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-06
+[XSCHED INFO @ T 135778 @ 00:38:13.246294] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135778 @ 00:38:13.283768] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 135784 @ 00:38:13.296388] Thread block cluster (cluster=2, blocks=60, sm=30), routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:497
+    [preempts=1/2 avg_susp=10.303ms avg_hp=0.033ms total=14.53ms hp_ok=1]
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [ACC-HW06-r17] rc=0 wall=0.3s
+>>> [ACC-HW06-r18] 00:38:13
+[XSCHED INFO @ T 135809 @ 00:38:13.439476] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-06
+[XSCHED INFO @ T 135809 @ 00:38:13.528414] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135809 @ 00:38:13.565258] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 135816 @ 00:38:13.578392] Thread block cluster (cluster=2, blocks=60, sm=30), routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:497
+    [preempts=1/2 avg_susp=8.831ms avg_hp=0.021ms total=13.04ms hp_ok=1]
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [ACC-HW06-r18] rc=0 wall=0.3s
+>>> [ACC-HW06-r19] 00:38:13
+[XSCHED INFO @ T 135841 @ 00:38:13.723296] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-06
+[XSCHED INFO @ T 135841 @ 00:38:13.809646] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135841 @ 00:38:13.846576] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 135847 @ 00:38:13.859467] Thread block cluster (cluster=2, blocks=60, sm=30), routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:497
+    [preempts=1/2 avg_susp=9.693ms avg_hp=0.019ms total=13.90ms hp_ok=1]
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [ACC-HW06-r19] rc=0 wall=0.3s
+>>> [ACC-HW06-r20] 00:38:13
+[XSCHED INFO @ T 135873 @ 00:38:14.002307] using app-managed scheduler
+[SM120_V2_LIB_ARCH_SUITE] GPU=NVIDIA GeForce RTX 5060 SM=12.0 SMs=30 filter=HW-06
+[XSCHED INFO @ T 135873 @ 00:38:14.090759] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135873 @ 00:38:14.127509] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[XSCHED WARN @ T 135879 @ 00:38:14.140222] Thread block cluster (cluster=2, blocks=60, sm=30), routing cleanly to level-1 boundary @ /mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:497
+    [preempts=1/2 avg_susp=9.876ms avg_hp=0.125ms total=14.26ms hp_ok=1]
+[HW-06] Blackwell CTA Cluster (2x1x1 + DSMEM): ce=0 mismatch=0/7680 -> PASS
+
+=== LIB & HW FEATURE SUMMARY: 1 / 1 PASSED ===
+<<< [ACC-HW06-r20] rc=0 wall=0.3s
+>>> [ACC-dnn06-r1] 00:38:14
+[XSCHED INFO @ T 135904 @ 00:38:14.317288] using app-managed scheduler
+[XSCHED INFO @ T 135904 @ 00:38:15.538901] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 135904 @ 00:38:15.575926] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[DNN-06 torch.compile(inductor, default)] PASS | preempts=3 susp=[1.014, 0.964, 0.965] max_err=0.000e+00
+<<< [ACC-dnn06-r1] rc=0 wall=4.7s
+>>> [ACC-dnn06-r2] 00:38:18
+[XSCHED INFO @ T 136010 @ 00:38:19.076614] using app-managed scheduler
+[XSCHED INFO @ T 136010 @ 00:38:20.257765] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 136010 @ 00:38:20.294446] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[DNN-06 torch.compile(inductor, default)] PASS | preempts=3 susp=[1.023, 0.931, 0.956] max_err=0.000e+00
+<<< [ACC-dnn06-r2] rc=0 wall=4.7s
+>>> [ACC-dnn06-r3] 00:38:23
+[XSCHED INFO @ T 136115 @ 00:38:23.793881] using app-managed scheduler
+[XSCHED INFO @ T 136115 @ 00:38:25.000389] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 136115 @ 00:38:25.036780] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[DNN-06 torch.compile(inductor, default)] PASS | preempts=3 susp=[1.032, 0.934, 0.973] max_err=0.000e+00
+<<< [ACC-dnn06-r3] rc=0 wall=4.7s
+>>> [ACC-dnn06-r4] 00:38:28
+[XSCHED INFO @ T 136212 @ 00:38:28.499374] using app-managed scheduler
+[XSCHED INFO @ T 136212 @ 00:38:29.697009] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 136212 @ 00:38:29.733870] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[DNN-06 torch.compile(inductor, default)] PASS | preempts=3 susp=[1.022, 0.991, 1.086] max_err=0.000e+00
+<<< [ACC-dnn06-r4] rc=0 wall=4.7s
+>>> [ACC-dnn06-r5] 00:38:33
+[XSCHED INFO @ T 136309 @ 00:38:33.249774] using app-managed scheduler
+[XSCHED INFO @ T 136309 @ 00:38:34.445669] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 136309 @ 00:38:34.481947] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[DNN-06 torch.compile(inductor, default)] PASS | preempts=3 susp=[0.976, 0.978, 0.969] max_err=0.000e+00
+<<< [ACC-dnn06-r5] rc=0 wall=4.7s
+>>> [LL-solo-g1500] 00:38:37
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 20357.97it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[SERVE mode=solo policy=- lp=ppl] PASS TTFT p50/p99=12.07/12.47ms TPOT p50/p99=10.13/11.88ms hp_exact=20/20 lp_iters=0 bad=0 lp_tput=- hp_duty=-
+<<< [LL-solo-g1500] rc=0 wall=33.6s
+>>> [LL-native-g1500] 00:39:11
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 18764.43it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[SERVE mode=native policy=- lp=ppl] PASS TTFT p50/p99=13.72/17.41ms TPOT p50/p99=11.39/15.15ms hp_exact=20/20 lp_iters=601 bad=0 lp_tput=96.7% hp_duty=13%
+<<< [LL-native-g1500] rc=0 wall=33.9s
+>>> [LL-lv1-request-g1500] 00:39:45
+[XSCHED INFO @ T 136743 @ 00:39:45.514772] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 20604.55it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 136743 @ 00:39:51.323855] level-3 sm120 trap backend enabled (default)
+[SERVE mode=lv1 policy=request lp=ppl] PASS TTFT p50/p99=11.03/23.31ms TPOT p50/p99=8.89/9.49ms hp_exact=20/20 lp_iters=552 bad=0 lp_tput=89.5% hp_duty=11%
+<<< [LL-lv1-request-g1500] rc=0 wall=33.9s
+>>> [LL-lv1-slo-g1500] 00:40:19
+[XSCHED INFO @ T 136914 @ 00:40:19.471489] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 22069.68it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 136914 @ 00:40:25.274085] level-3 sm120 trap backend enabled (default)
+[SERVE mode=lv1 policy=slo lp=ppl] PASS TTFT p50/p99=12.55/20.70ms TPOT p50/p99=9.04/16.46ms hp_exact=20/20 lp_iters=556 bad=0 lp_tput=90.2% hp_duty=12%
+<<< [LL-lv1-slo-g1500] rc=0 wall=33.9s
+>>> [LL-lv1-prefill-g1500] 00:40:53
+[XSCHED INFO @ T 137085 @ 00:40:53.421123] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 18814.65it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 137085 @ 00:40:59.263817] level-3 sm120 trap backend enabled (default)
+[SERVE mode=lv1 policy=prefill lp=ppl] PASS TTFT p50/p99=12.84/20.27ms TPOT p50/p99=11.47/16.96ms hp_exact=20/20 lp_iters=595 bad=0 lp_tput=96.1% hp_duty=14%
+<<< [LL-lv1-prefill-g1500] rc=0 wall=34.0s
+>>> [LL-lv3-request-g1500] 00:41:27
+[XSCHED INFO @ T 137258 @ 00:41:27.466070] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 20573.88it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 137258 @ 00:41:33.293610] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 137258 @ 00:41:33.330364] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[SERVE mode=lv3 policy=request lp=ppl] PASS TTFT p50/p99=10.94/14.01ms TPOT p50/p99=9.09/9.60ms hp_exact=20/20 lp_iters=490 bad=0 lp_tput=79.4% hp_duty=11%
+<<< [LL-lv3-request-g1500] rc=0 wall=34.0s
+>>> [LL-lv3-slo-g1500] 00:42:01
+[XSCHED INFO @ T 137425 @ 00:42:01.496637] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 19843.52it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 137425 @ 00:42:07.291613] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 137425 @ 00:42:07.328163] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[SERVE mode=lv3 policy=slo lp=ppl] PASS TTFT p50/p99=10.74/17.48ms TPOT p50/p99=9.11/14.72ms hp_exact=20/20 lp_iters=493 bad=0 lp_tput=79.3% hp_duty=11%
+<<< [LL-lv3-slo-g1500] rc=0 wall=34.0s
+>>> [LL-lv3-prefill-g1500] 00:42:35
+[XSCHED INFO @ T 137595 @ 00:42:35.471119] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 20750.07it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 137595 @ 00:42:41.278567] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 137595 @ 00:42:41.315444] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[SERVE mode=lv3 policy=prefill lp=ppl] PASS TTFT p50/p99=10.85/15.51ms TPOT p50/p99=12.17/18.21ms hp_exact=20/20 lp_iters=531 bad=0 lp_tput=85.9% hp_duty=14%
+<<< [LL-lv3-prefill-g1500] rc=0 wall=34.0s
+>>> [LL-solo-g3000] 00:43:09
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 21863.79it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[SERVE mode=solo policy=- lp=ppl] PASS TTFT p50/p99=12.04/12.66ms TPOT p50/p99=10.18/10.83ms hp_exact=20/20 lp_iters=0 bad=0 lp_tput=- hp_duty=-
+<<< [LL-solo-g3000] rc=0 wall=60.9s
+>>> [LL-native-g3000] 00:44:10
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 21528.67it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[SERVE mode=native policy=- lp=ppl] PASS TTFT p50/p99=12.59/17.43ms TPOT p50/p99=11.73/15.03ms hp_exact=20/20 lp_iters=1212 bad=0 lp_tput=98.1% hp_duty=7%
+<<< [LL-native-g3000] rc=0 wall=61.1s
+>>> [LL-lv1-request-g3000] 00:45:11
+[XSCHED INFO @ T 138248 @ 00:45:11.547289] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 19121.66it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 138248 @ 00:45:17.356019] level-3 sm120 trap backend enabled (default)
+[SERVE mode=lv1 policy=request lp=ppl] PASS TTFT p50/p99=11.09/23.44ms TPOT p50/p99=8.96/9.59ms hp_exact=20/20 lp_iters=1160 bad=0 lp_tput=94.1% hp_duty=5%
+<<< [LL-lv1-request-g3000] rc=0 wall=61.1s
+>>> [LL-lv1-slo-g3000] 00:46:12
+[XSCHED INFO @ T 138495 @ 00:46:12.657534] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 19463.75it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 138495 @ 00:46:18.480383] level-3 sm120 trap backend enabled (default)
+[SERVE mode=lv1 policy=slo lp=ppl] PASS TTFT p50/p99=11.47/19.75ms TPOT p50/p99=9.08/16.31ms hp_exact=20/20 lp_iters=1165 bad=0 lp_tput=94.4% hp_duty=6%
+<<< [LL-lv1-slo-g3000] rc=0 wall=61.1s
+>>> [LL-lv1-prefill-g3000] 00:47:13
+[XSCHED INFO @ T 138748 @ 00:47:13.802958] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 19545.70it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 138748 @ 00:47:19.661912] level-3 sm120 trap backend enabled (default)
+[SERVE mode=lv1 policy=prefill lp=ppl] PASS TTFT p50/p99=12.62/25.50ms TPOT p50/p99=11.68/17.70ms hp_exact=20/20 lp_iters=1204 bad=0 lp_tput=97.3% hp_duty=7%
+<<< [LL-lv1-prefill-g3000] rc=0 wall=61.2s
+>>> [LL-lv3-request-g3000] 00:48:14
+[XSCHED INFO @ T 139001 @ 00:48:15.026405] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 20853.23it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 139001 @ 00:48:20.915653] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 139001 @ 00:48:20.952401] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[SERVE mode=lv3 policy=request lp=ppl] PASS TTFT p50/p99=11.08/19.53ms TPOT p50/p99=9.15/9.75ms hp_exact=20/20 lp_iters=1045 bad=0 lp_tput=84.4% hp_duty=6%
+<<< [LL-lv3-request-g3000] rc=0 wall=61.2s
+>>> [LL-lv3-slo-g3000] 00:49:16
+[XSCHED INFO @ T 139276 @ 00:49:16.294519] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 19518.41it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 139276 @ 00:49:22.108295] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 139276 @ 00:49:22.145328] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[SERVE mode=lv3 policy=slo lp=ppl] PASS TTFT p50/p99=11.37/14.68ms TPOT p50/p99=9.14/14.07ms hp_exact=20/20 lp_iters=1047 bad=0 lp_tput=84.7% hp_duty=6%
+<<< [LL-lv3-slo-g3000] rc=0 wall=61.2s
+>>> [LL-lv3-prefill-g3000] 00:50:17
+[XSCHED INFO @ T 139501 @ 00:50:17.478728] using app-managed scheduler
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 19415.28it/s]
+[transformers] `past_key_values`/`cache_params` are deprecated. Use `cache` instead.
+~/.venv_sm120/lib/python3.12/site-packages/torch/nn/modules/module.py:1790: FutureWarning: `past_key_values` is deprecated and will be removed in version 5.40.0 for `Qwen2ForCausalLM.forward`. Use `cache` instead.
+  return forward_call(*args, **kwargs)
+[XSCHED INFO @ T 139501 @ 00:50:23.299640] level-3 sm120 trap backend enabled (default)
+[XSCHED INFO @ T 139501 @ 00:50:23.336897] sm120_trap_engine: installed static 9-cave engine (c0=139/152 c1=119/154 c2=136/153 c3=99/159 c4=113/158 c5=136/156 c6=112/158 c7=78/144 c8=113/156)
+[SERVE mode=lv3 policy=prefill lp=ppl] PASS TTFT p50/p99=11.60/16.03ms TPOT p50/p99=11.93/19.03ms hp_exact=20/20 lp_iters=1085 bad=0 lp_tput=87.8% hp_duty=7%
+<<< [LL-lv3-prefill-g3000] rc=0 wall=61.2s
+=== guarded run done 2026-11-27T00:51:18+01:00 ===

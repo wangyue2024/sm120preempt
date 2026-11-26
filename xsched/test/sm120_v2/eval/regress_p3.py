@@ -82,6 +82,17 @@ def plan(args):
             # Arena trimming exercised under preemption (1 MiB threshold => frequent frees).
             # Phase 3.4-2 (DEF-25): XQueueQuery must report Idle after every synchronize.
             L("SYN-xq-idle", 120, "$PY $EVAL/test_xqueue_idle_p34.py")
+            # DEF-09: preemption inside a CUDA graph (flattening) on a non-idempotent training step.
+            L("SYN-graph-preempt", 900, "$PY $EVAL/test_graph_preempt_p35.py --layers 8 --dim 2048 --batch 1024 --replays 40 --preempts 15")
+            # Phase 3.5: non-blocking cross-stream waits on XQueue events (Level-3 bridge, Level-1 GPU wait),
+            # and the hazard the bridge prevents (plain GPU wait corrupts under Level-3 preemption).
+            L("SYN-event-bridge-lv3", 600, "$PY $EVAL/test_event_bridge_p35.py --level 3 --iters 30")
+            L("SYN-event-bridge-lv1", 600, "$PY $EVAL/test_event_bridge_p35.py --level 1 --iters 20")
+            L("SYN-event-bridge-modload", 600, "$PY $EVAL/test_event_bridge_p35.py --level 3 --iters 10 --module-load")
+            # DEF-31: a whole CUDA graph must never run twice when a Level-3 queue is restored.
+            L("SYN-graph-relaunch-whole", 600, "XSCHED_CUDA_GRAPH_FLATTEN=0 $PY $EVAL/test_graph_relaunch_p35.py --iters 60")
+            L("SYN-graph-relaunch-flat", 600, "$PY $EVAL/test_graph_relaunch_p35.py --iters 60")
+            L("SYN-event-bridge-hazard", 600, "XSCHED_CUDA_ASYNC_EVENT_WAIT=2 $PY $EVAL/test_event_bridge_p35.py --level 3 --iters 10 --expect-fail")
             L("SYN-stress-trim", 900, f"{M5} XSCHED_SM120_ARENA_TRIM_MIN_MB=1 GRID_MULT=8 CHAIN=6 GAP_US=1000 TARGET_MS=4 $OUT/test_convbar_p3 all 3 10")
         elif g == "acc":
             L("ACC-C1-np2", 600, f"{M5} $OUT/test_convbar_p3 C1 10 2")

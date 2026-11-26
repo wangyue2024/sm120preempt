@@ -1,0 +1,294 @@
+=== guarded run start 2026-11-26T21:58:09+01:00 host=<host> plan=~/.xsched_p3_build/ab_5060.plan ===
+NVIDIA GeForce RTX 5060, 595.99.02, 357 MiB, 11 %, 55
+>>> [AB-lv3-1] 21:58:09
+Traceback (most recent call last):
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 56, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 41, in main
+    c, t = work()
+           ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 31, in work
+    c = torch.cumsum(x, 0)
+        ^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 256.00 MiB. GPU 0 has a total capacity of 7.52 GiB of which 41.69 MiB is free. Including non-PyTorch memory, this process has 7.13 GiB memory in use. Of the allocated memory 6.91 GiB is allocated by PyTorch, and 11.88 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+<<< [AB-lv3-1] rc=1 wall=4.3s
+>>> [AB-lv3-2] 21:58:13
+Traceback (most recent call last):
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 56, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 41, in main
+    c, t = work()
+           ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 31, in work
+    c = torch.cumsum(x, 0)
+        ^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 256.00 MiB. GPU 0 has a total capacity of 7.52 GiB of which 41.69 MiB is free. Including non-PyTorch memory, this process has 7.13 GiB memory in use. Of the allocated memory 6.91 GiB is allocated by PyTorch, and 11.88 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+<<< [AB-lv3-2] rc=1 wall=4.2s
+>>> [AB-lv3-3] 21:58:17
+Traceback (most recent call last):
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 56, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 41, in main
+    c, t = work()
+           ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 31, in work
+    c = torch.cumsum(x, 0)
+        ^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 256.00 MiB. GPU 0 has a total capacity of 7.52 GiB of which 41.69 MiB is free. Including non-PyTorch memory, this process has 7.13 GiB memory in use. Of the allocated memory 6.91 GiB is allocated by PyTorch, and 11.88 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+<<< [AB-lv3-3] rc=1 wall=4.2s
+>>> [AB-lv3-4] 21:58:21
+Traceback (most recent call last):
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 56, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 41, in main
+    c, t = work()
+           ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 31, in work
+    c = torch.cumsum(x, 0)
+        ^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 256.00 MiB. GPU 0 has a total capacity of 7.52 GiB of which 41.69 MiB is free. Including non-PyTorch memory, this process has 7.13 GiB memory in use. Of the allocated memory 6.91 GiB is allocated by PyTorch, and 11.88 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+<<< [AB-lv3-4] rc=1 wall=4.2s
+>>> [AB-lv3-5] 21:58:26
+Traceback (most recent call last):
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 56, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 41, in main
+    c, t = work()
+           ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 31, in work
+    c = torch.cumsum(x, 0)
+        ^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 256.00 MiB. GPU 0 has a total capacity of 7.52 GiB of which 41.69 MiB is free. Including non-PyTorch memory, this process has 7.13 GiB memory in use. Of the allocated memory 6.91 GiB is allocated by PyTorch, and 11.88 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+<<< [AB-lv3-5] rc=1 wall=4.2s
+>>> [AB-lv3-6] 21:58:30
+Traceback (most recent call last):
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 56, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 41, in main
+    c, t = work()
+           ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 31, in work
+    c = torch.cumsum(x, 0)
+        ^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 256.00 MiB. GPU 0 has a total capacity of 7.52 GiB of which 41.69 MiB is free. Including non-PyTorch memory, this process has 7.13 GiB memory in use. Of the allocated memory 6.91 GiB is allocated by PyTorch, and 11.88 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+<<< [AB-lv3-6] rc=1 wall=4.2s
+>>> [AB-lv3-7] 21:58:34
+Traceback (most recent call last):
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 56, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 41, in main
+    c, t = work()
+           ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 31, in work
+    c = torch.cumsum(x, 0)
+        ^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 256.00 MiB. GPU 0 has a total capacity of 7.52 GiB of which 41.69 MiB is free. Including non-PyTorch memory, this process has 7.13 GiB memory in use. Of the allocated memory 6.91 GiB is allocated by PyTorch, and 11.88 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+<<< [AB-lv3-7] rc=1 wall=4.2s
+>>> [AB-lv3-8] 21:58:38
+Traceback (most recent call last):
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 56, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 41, in main
+    c, t = work()
+           ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 31, in work
+    c = torch.cumsum(x, 0)
+        ^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 256.00 MiB. GPU 0 has a total capacity of 7.52 GiB of which 41.69 MiB is free. Including non-PyTorch memory, this process has 7.13 GiB memory in use. Of the allocated memory 6.91 GiB is allocated by PyTorch, and 11.88 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+<<< [AB-lv3-8] rc=1 wall=4.2s
+>>> [AB-lv3-9] 21:58:43
+Traceback (most recent call last):
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 56, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 41, in main
+    c, t = work()
+           ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 31, in work
+    c = torch.cumsum(x, 0)
+        ^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 256.00 MiB. GPU 0 has a total capacity of 7.52 GiB of which 41.69 MiB is free. Including non-PyTorch memory, this process has 7.13 GiB memory in use. Of the allocated memory 6.91 GiB is allocated by PyTorch, and 11.88 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+<<< [AB-lv3-9] rc=1 wall=4.2s
+>>> [AB-lv3-10] 21:58:47
+Traceback (most recent call last):
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 56, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 41, in main
+    c, t = work()
+           ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 31, in work
+    c = torch.cumsum(x, 0)
+        ^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 256.00 MiB. GPU 0 has a total capacity of 7.52 GiB of which 41.69 MiB is free. Including non-PyTorch memory, this process has 7.13 GiB memory in use. Of the allocated memory 6.91 GiB is allocated by PyTorch, and 11.88 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+<<< [AB-lv3-10] rc=1 wall=4.2s
+>>> [AB-lv3-11] 21:58:51
+Traceback (most recent call last):
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 56, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 41, in main
+    c, t = work()
+           ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 31, in work
+    c = torch.cumsum(x, 0)
+        ^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 256.00 MiB. GPU 0 has a total capacity of 7.52 GiB of which 41.69 MiB is free. Including non-PyTorch memory, this process has 7.13 GiB memory in use. Of the allocated memory 6.91 GiB is allocated by PyTorch, and 11.88 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+<<< [AB-lv3-11] rc=1 wall=4.2s
+>>> [AB-lv3-12] 21:58:55
+Traceback (most recent call last):
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 56, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 41, in main
+    c, t = work()
+           ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 31, in work
+    c = torch.cumsum(x, 0)
+        ^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 256.00 MiB. GPU 0 has a total capacity of 7.52 GiB of which 41.69 MiB is free. Including non-PyTorch memory, this process has 7.13 GiB memory in use. Of the allocated memory 6.91 GiB is allocated by PyTorch, and 11.88 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+<<< [AB-lv3-12] rc=1 wall=4.2s
+>>> [AB-native-1] 21:58:59
+Traceback (most recent call last):
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 56, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 41, in main
+    c, t = work()
+           ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 31, in work
+    c = torch.cumsum(x, 0)
+        ^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 256.00 MiB. GPU 0 has a total capacity of 7.52 GiB of which 41.69 MiB is free. Including non-PyTorch memory, this process has 7.13 GiB memory in use. Of the allocated memory 6.91 GiB is allocated by PyTorch, and 11.88 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+<<< [AB-native-1] rc=1 wall=4.0s
+>>> [AB-native-2] 21:59:03
+Traceback (most recent call last):
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 56, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 41, in main
+    c, t = work()
+           ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 31, in work
+    c = torch.cumsum(x, 0)
+        ^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 256.00 MiB. GPU 0 has a total capacity of 7.52 GiB of which 41.69 MiB is free. Including non-PyTorch memory, this process has 7.13 GiB memory in use. Of the allocated memory 6.91 GiB is allocated by PyTorch, and 11.88 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+<<< [AB-native-2] rc=1 wall=4.0s
+>>> [AB-native-3] 21:59:07
+Traceback (most recent call last):
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 56, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 41, in main
+    c, t = work()
+           ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 31, in work
+    c = torch.cumsum(x, 0)
+        ^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 256.00 MiB. GPU 0 has a total capacity of 7.52 GiB of which 41.69 MiB is free. Including non-PyTorch memory, this process has 7.13 GiB memory in use. Of the allocated memory 6.91 GiB is allocated by PyTorch, and 11.88 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+<<< [AB-native-3] rc=1 wall=4.0s
+>>> [AB-native-4] 21:59:11
+Traceback (most recent call last):
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 56, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 41, in main
+    c, t = work()
+           ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 31, in work
+    c = torch.cumsum(x, 0)
+        ^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 256.00 MiB. GPU 0 has a total capacity of 7.52 GiB of which 41.69 MiB is free. Including non-PyTorch memory, this process has 7.13 GiB memory in use. Of the allocated memory 6.91 GiB is allocated by PyTorch, and 11.88 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+<<< [AB-native-4] rc=1 wall=4.0s
+>>> [AB-native-5] 21:59:15
+Traceback (most recent call last):
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 56, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 41, in main
+    c, t = work()
+           ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 31, in work
+    c = torch.cumsum(x, 0)
+        ^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 256.00 MiB. GPU 0 has a total capacity of 7.52 GiB of which 41.69 MiB is free. Including non-PyTorch memory, this process has 7.13 GiB memory in use. Of the allocated memory 6.91 GiB is allocated by PyTorch, and 11.88 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+<<< [AB-native-5] rc=1 wall=4.0s
+>>> [AB-native-6] 21:59:19
+Traceback (most recent call last):
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 56, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 41, in main
+    c, t = work()
+           ^^^^^^
+  File "/mnt/data/1file/Desktop/code/code/xsched/5080opencode/xsched/test/sm120_v2/eval/probe_native_det_p35.py", line 31, in work
+    c = torch.cumsum(x, 0)
+        ^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 256.00 MiB. GPU 0 has a total capacity of 7.52 GiB of which 41.69 MiB is free. Including non-PyTorch memory, this process has 7.13 GiB memory in use. Of the allocated memory 6.91 GiB is allocated by PyTorch, and 11.88 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+<<< [AB-native-6] rc=1 wall=4.0s
+=== guarded run done 2026-11-26T21:59:23+01:00 ===
+=== guarded run start 2026-11-26T22:00:32+01:00 host=<host> plan=~/.xsched_p3_build/ab_5060.plan ===
+NVIDIA GeForce RTX 5060, 595.99.02, 357 MiB, 11 %, 52
+>>> [AB-lv3-1] 22:00:32
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [AB-lv3-1] rc=0 wall=9.1s
+>>> [AB-lv3-2] 22:00:41
+[NATIVE-DET] PASS | reps 85 bad 0  | late deterministic True
+<<< [AB-lv3-2] rc=0 wall=9.0s
+>>> [AB-lv3-3] 22:00:50
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [AB-lv3-3] rc=0 wall=9.0s
+>>> [AB-lv3-4] 22:00:59
+[NATIVE-DET] PASS | reps 85 bad 0  | late deterministic True
+<<< [AB-lv3-4] rc=0 wall=9.0s
+>>> [AB-lv3-5] 22:01:08
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [AB-lv3-5] rc=0 wall=9.0s
+>>> [AB-lv3-6] 22:01:17
+[NATIVE-DET] PASS | reps 85 bad 0  | late deterministic True
+<<< [AB-lv3-6] rc=0 wall=9.0s
+>>> [AB-lv3-7] 22:01:26
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [AB-lv3-7] rc=0 wall=9.0s
+>>> [AB-lv3-8] 22:01:35
+[NATIVE-DET] PASS | reps 85 bad 0  | late deterministic True
+<<< [AB-lv3-8] rc=0 wall=9.0s
+>>> [AB-lv3-9] 22:01:44
+[NATIVE-DET] PASS | reps 85 bad 0  | late deterministic True
+<<< [AB-lv3-9] rc=0 wall=9.0s
+>>> [AB-lv3-10] 22:01:53
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [AB-lv3-10] rc=0 wall=9.0s
+>>> [AB-lv3-11] 22:02:02
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [AB-lv3-11] rc=0 wall=9.1s
+>>> [AB-lv3-12] 22:02:11
+[NATIVE-DET] PASS | reps 85 bad 0  | late deterministic True
+<<< [AB-lv3-12] rc=0 wall=9.0s
+>>> [AB-native-1] 22:02:20
+[NATIVE-DET] PASS | reps 85 bad 0  | late deterministic True
+<<< [AB-native-1] rc=0 wall=8.8s
+>>> [AB-native-2] 22:02:29
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [AB-native-2] rc=0 wall=8.9s
+>>> [AB-native-3] 22:02:38
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [AB-native-3] rc=0 wall=8.9s
+>>> [AB-native-4] 22:02:47
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [AB-native-4] rc=0 wall=8.8s
+>>> [AB-native-5] 22:02:56
+[NATIVE-DET] PASS | reps 85 bad 0  | late deterministic True
+<<< [AB-native-5] rc=0 wall=8.9s
+>>> [AB-native-6] 22:03:05
+[NATIVE-DET] PASS | reps 86 bad 0  | late deterministic True
+<<< [AB-native-6] rc=0 wall=8.8s
+=== guarded run done 2026-11-26T22:03:14+01:00 ===

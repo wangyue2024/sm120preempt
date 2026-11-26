@@ -190,6 +190,8 @@ Mode 1（`XSCHED_SM120_FORCE_MODE1=1` 或命令带“幂等”属性）不保存
 
 **恢复途中再次抢占（mid-restore re-preemption）**：Guardian 在 `replay_state_c` 里用 `cmd & 1` 区分“正常恢复（cmd=2/6）”与“恢复中又被抢占（cmd=1/5）”，后者保持状态、写 `entry_dec=2` 后退出，保证同一 CTA 不会被执行两次。约 3,000 次压测抢占验证（DEF-21 关闭）。
 
+**重发哪些命令（DEF-31，Phase 3.5）**。`Reactivate(log)` 拿到的日志是已发射、尚未被 XSched 标记完成的命令。只有**可能被 Trap 或入口门控杀掉的命令**才需要重发：killable（受 Trap 管理的）内核，以及排在它们之后、必须重新记录的幂等命令（事件 record）。非 killable 命令——整图、Level-1 路由内核、内存拷贝、主机函数——的 Guardian 窗口已清零或根本没有插桩，它们总是完整执行；以前的“无驱逐”分支按 `active_kernel_idx` 之后的日志全部重发，而这个下标只由 killable 内核更新，于是排在一个早已结束的 killable 内核之后的整图会被执行第二次。现在两条分支都用 `RelaunchableAfterTrap()` 过滤。发射线程的屏障规则（非 deactivatable 且非幂等的命令要等所有在飞的 deactivatable 命令完成后才发射）保证这类命令不会排在一个被杀掉的内核之后，所以过滤不会漏掉需要重发的工作。
+
 ### 3.6 控制平面：数据布局
 
 控制头（`Sm120ControlHeader`，`0x50` 字节，设备内存，主机通过拷贝流写入）：
@@ -283,12 +285,54 @@ CTA 表项（每 CTA 16 字节，从 `u_ctrl + 0x50 + 16 × cta_id` 开始）：
 | 2 | 协作启动（`grid.sync`） | 需要整个网格同时驻留，无法部分驱逐 | `lv1_cooperative` |
 | 3 | 线程块 Cluster（多波，或单波且未设 `XSCHED_SM120_CLUSTER_MODE5=1`） | DEF-19：Cluster 屏障相位、DSMEM 映射不在 Trap 帧中，5080 上 1–2 个 CTA 偶发错 | `lv1_cluster` |
 | 4 | 插桩失败，或含硬件 mbarrier（`SYNCS`）指令 | mbarrier 状态在共享内存中有硬件语义，无法保存 / 重建 | `lv1_uninstrumentable` / `lv1_mbarrier` |
-| 5 | 无回边、无间接分支、无调用（`loop_free`），且波数在 `[2, 1024]` | 每条指令每个线程至多执行一次，CTA 很短；Level-1 边界的抢占延迟就是该内核本身的短时长，却省掉了每个 CTA 的 Guardian 成本（DEF-17） | `lv1_short_cta` |
-| 6 | CUDA Graph | 图在驱动内部发射，无法逐内核插桩（DEF-09） | `lv1_graph` |
+| 5 | 无回边、无间接分支、无调用（`loop_free`），波数在 `[2, 1024]`，**且实测时长 ≤ `XSCHED_SM120_SHORT_CTA_MAX_US`（默认 200 µs）** | 每条指令每个线程至多执行一次，CTA 很短；Level-1 边界的抢占延迟就是该内核本身的短时长，却省掉了每个 CTA 的 Guardian 成本（DEF-17）。时长条件见下文（DEF-30） | `lv1_short_cta` |
+| 6 | CUDA Graph 整图发射（未展平：`XSCHED_CUDA_GRAPH_FLATTEN=0`、图不可展平，或图时长低于 `XSCHED_CUDA_GRAPH_FLATTEN_MIN_US`） | 图在驱动内部发射，无法逐内核插桩；默认情况下 Level-3 队列上的图被展平为逐内核提交（§5.1，DEF-09） | `lv1_graph` |
 
 `loop_free` 的判定（`BinaryIsLoopFree()`）：扫描内核 SASS，任一 `BRA` 的偏移为负（回边）、任一 `BRX`（间接分支，`0x949`）、任一调用（`CALL.REL(.NOINC)` `0x943/0x944`、`CALL.ABS.NOINC` `0x343`、间接 `CALL.REL.NOINC Rx` `0x344`）或 `RET`（`0x950`）都判为非 loop-free。结尾填充用的 `BRA self` 忽略。`BRA` 偏移字段的编码通过 3,653 条分支拟合确认。
 
 代价：被路由的内核在**自己结束时**才让出 GPU（5060 `transpose_copy` HP P50 1.09 → 2.37 ms）。需要严格亚毫秒抢占的部署可用 `XSCHED_SM120_SHORT_CTA_LV1=0` 关闭（门控镜像之后纯 Mode 5 也满足 < 10% 目标）。
+
+**时长条件（Phase 3.5，DEF-30）**。只按波数放行会把**毫秒级**的 loop-free 内核也送到 Level-1：RTX 5060 上 37.7 M 元素的逐元素比较（`ne` / `any` / `logical_or`，约 0.3–0.6 ms）满足 `[2, 1024]` 波。Lv3 挂起到达时若这类内核已排在被 Trap 的内核之后，挂起要等它们全部执行完，HP P99 从 0.5–1 ms 拉长到 2–3 ms（§5 末的价值实验）。现在每个候选（函数, CTA 数, 线程数, 动态共享内存）的**第一次**发射留在 Level-3，并在发射线程上用一对 CUDA 事件计时；以后的发射只有实测时长 ≤ 200 µs 才走 Level-1。被抢占拉长的计时把内核判为“长”（更可抢占的一侧）。两个实现细节：
+- 从未 record 过的 CUDA 事件 `cuEventQuery` 返回成功、`cuEventElapsedTime` 返回 `CUDA_ERROR_INVALID_HANDLE`。计时请求在提交时登记、事件在发射线程 `Launch()` 中才 record，所以只有 `recorded` 标志置位后才查询（第一版没有这个标志，所有内核都被判为“长”，相当于关闭了路由，T-25）。
+- 占用率查询（`cuOccupancyMaxActiveBlocksPerMultiprocessor`）是驱动调用，原来每次发射都调用；现在与时长状态一起按几何形状缓存（PERF-3：展平后的 CUDA Graph 每秒提交上万个内核）。
+
+效果（RTX 5060，Lv3，LP 带逐迭代校验）：GEMM 6144 / SDPA 16384 的挂起 P99 1.94 / 2.53 ms → 0.22 / 0.25 ms；路由目标算子（`transpose_copy`、`gelu_tanh`、`softmax` 等）开销与只按波数时相同（−1%–+1%），超过 200 µs 的 `rope_apply` 留在 Level-3（+7%，路由关闭时 +9%）。
+
+### 5.1 CUDA Graph 展平（DEF-09，Phase 3.5）
+
+CUDA Graph 由驱动整体发射，XSched 看到的只有一个 `cuGraphLaunch` 命令：Level-3 队列以前只能在**图边界**挂起，`torch.compile(mode="reduce-overhead")` 的图挂起 10–31 ms，PyTorch 整网捕获的训练步（27 ms）挂起 P50 约 290 ms（排在后面的多个整图都要跑完）。
+
+展平（`platforms/cuda/shim/src/graph_flatten.cpp`）把图在 XQueue 上**按节点逐个提交**，每个内核走正常的 Level-3 路径（Guardian 插桩、Trap 驱逐、恢复）：
+
+1. **实例化时记录**（`cuGraphInstantiate*` 的包装）。PyTorch 在实例化后立即销毁 `CUgraph`，所以必须在此时遍历：`cuGraphGetNodes/GetEdges` 做 Kahn 拓扑排序（同层按节点序），子图内联（深度 ≤ 8）。内核节点保存函数、网格/块、动态共享内存和**参数值的字节拷贝**（偏移与大小来自 `cuFuncGetParamInfo`）；memset / memcpy 节点保存参数；空节点丢弃。其他节点类型（host、event、外部信号量、内存分配/释放、条件节点、批量内存操作）、通过 `extra` 传参的内核、Cluster / 协作内核使图“不可展平”，以后整图发射。
+2. **修改即失效**。`cuGraphExecUpdate`、`cuGraphExec*SetParams`、`cuGraphNodeSetEnabled`、`cuGraphExecNodeSetParams` 把该可执行图标为不可展平（替换计划对象而不是原地修改，正在遍历旧计划的发射不受影响）；`cuGraphExecDestroy` 删除记录。
+3. **发射时提交**（`cuGraphLaunch` 落到 XQueue 时）。`XSCHED_CUDA_GRAPH_FLATTEN`：0 关闭；1（默认）只对 Level ≥ Interrupt 的队列展平；2 所有 XQueue。并行分支在流上顺序执行（拓扑序是合法调度）。内核命令深拷贝参数（`deep_copy=true`），因为计划对象可能先于命令执行被替换。
+4. **按时长展平**（`XSCHED_CUDA_GRAPH_FLATTEN_MIN_US`，默认 0 = 总是展平）。展平的代价是 CPU：每个节点一次 XQueue 提交 + Lv3 发射准备（约 5 µs），而整图发射摊到每个节点不到 1 µs。图比延迟目标还短时展平没有意义：设阈值后，图在队列上的第一次发射整图执行并用事件计时（事件是 XQueue 命令，查询前先确认结束事件的命令已发射，理由同 T-25），时长 ≥ 阈值才展平。
+
+正确性论证：图的语义是节点间的依赖偏序；拓扑序串行执行满足所有依赖。节点参数在实例化后固定（修改即失效），所以每次发射提交的内容与驱动整图发射时相同。抢占时 XQueue 的命令日志按逐内核粒度重放，与普通 eager 内核相同。
+
+验证（RTX 5060）：整网捕获的 MLP 训练步（8 层 2048 维前向 + 反向 + `capturable` AdamW，非幂等）40 次重放、15 次挂起，参数与优化器状态与原生重放**比特一致**；挂起 P50 / P99 0.13 / 1.39 ms（未展平 289 / 407 ms）；无抢占重放 26.78 → 27.14 ms（+1.3%）。`DNN-07`（`torch.compile` reduce-overhead）3/3 通过，挂起 0.09–0.60 ms；`HW-04` 4 节点图在图内被抢占（挂起 0.19 ms，原 20 ms）。
+
+### 5.2 跨流事件等待不再阻塞调用线程（DEF-29，Phase 3.5）
+
+`cuStreamWaitEvent(S, E)`：E 在 XQueue 上 record、S 是普通流（非 XQueue）时，原实现让**调用线程**阻塞到 E 完成（`xevent->Wait()`）。原因是 GPU 端的依赖不可信：Level-2/3 下被抢占的内核会提前结束（被 Trap 的 CTA 退出、后续 CTA 在入口被 Guardian 杀掉），其后 record 的事件随即触发，而真正的工作要等 XQueue 恢复时重新发射。阻塞保证了正确，却把应用的 CPU 工作和 GPU 执行串行化：vLLM 每个 decode 步的 `copy_stream.wait_stream(main_stream)` 在 Level-1 下阻塞 1.8 ms（cProfile：`Event.wait` 128 次共 0.231 s），吞吐 −22%。
+
+新实现（`platforms/cuda/shim/src/event_bridge.cpp`，`XSCHED_CUDA_ASYNC_EVENT_WAIT`，默认 1）：
+- **录制队列为 Level-1**：已发射的工作从不丢弃。等到 record 命令**已发射**（`kCommandStateInFlight`），再调用原生 `cuStreamWaitEvent`，依赖完全交给 GPU。
+- **录制队列为 Level-2/3**：把等待方流**提升为内部 Level-1 XQueue**，等待作为 `CudaEventWaitCommand` 提交给它。等待由该队列的发射线程（而不是调用线程）在 `BeforeLaunch()` 中完成：等 record 命令在 XSched 意义上完成（`HwCommand::Wait`，计入抢占与重放）后才继续；该流此后的命令都在新队列里排在等待之后。调用线程立即返回，GPU 上没有任何依赖主机进度的等待。
+- 提升出的队列继承录制队列的优先级提示（客户端记录最近一次 `XHintPriority`，新增 `XHintGetPriority`），以免全局 HPF 调度器把高优先级进程的辅助队列当作低优先级挂起；`cuStreamDestroy` 时先排空再销毁它（`cuStreamDestroy` 允许已排队的工作继续完成，而销毁 XQueue 会丢弃未发射命令）。
+- `XSCHED_CUDA_ASYNC_EVENT_WAIT=2` 是**仅供测试的不安全模式**：所有级别都用原生 GPU 等待，用来证明 Level-2/3 下必须由主机确认完成。
+
+**被否决的第一版设计：GPU 等待主机标志（死锁）**。第一版让等待方流在 GPU 上 `cuStreamWaitValue32` 等一个钉住的主机标志，由每个录制队列的“桥”线程在 record 命令完成后写入。合成测试全部通过，但 vLLM 在启动阶段卡死（RTX 5080，Level-3，`gdb` 栈）：主线程在 `cuModuleLoadData`（Triton 加载内核）里**持有驱动锁并等待 GPU 空闲**；GPU 上的拷贝流在等标志；桥线程在等 record 命令完成；而该命令还没发射，因为 XQueue 发射线程卡在 `cuLaunchKernel` 上等主线程持有的那把锁。结论：**任何“GPU 等待依赖于未来主机端发射”的方案，都可能与隐式同步的驱动调用（模块加载等）形成环**。提升方案中依赖只存在于主机线程之间，GPU 始终能自行排空，所以不会成环。回归新增 `SYN-event-bridge-modload`：每次等待后立即加载一个新的 CUDA 模块（jiterator 内核）。
+
+验证（`test_event_bridge_p35.py`，RTX 5060，LP 在 XQueue 上计算 34 ms 的矩阵链，普通拷贝流等待其事件后复制结果，挂起落在链中间）：
+
+| 模式 | 结果被破坏的迭代 | 调用线程阻塞（P50） |
+|---|---|---|
+| 0（原阻塞） | 0 / 30 | 38.5 ms |
+| **1（默认：Level-3 下提升等待流）** | **0 / 30**；加模块加载 0 / 10，无死锁 | **4–5 µs** |
+| 2（不安全的原生 GPU 等待） | **30 / 30**（无挂起的对照 0 / 20） | 4 µs |
+| 1，Level-1 录制队列（发射后 GPU 等待） | 0 / 20（含模块加载） | 3–98 µs |
 
 调用检测同时决定 LMEM 保存区：含调用的内核要保存调用栈（§6.2）。DEF-22（`CALL.ABS` 漏检）与 DEF-24（间接调用 / `RET` 漏检）是这里的两个修复。
 
@@ -303,6 +347,10 @@ CTA 表项（每 CTA 16 字节，从 `u_ctrl + 0x50 + 16 × cta_id` 开始）：
 ### 6.2 LMEM 保存容量（DEF-23）
 
 原实现对含调用的内核按每线程固定 4 KiB 预留栈保存区（LayerNorm 在 5060 上需要 231 MiB）。改为“静态局部内存 + `CU_LIMIT_STACK_SIZE`（运行时实际栈上限）”精确预留。`XSCHED_SM120_LMEM_CAP_BYTES` 可覆盖。
+
+### 6.2b 生命周期与进程退出（DEF-33）
+
+Trap 引擎、Guardian 注册表、`LaunchMutex` 按上下文创建，存放在进程级单例表中，从不删除。以前这些表是普通静态对象，进程退出时静态析构会销毁引擎，`~Sm120TrapEngine` 把原 Trap 处理程序写回 ToolsMemory——此时 CUDA 运行时或 cuFFT 等库的退出处理可能已经拆除了上下文，写入成为 libcuda 内部的释放后使用（5080 上 LIB-12 退出时堆损坏）。处理程序位于上下文自己的 ToolsMemory 中，上下文销毁时由驱动回收，所以现在这些表是**有意泄漏**的堆对象，进程退出时不从静态析构调用任何驱动 API（图展平的计划表同理，其析构会销毁 CUDA 事件）。
 
 ### 6.3 arena 空闲回收（MEM-1）
 
@@ -323,6 +371,16 @@ arena 随更大的内核增长，旧 arena 被替换后原来永不释放。`Cud
 - `DirectLaunch` 的上下文 / 架构查询按线程缓存。
 
 效果：5080 上 HP decode TPOT 相对无 XSched 由 1.23× 降到 1.01–1.06×；5060 仅加载 shim 的 decode 开销 +16% → +1.3–3.8%。
+
+### 7.3 整图发射与参数窗口（DEF-32，Phase 3.5）
+
+参数窗口（`cuXtraSetDebuggerParams`）是**每个函数**的状态。实测（vLLM，§5.1 / Phase 3.5 报告 §4.2）：CUDA Graph 的内核节点在**图发射时**使用该函数当时的窗口，而不是捕获时的值。若同一个函数先以 Mode 5 方式 eager 发射过（窗口里是那次发射的控制头地址、描述符与内核序号），之后整图重放时这些节点就以“第 N 号 Mode 5 发射”的身份运行：脉冲到来时被驱逐、门控关闭时在入口排空，而整图不是 killable 命令，这些 CTA 不会被恢复——静默丢失工作。
+
+修复：图在实例化时记录全部内核节点的函数（`GraphPlan::funcs`，与能否展平无关，子图递归收集；`cuGraphExecUpdate` / `cuGraphExec*SetParams` 合并新函数）。整图发射前清零这些函数的窗口，并与发射一起放在上下文的 `LaunchMutex` 内，保证中间不会插入 Mode 5 发射：
+- Level-3 队列：`CudaQueueLv3Trap::Launch()` 处理 `CudaGraphLaunchCommand::graph_funcs`；
+- 普通流（透传）：`PassThroughGraphLaunch()`，仅当有函数持有非零窗口时（`AnyParamsSet()`，无锁计数）才加锁清零，否则直接发射。
+
+清零只影响之后的发射：已经入队的 eager Mode 5 发射在发射时已经带上了自己的窗口。
 
 ---
 
@@ -430,6 +488,7 @@ HP 客户端                         xserver                                   L
 | 变量 | 默认 | 作用 |
 |---|---|---|
 | `XSCHED_SM120_SHORT_CTA_LV1` | 1 | 短 CTA 路由；`_MIN_WAVES` / `_MAX_WAVES` 默认 2 / 1024 |
+| `XSCHED_SM120_SHORT_CTA_MAX_US` | 200 | 短 CTA 路由的时长上限（首发计时，超过则留在 Level-3）；0 = 只按波数（Phase 3.3 行为） |
 | `XSCHED_SM120_GUARDIAN_BARRED` | 1 | `BAR.RED` norm_gate；0 = `BAR.SYNC` + 无条件读 `entry_dec` |
 | `XSCHED_SM120_GATE_MIRROR` | 1 | 门控镜像；`_CHECK=1` 每次读头时比对镜像（调试） |
 | `XSCHED_SM120_GUARDIAN_V1` | 0 | 1 = 原版 Guardian（含 slot 28 重读） |
@@ -460,6 +519,9 @@ HP 客户端                         xserver                                   L
 |---|---|---|
 | `XSCHED_XQUEUE_DIRECT` | 1 | 直接提交 |
 | `XSCHED_XQUEUE_CALLER_SYNC` | 1 | 调用方 `WaitAll` |
+| `XSCHED_CUDA_GRAPH_FLATTEN` | 1 | CUDA Graph 展平：0 关，1 Level ≥ Interrupt 的队列，2 所有 XQueue（§5.1） |
+| `XSCHED_CUDA_GRAPH_FLATTEN_MIN_US` | 0 | 只展平首发计时 ≥ 该值的图；0 = 总是展平 |
+| `XSCHED_CUDA_ASYNC_EVENT_WAIT` | 1 | 普通流等待 XQueue 事件：0 阻塞调用线程（旧），1 Level-1 发射后 GPU 等待 / Level-2/3 把等待流提升为 Level-1 XQueue（§5.2），2 不安全测试模式 |
 | `XSCHED_SPIN_US` | 30 | 发射线程 / 调用方自旋预算（µs） |
 | `XSCHED_SCHEDULER` | APP | `APP` / `LCL` / `GLB` |
 | `XSCHED_POLICY` | — | 本地调度器策略（如 `HPF`） |

@@ -1,0 +1,42 @@
+=== guarded run start 2026-11-27T05:10:46+08:00 host=<host> plan=~/p3runs/lib12.plan ===
+NVIDIA GeForce RTX 5080, 580.95.05, 7 MiB, 0 %, 21
+>>> [L12-base] 05:10:46
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+bash: line 1: 2307288 Aborted                 (core dumped) XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2307298 Aborted                 (core dumped) XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2307308 Aborted                 (core dumped) XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2307318 Aborted                 (core dumped) XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2307328 Aborted                 (core dumped) XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2307338 Aborted                 (core dumped) XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+L12 base fails=6/6
+<<< [L12-base] rc=0 wall=2.5s
+>>> [L12-aw0] 05:10:49
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+bash: line 1: 2307377 Aborted                 (core dumped) XSCHED_CUDA_ASYNC_EVENT_WAIT=0 XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2307387 Aborted                 (core dumped) XSCHED_CUDA_ASYNC_EVENT_WAIT=0 XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2307397 Aborted                 (core dumped) XSCHED_CUDA_ASYNC_EVENT_WAIT=0 XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2307407 Aborted                 (core dumped) XSCHED_CUDA_ASYNC_EVENT_WAIT=0 XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2307426 Aborted                 (core dumped) XSCHED_CUDA_ASYNC_EVENT_WAIT=0 XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+L12 aw0 fails=5/6
+<<< [L12-aw0] rc=0 wall=2.3s
+>>> [L12-fl0] 05:10:51
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+bash: line 1: 2307465 Aborted                 (core dumped) XSCHED_CUDA_GRAPH_FLATTEN=0 XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2307475 Aborted                 (core dumped) XSCHED_CUDA_GRAPH_FLATTEN=0 XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2307486 Aborted                 (core dumped) XSCHED_CUDA_GRAPH_FLATTEN=0 XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2307496 Aborted                 (core dumped) XSCHED_CUDA_GRAPH_FLATTEN=0 XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2307506 Aborted                 (core dumped) XSCHED_CUDA_GRAPH_FLATTEN=0 XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2307516 Aborted                 (core dumped) XSCHED_CUDA_GRAPH_FLATTEN=0 XSCHED_SM120_SHORT_CTA_LV1=0 TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+L12 fl0 fails=6/6
+<<< [L12-fl0] rc=0 wall=2.4s
+>>> [L12-router] 05:10:53
+bash: warning: setlocale: LC_ALL: cannot change locale (zh_CN.UTF-8)
+bash: line 1: 2307555 Aborted                 (core dumped) TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2307565 Aborted                 (core dumped) TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2307575 Aborted                 (core dumped) TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2307585 Aborted                 (core dumped) TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2307595 Aborted                 (core dumped) TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+bash: line 1: 2307605 Aborted                 (core dumped) TEST_NP=2 $OUT/test_real_cuda_libs_p3 LIB-12 > /tmp/l12.log 2>&1
+L12 router-on fails=6/6
+<<< [L12-router] rc=0 wall=2.3s
+=== guarded run done 2026-11-27T05:10:56+08:00 ===

@@ -147,7 +147,33 @@ CUresult XStreamEndCapture(CUstream stream, CUgraph *graph);
 CUresult XStreamEndCapture_ptsz(CUstream stream, CUgraph *graph);
 
 CUDA_SHIM_FUNC(GraphUpload, CudaGraphUploadCommand, CUgraphExec, graph_exec);
-CUDA_SHIM_FUNC(GraphLaunch, CudaGraphLaunchCommand, CUgraphExec, graph_exec);
+// DEF-09: graph launches on an XQueue may be flattened into their commands (graph_flatten.cpp).
+CUresult XGraphLaunch(CUgraphExec exec, CUstream stream);
+CUresult XGraphLaunch_ptsz(CUgraphExec exec, CUstream stream);
+void GraphFlattenOnInstantiate(CUgraphExec exec, CUgraph graph);
+void GraphFlattenInvalidate(CUgraphExec exec, const char *why, CUgraph new_graph = nullptr,
+                            CUfunction new_func = nullptr);
+void GraphFlattenOnDestroy(CUgraphExec exec);
+bool GraphFlattenSubmit(CUgraphExec exec, const std::shared_ptr<xsched::preempt::XQueue> &xq);
+
+/// Non-blocking wait of a non-XQueue stream on an event recorded on an XQueue (event_bridge.cpp).
+/// Returns false if the wait could not be enqueued asynchronously (caller blocks instead).
+bool AsyncCrossStreamWait(CUstream stream, CUevent event, unsigned int flags,
+                          const std::shared_ptr<CudaEventRecordCommand> &xevent);
+/// Drain and destroy the internal XQueue of a stream promoted by AsyncCrossStreamWait (if any).
+void StreamPromotionOnDestroy(CUstream stream);
+CUresult XGraphInstantiateWithFlags(CUgraphExec *phGraphExec, CUgraph hGraph, unsigned long long flags);
+CUresult XGraphInstantiateWithParams(CUgraphExec *phGraphExec, CUgraph hGraph, CUDA_GRAPH_INSTANTIATE_PARAMS *p);
+CUresult XGraphInstantiateWithParams_ptsz(CUgraphExec *phGraphExec, CUgraph hGraph, CUDA_GRAPH_INSTANTIATE_PARAMS *p);
+CUresult XGraphInstantiate(CUgraphExec *phGraphExec, CUgraph hGraph, CUgraphNode *err, char *log, size_t size);
+CUresult XGraphInstantiate_v2(CUgraphExec *phGraphExec, CUgraph hGraph, CUgraphNode *err, char *log, size_t size);
+CUresult XGraphExecDestroy(CUgraphExec exec);
+CUresult XGraphExecUpdate_v2(CUgraphExec exec, CUgraph g, CUgraphExecUpdateResultInfo *info);
+CUresult XGraphExecKernelNodeSetParams_v2(CUgraphExec exec, CUgraphNode node, const CUDA_KERNEL_NODE_PARAMS *p);
+CUresult XGraphExecMemcpyNodeSetParams(CUgraphExec exec, CUgraphNode node, const CUDA_MEMCPY3D *p, CUcontext ctx);
+CUresult XGraphExecMemsetNodeSetParams(CUgraphExec exec, CUgraphNode node, const CUDA_MEMSET_NODE_PARAMS *p, CUcontext ctx);
+CUresult XGraphNodeSetEnabled(CUgraphExec exec, CUgraphNode node, unsigned int enabled);
+CUresult XGraphExecNodeSetParams(CUgraphExec exec, CUgraphNode node, CUgraphNodeParams *p);
 
 ////////////////////////////// memory related //////////////////////////////
 CUDA_SHIM_FUNC(MemcpyAsync, CudaMemcpyAsyncCommand, CUdeviceptr, dst, CUdeviceptr, src, size_t, ByteCount);

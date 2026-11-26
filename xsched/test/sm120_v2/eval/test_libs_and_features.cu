@@ -860,8 +860,12 @@ bool TestHwCudaGraph(XQueueHandle xq, cudaStream_t lp_stream, cudaStream_t hp_st
 
     double max_err = 0.0;
     for (int i = 0; i < n; ++i) max_err = std::max(max_err, std::fabs(double(h_pre[i]) - double(h_ref[i])));
-    std::printf("[HW-04] CUDA Graph (4-node, %.2fms): max_err=%.6e susp=%.3fms (Lv1 boundary fallback!) -> %s\n",
-                graph_ms, max_err, pt.suspend_ms, (ok && max_err == 0.0) ? "PASS (Lv1-fallback)" : "FAIL");
+    // DEF-09: with graph flattening (XSCHED_CUDA_GRAPH_FLATTEN, default on for Level-3 queues) the
+    // graph's kernels are preempted inside the graph; otherwise only at the graph boundary.
+    const bool in_graph = pt.suspend_ms < 0.5 * graph_ms;
+    std::printf("[HW-04] CUDA Graph (4-node, %.2fms): max_err=%.6e susp=%.3fms (%s) -> %s\n",
+                graph_ms, max_err, pt.suspend_ms, in_graph ? "preempted inside the graph" : "graph-boundary fallback",
+                (ok && max_err == 0.0) ? (in_graph ? "PASS (in-graph)" : "PASS (graph-boundary)") : "FAIL");
     return ok && (max_err == 0.0);
 }
 
