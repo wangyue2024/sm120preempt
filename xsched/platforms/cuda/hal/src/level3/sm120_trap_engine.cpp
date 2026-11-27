@@ -1310,6 +1310,7 @@ struct Nvml
     int (*by_bus)(const char *, NvmlDev *) = nullptr;
     int (*compute)(NvmlDev, unsigned int *, NvmlProcInfo *) = nullptr;
     int (*graphics)(NvmlDev, unsigned int *, NvmlProcInfo *) = nullptr;
+    int (*mps)(NvmlDev, unsigned int *, NvmlProcInfo *) = nullptr;   // MPS clients (optional)
 
     static Nvml &Get()
     {
@@ -1323,6 +1324,8 @@ struct Nvml
                 dlsym(h, "nvmlDeviceGetComputeRunningProcesses_v3"));
             x->graphics = reinterpret_cast<int (*)(NvmlDev, unsigned int *, NvmlProcInfo *)>(
                 dlsym(h, "nvmlDeviceGetGraphicsRunningProcesses_v3"));
+            x->mps = reinterpret_cast<int (*)(NvmlDev, unsigned int *, NvmlProcInfo *)>(
+                dlsym(h, "nvmlDeviceGetMPSComputeRunningProcesses_v3"));
             x->ok = init && x->by_bus && x->compute && x->graphics && init() == 0;
             return x;
         }();
@@ -1370,6 +1373,22 @@ std::string ProcComm(int pid)
     fclose(f);
     buf[strcspn(buf, "\n")] = '\0';
     return buf;
+}
+
+// The MPS server process hosts the shared context of its clients; NVML lists the clients themselves.
+bool IsMpsServer(int pid)
+{
+    char path[64];
+    snprintf(path, sizeof(path), "/proc/%d/cmdline", pid);
+    FILE *f = fopen(path, "r");
+    if (f == nullptr) return false;
+    char buf[256] = {};
+    const size_t n = fread(buf, 1, sizeof(buf) - 1, f);
+    fclose(f);
+    buf[n] = '\0';
+    const char *base = strrchr(buf, '/');
+    base = base ? base + 1 : buf;
+    return strcmp(base, "nvidia-cuda-mps-server") == 0;
 }
 
 std::string TenantFile(const std::string &bus, int pid, const std::string &start)
@@ -1575,11 +1594,24 @@ private:
                 *desc = "NVML process query failed";
             }
         }
+        // MPS: clients of one MPS server share a single hardware context, so they are never
+        // time-sliced against each other and the DEF-41 peer rule does not apply between them
+        // (RTX 5080: two Level-3 MPS clients 8/8 runs, ~7,600 pulses each, no Xid; without MPS
+        // 14/14 Xid 109). Non-XSched MPS clients remain foreign (a pulse took down the MPS server).
+        std::set<unsigned int> mps_pids;
+        if (n.mps != nullptr) {
+            unsigned int cnt = 256;
+            if (n.mps(nvml, &cnt, info) == 0) {
+                for (unsigned int k = 0; k < cnt; ++k) mps_pids.insert(info[k].pid);
+            }
+        }
+        const bool self_mps = mps_pids.count(static_cast<unsigned int>(getpid())) != 0;
         const int64_t now = MonoUs();
         std::lock_guard<std::mutex> lk(cache_mu_);
         for (unsigned int k = 0; k < np; ++k) {
             const unsigned int pid = pids[k];
             if (static_cast<int>(pid) == getpid()) continue;
+            if (self_mps && IsMpsServer(static_cast<int>(pid))) continue;   // our own shared context
             PidClass &pc = cache_[pid];
             if (pc.checked_us == 0 || now - pc.checked_us > 200000) {
                 const std::string st = ProcStartTime(static_cast<int>(pid));
@@ -1597,7 +1629,8 @@ private:
             const char *why = nullptr;
             if (pc.cls == 1 && !ForeignAllowed()) {
                 why = "";
-            } else if (pc.cls == 2 && self_lv3 && !PeersAllowed() && !PeerQuiescent(pc.lv3_file)) {
+            } else if (pc.cls == 2 && self_lv3 && !PeersAllowed() && !(self_mps && mps_pids.count(pid)) &&
+                       !PeerQuiescent(pc.lv3_file)) {
                 // Two busy Level-3 processes are two time-sliced contexts: a context switch that
                 // arrives while one's warps are in the trap handler times out (Xid 109, DEF-27 class;
                 // 14/14 runs with two independent Level-3 processes). The ready gate only covers

@@ -105,6 +105,9 @@ def plan(args):
             # rotation, quiescent peers may be pulsed); no Xid, every checkpoint exact.
             L("SYN-lv3-peers-glb", 600, f"NATIVE_LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu $PY $EVAL/test_lv3_peers_glb_p35.py "
                                         f"--seconds 15 --ref {out_dir}/lv3_peers_ref.json")
+            # DEF-27 / DEF-41 structural fix: two Level-3 processes as MPS clients (one hardware context,
+            # no time slicing) with default settings, and a non-XSched MPS client left untouched.
+            L("SYN-mps-lv3", 900, "$PY $EVAL/test_mps_lv3_p35.py --steps 6000")
             # Driver-internal memset / copy kernels under pulses, and the OBS-23 starvation guard
             # (256 MiB buffers, suspension every ~0.4 ms: no progress without the guard).
             L("SYN-driver-kernels", 600, "$PY $EVAL/test_lv3_driver_kernels_p35.py --mib 256 --iters 60 --gap-us 400")

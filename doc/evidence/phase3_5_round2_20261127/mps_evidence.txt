@@ -1,0 +1,184 @@
+# MPS experiments (RTX 5080; private MPS daemon, only these test processes connect)
+=== mps
+>>> [MPS-flash] 00:23:57
+new_xid=0
+<<< [MPS-flash] rc=0 wall=5.1s
+>>> [MPS-mq] 00:24:32
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 1500 | wrong queues [] | preemptions [423, 423, 411, 415] | recovery pulses 0 | wall 0.45s | checkpoints 12 valid True | native deterministic True
+new_xid=0
+<<< [MPS-mq] rc=0 wall=6.1s
+>>> [MPS-xp-allow-1] 00:25:09
+[MULTIQ-LV3 q=2 rank=1 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1895, 1901] | recovery pulses 0 | wall 1.94s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 q=2 rank=0 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1914, 1916] | recovery pulses 0 | wall 1.95s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 procs=2 host_gate=1] PASS | process exit codes [0, 0]
+new_xid=0
+<<< [MPS-xp-allow-1] rc=0 wall=12.3s
+>>> [MPS-xp-allow-2] 00:25:51
+[MULTIQ-LV3 q=2 rank=0 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1919, 1913] | recovery pulses 1 | wall 1.98s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 q=2 rank=1 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1920, 1921] | recovery pulses 0 | wall 1.98s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 procs=2 host_gate=1] PASS | process exit codes [0, 0]
+new_xid=0
+<<< [MPS-xp-allow-2] rc=0 wall=12.3s
+>>> [MPS-xp-allow-3] 00:26:33
+[MULTIQ-LV3 q=2 rank=0 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1906, 1916] | recovery pulses 1 | wall 2.00s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 q=2 rank=1 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1909, 1912] | recovery pulses 2 | wall 2.00s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 procs=2 host_gate=1] PASS | process exit codes [0, 0]
+new_xid=0
+<<< [MPS-xp-allow-3] rc=0 wall=12.3s
+=== mps2
+>>> [MPS2-xp-1] 00:28:00
+NVML: 14251, nvidia-cuda-mps-server
+NVML: 13771, ~/.venv_sm120/bin/python
+NVML: 13772, ~/.venv_sm120/bin/python
+[MULTIQ-LV3 q=2 rank=1 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1911, 1899] | pulses 3776 recovery pulses 1 | wall 2.00s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 q=2 rank=0 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1907, 1912] | pulses 3769 recovery pulses 2 | wall 2.00s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 procs=2 host_gate=1] PASS | process exit codes [0, 0]
+new_xid=0
+<<< [MPS2-xp-1] rc=0 wall=12.3s
+>>> [MPS2-xp-2] 00:28:42
+NVML: 15199, nvidia-cuda-mps-server
+NVML: 15140, ~/.venv_sm120/bin/python
+NVML: 15141, ~/.venv_sm120/bin/python
+[MULTIQ-LV3 q=2 rank=0 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1903, 1901] | pulses 3772 recovery pulses 1 | wall 2.00s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 q=2 rank=1 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1904, 1905] | pulses 3780 recovery pulses 2 | wall 2.01s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 procs=2 host_gate=1] PASS | process exit codes [0, 0]
+new_xid=0
+<<< [MPS2-xp-2] rc=0 wall=12.2s
+>>> [MPS2-xp-3] 00:29:25
+NVML: 16039, nvidia-cuda-mps-server
+NVML: 15980, ~/.venv_sm120/bin/python
+NVML: 15981, ~/.venv_sm120/bin/python
+[MULTIQ-LV3 q=2 rank=0 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1920, 1937] | pulses 3835 recovery pulses 2 | wall 2.00s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 q=2 rank=1 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1924, 1940] | pulses 3838 recovery pulses 0 | wall 2.01s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 procs=2 host_gate=1] PASS | process exit codes [0, 0]
+new_xid=0
+<<< [MPS2-xp-3] rc=0 wall=12.3s
+>>> [MPS2-xp-4] 00:30:07
+NVML: 16737, nvidia-cuda-mps-server
+NVML: 16679, ~/.venv_sm120/bin/python
+NVML: 16678, ~/.venv_sm120/bin/python
+[MULTIQ-LV3 q=2 rank=1 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1912, 1903] | pulses 3785 recovery pulses 0 | wall 1.99s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 q=2 rank=0 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1912, 1916] | pulses 3784 recovery pulses 2 | wall 1.99s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 procs=2 host_gate=1] PASS | process exit codes [0, 0]
+new_xid=0
+<<< [MPS2-xp-4] rc=0 wall=12.3s
+>>> [MPS2-xp-5] 00:30:49
+NVML: 17268, nvidia-cuda-mps-server
+NVML: 17208, ~/.venv_sm120/bin/python
+NVML: 17209, ~/.venv_sm120/bin/python
+[MULTIQ-LV3 q=2 rank=1 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1910, 1916] | pulses 3783 recovery pulses 1 | wall 2.00s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 q=2 rank=0 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1914, 1920] | pulses 3792 recovery pulses 1 | wall 2.00s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 procs=2 host_gate=1] PASS | process exit codes [0, 0]
+new_xid=0
+<<< [MPS2-xp-5] rc=0 wall=12.3s
+>>> [MPS2-glb-x0-1] 00:31:32
+[LV3-PEERS-GLB exclusive=0] PASS | LP rounds [173, 173] bad [0, 0] pulses [0, 0] | HP requests 1787 bad 0 P50/P99 0.34/1.55 ms | withheld warnings 80 | new Xid 0
+new_xid=0
+<<< [MPS2-glb-x0-1] rc=0 wall=24.5s
+>>> [MPS2-glb-x0-2] 00:32:26
+[LV3-PEERS-GLB exclusive=0] PASS | LP rounds [178, 184] bad [0, 0] pulses [0, 0] | HP requests 1793 bad 0 P50/P99 0.31/1.54 ms | withheld warnings 80 | new Xid 0
+new_xid=0
+<<< [MPS2-glb-x0-2] rc=0 wall=24.5s
+>>> [MPS2-foreign] 00:33:21
+<<< [MPS2-foreign] rc=124 wall=300.1s
+=== mps3
+>>> [MPS3-xp-1] 00:41:44
+[MULTIQ-LV3 q=2 rank=0 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1715, 1728] | pulses 3406 recovery pulses 0 | wall 1.85s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 q=2 rank=1 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1729, 1727] | pulses 3405 recovery pulses 1 | wall 1.85s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 procs=2 host_gate=1] PASS | process exit codes [0, 0]
+new_xid=0
+<<< [MPS3-xp-1] rc=0 wall=13.3s
+>>> [MPS3-xp-2] 00:42:27
+[MULTIQ-LV3 q=2 rank=0 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1718, 1723] | pulses 3410 recovery pulses 0 | wall 1.83s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 q=2 rank=1 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1727, 1723] | pulses 3422 recovery pulses 0 | wall 1.84s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 procs=2 host_gate=1] PASS | process exit codes [0, 0]
+new_xid=0
+<<< [MPS3-xp-2] rc=0 wall=13.3s
+>>> [MPS3-xp-3] 00:43:10
+[MULTIQ-LV3 q=2 rank=1 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1727, 1729] | pulses 3425 recovery pulses 0 | wall 1.84s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 q=2 rank=0 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1734, 1737] | pulses 3415 recovery pulses 0 | wall 1.84s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 procs=2 host_gate=1] PASS | process exit codes [0, 0]
+new_xid=0
+<<< [MPS3-xp-3] rc=0 wall=13.3s
+>>> [MPS3-glb-x0-1] 00:43:54
+[LV3-PEERS-GLB exclusive=0] PASS | LP rounds [175, 174] bad [0, 0] pulses [950, 907] | HP requests 1781 bad 0 P50/P99 0.32/1.55 ms | withheld warnings 4 | new Xid 0
+new_xid=0
+<<< [MPS3-glb-x0-1] rc=0 wall=25.6s
+>>> [MPS3-glb-x0-2] 00:44:50
+[LV3-PEERS-GLB exclusive=0] PASS | LP rounds [174, 180] bad [0, 0] pulses [906, 879] | HP requests 1780 bad 0 P50/P99 0.31/1.51 ms | withheld warnings 2 | new Xid 0
+new_xid=0
+<<< [MPS3-glb-x0-2] rc=0 wall=25.6s
+>>> [MPS3-foreign] 00:45:45
+[FOREIGN-CTX aggressor lv3 gap 600 us] victim unaffected | victim iters 2277 wrong 0 rc 0 error '' | aggressor suspensions 2481 error ''
+new_xid=0
+<<< [MPS3-foreign] rc=0 wall=24.5s
+>>> [NOMPS-xp] 00:46:40
+[MULTIQ-LV3 q=2 rank=0 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [1971, 2006] | pulses 12 recovery pulses 0 | wall 2.14s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 q=2 rank=1 pulse_gate=1] PASS | steps 6000 | wrong queues [] | preemptions [2005, 2033] | pulses 19 recovery pulses 0 | wall 2.15s | checkpoints 12 valid True | native deterministic True
+[MULTIQ-LV3 procs=2 host_gate=1] PASS | process exit codes [0, 0]
+new_xid=0
+<<< [NOMPS-xp] rc=0 wall=9.2s
+=== mps4
+>>> [SYN-mps-lv3-1] 00:48:41
+[MPS-LV3] PASS | two Level-3 MPS clients ok True pulses [3455, 3479] | non-XSched MPS client unaffected True | new Xid 0
+<<< [SYN-mps-lv3-1] rc=0 wall=25.6s
+>>> [SYN-mps-lv3-2] 00:49:37
+[MPS-LV3] PASS | two Level-3 MPS clients ok True pulses [3424, 3444] | non-XSched MPS client unaffected True | new Xid 0
+<<< [SYN-mps-lv3-2] rc=0 wall=25.6s
+=== synmps
+>>> [SYN-partial] 00:52:45
+<<< [SYN-partial] rc=0 wall=2.0s
+>>> [SYN-convbar-np3] 00:53:17
+<<< [SYN-convbar-np3] rc=0 wall=3.1s
+>>> [SYN-stress-g2] 00:53:51
+<<< [SYN-stress-g2] rc=0 wall=2.0s
+>>> [SYN-stress-g8] 00:54:23
+<<< [SYN-stress-g8] rc=0 wall=2.0s
+>>> [SYN-stress-gap300] 00:54:55
+<<< [SYN-stress-gap300] rc=0 wall=8.1s
+>>> [SYN-percall-lv1] 00:55:33
+<<< [SYN-percall-lv1] rc=0 wall=1.0s
+>>> [SYN-percall-lv3] 00:56:04
+<<< [SYN-percall-lv3] rc=0 wall=1.0s
+>>> [SYN-xq-idle] 00:56:35
+<<< [SYN-xq-idle] rc=0 wall=2.0s
+>>> [SYN-graph-preempt] 00:57:08
+<<< [SYN-graph-preempt] rc=0 wall=4.1s
+>>> [SYN-event-bridge-lv3] 00:57:42
+<<< [SYN-event-bridge-lv3] rc=0 wall=2.0s
+>>> [SYN-event-bridge-lv1] 00:58:14
+<<< [SYN-event-bridge-lv1] rc=0 wall=2.0s
+>>> [SYN-event-bridge-modload] 00:58:46
+<<< [SYN-event-bridge-modload] rc=0 wall=2.0s
+>>> [SYN-graph-relaunch-whole] 00:59:18
+<<< [SYN-graph-relaunch-whole] rc=0 wall=2.0s
+>>> [SYN-graph-relaunch-flat] 00:59:50
+<<< [SYN-graph-relaunch-flat] rc=0 wall=2.0s
+>>> [SYN-regpress255] 01:00:22
+<<< [SYN-regpress255] rc=0 wall=2.0s
+>>> [SYN-flash-stress] 01:00:55
+<<< [SYN-flash-stress] rc=0 wall=2.0s
+>>> [SYN-multiq-lv3] 01:01:27
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 1500 | wrong queues [] | preemptions [208, 209, 203, 204] | pulses 814 recovery pulses 0 | wall 0.43s | checkpoints 12 valid True | native deterministic True
+<<< [SYN-multiq-lv3] rc=0 wall=3.1s
+>>> [SYN-lv3-peers-glb] 01:02:00
+[LV3-PEERS-GLB exclusive=1] PASS | LP rounds [136, 136] bad [0, 0] pulses [693, 588] | HP requests 1779 bad 0 P50/P99 0.33/1.38 ms | withheld warnings 9 | new Xid 0
+<<< [SYN-lv3-peers-glb] rc=0 wall=21.4s
+>>> [SYN-mps-lv3] 01:02:51
+[MPS-LV3] PASS | two Level-3 MPS clients ok True pulses [3419, 3409] | non-XSched MPS client unaffected True | new Xid 0
+<<< [SYN-mps-lv3] rc=0 wall=25.6s
+>>> [SYN-driver-kernels] 01:03:47
+<<< [SYN-driver-kernels] rc=0 wall=5.1s
+>>> [SYN-no-engine] 01:04:22
+<<< [SYN-no-engine] rc=0 wall=3.1s
+>>> [SYN-auto-legacy-lv3] 01:04:56
+<<< [SYN-auto-legacy-lv3] rc=0 wall=4.1s
+>>> [SYN-event-bridge-hazard] 01:05:30
+[EVENT-BRIDGE lv3 mode=2] PASS | iters 10 corrupted 1 | pulses 10 | work 10.0 ms | wait_event caller blocked p50 10972 us max 11383 us | native deterministic True 
+<<< [SYN-event-bridge-hazard] rc=0 wall=2.0s
+>>> [SYN-stress-trim] 01:06:02
+<<< [SYN-stress-trim] rc=0 wall=2.0s
+>>> [FOREIGN-nompsdefault] 01:06:34
+[FOREIGN-CTX aggressor lv3 gap 600 us] victim unaffected | victim iters 2649 wrong 0 rc 0 error '' | aggressor suspensions 1665 error ''
+<<< [FOREIGN-nompsdefault] rc=0 wall=20.4s
+=== non-XSched MPS client with pulses allowed (mps2 MPS2-foreign): Xid 13 Graphics Exception (00:33:29), MPS server Xid 43 after the timeout (00:38:21); MPS daemon then shut down cleanly; a fresh native job ran normally afterwards

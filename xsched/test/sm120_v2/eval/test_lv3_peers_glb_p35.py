@@ -149,7 +149,8 @@ def main():
         return role_hp(a)
     sys.path.insert(0, HERE)
     from bench_vllm_mp_p35 import check_ipc_owner
-    base = {k: v for k, v in os.environ.items() if not k.startswith("XSCHED_")}
+    # Scheduler settings come from this harness; SM120 engine settings (XSCHED_SM120_*) are passed on.
+    base = {k: v for k, v in os.environ.items() if not k.startswith("XSCHED_") or k.startswith("XSCHED_SM120_")}
     nat = dict(base, LD_LIBRARY_PATH=os.environ.get("NATIVE_LD_LIBRARY_PATH", "/usr/lib/x86_64-linux-gnu"))
     me = [sys.executable, os.path.abspath(__file__), "--seconds", str(a.seconds), "--steps", str(a.steps),
           "--every", str(a.every), "--hp-gap-ms", str(a.hp_gap_ms), "--ref", a.ref]

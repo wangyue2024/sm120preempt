@@ -17,6 +17,16 @@ sys.path.insert(0, HERE)
 
 
 
+def pulses_fired():
+    try:
+        import ctypes
+        f = ctypes.CDLL("libhalcuda.so").XSm120Pulses
+        f.restype = ctypes.c_uint64
+        return int(f())
+    except Exception:
+        return -1
+
+
 def recovery_pulses():
     """Recovery pulses fired by the SM120 trap engine so far (OBS-21 investigation)."""
     try:
@@ -158,7 +168,7 @@ def main():
     mode = os.environ.get("XSCHED_SM120_CTX_PULSE_GATE", "1")
     tag = f" rank={a.rank}" if a.rank >= 0 else ""
     print(f"[MULTIQ-LV3 q={a.queues}{tag} pulse_gate={mode}] {'PASS' if ok else 'FAIL'} | steps {a.steps} | "
-          f"wrong queues {bad} | preemptions {n_pre} | recovery pulses {recovery_pulses()} | wall {wall:.2f}s | checkpoints {len(gold[0])} valid {valid} | native deterministic {det}", flush=True)
+          f"wrong queues {bad} | preemptions {n_pre} | pulses {pulses_fired()} recovery pulses {recovery_pulses()} | wall {wall:.2f}s | checkpoints {len(gold[0])} valid {valid} | native deterministic {det}", flush=True)
     return 0 if ok else 1
 
 
