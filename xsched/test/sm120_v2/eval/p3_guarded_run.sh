@@ -51,6 +51,9 @@ foreign_gpu_apps() {
     while IFS= read -r line; do
         [[ -z "$line" ]] && continue
         pid="$(echo "$line" | cut -d',' -f1 | xargs)"
+        # A process that has already left /proc is one of ours finishing its context teardown
+        # (nvidia-smi lists it as "[No data]" for a moment); a newly started job is alive.
+        [[ -d "/proc/$pid" ]] || continue
         descends_from "$pid" "$root_pid" || echo "$line"
     done < <(gpu_apps)
 }

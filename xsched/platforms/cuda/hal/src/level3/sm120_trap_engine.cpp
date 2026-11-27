@@ -670,10 +670,20 @@ bool Sm120TrapEngine::Init()
 {
     std::lock_guard<std::mutex> lock(mu_);
     if (ready_) return true;
-    if (!arena_.Discover(true)) return false;
+    if (init_failed_) return false;            // tier-1 item 4: do not rescan on every launch
+    static const bool simulate = GetEnvOption("XSCHED_SM120_SIMULATE_UNSUPPORTED_DRIVER", false);
+    if (simulate || !arena_.Discover(true)) {
+        init_failed_ = true;
+        int drv = 0;
+        Driver::DriverGetVersion(&drv);
+        XWARN("sm120_trap_engine: trap-handler layout of this driver not recognised (CUDA driver API %d%s); "
+              "Level-3 disabled for this context", drv, simulate ? ", simulated" : "");
+        return false;
+    }
     LoadHelperModule();
     if (!EmitStaticHandler()) {
         arena_.RestoreAll();
+        init_failed_ = true;
         return false;
     }
     arena_.EnsureBar0Mapped();

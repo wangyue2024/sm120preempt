@@ -101,6 +101,10 @@ def plan(args):
             # pulse rate: the RTX 5060 drives the desktop, see OBS-14).
             L("SYN-multiq-lv3", 600, "XSCHED_SM120_WATCHDOG_MS=5000 $PY $EVAL/test_multiqueue_lv3_p35.py --queues 4 "
                                      "--steps 1500 --gap-us 1500 --hold-us 300")
+            # Tier-1 item 4: an unrecognised driver trap-handler layout must degrade to the Level-1
+            # boundary (one warning, correct results), never abort.
+            L("SYN-no-engine", 600, "XSCHED_SM120_SIMULATE_UNSUPPORTED_DRIVER=1 $PY $EVAL/test_lv3_stress_kernel_p35.py "
+                                    "--kernel gemm --iters 100 --gap-us 3000")
             # DEF-37: default-stream PyTorch under automatic Level-3 XQueues (native reference first).
             L("SYN-auto-legacy-lv3", 600, f"{nat} $PY $EVAL/test_auto_legacy_p35.py --ref {out_dir}/auto_legacy_ref.json "
                                           f"--write && XSCHED_AUTO_XQUEUE=1 XSCHED_AUTO_XQUEUE_LEVEL=3 $PY "

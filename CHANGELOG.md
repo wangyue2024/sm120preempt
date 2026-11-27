@@ -22,12 +22,17 @@ Doc: `doc/SM120_V2_PHASE3_5_TIER1_ZH.md` §8; ledger §10.13; environment variab
 - **DEF-37**: work on the legacy default stream always bypassed XSched (46% of the commands of a 3B vLLM LP; HP 46 ms vs 30.5 ms solo). Under `XSCHED_AUTO_XQUEUE` it now goes to one blocking proxy stream per context with an XQueue (`XSCHED_AUTO_XQUEUE_LEGACY`, default on); 57 synchronous memcpy / memset APIs first drain the blocking XQueues; legacy semantics fall back to the old path once the application creates a blocking stream of its own.
 - **DEF-36**: automatic XQueues were created for every stream (128 per PyTorch process) and suspending an idle Level-3 queue still fired a GPU-wide pulse: transparent vLLM Level-3 corrupted an LP batch and made HP slower than native. Automatic XQueues are created on a stream's first submission (`XSCHED_AUTO_XQUEUE_LAZY`, default on) and idle queues no longer pulse.
 - **DEF-35**: the loop detector missed uniform-predicate branches `BRA.U` (`0x547`).
+- **Tier-1 item 4 (driver robustness)**: when the trap engine does not recognise the driver's trap-handler layout (it already validated export tables, ToolsMemory size, handler fingerprint and hook-site instructions), Level-2/3 queues now route kernels to the Level-1 boundary (`lv1_no_engine` route statistic, one warning with the driver version) instead of aborting in `PrepareLaunch`; a failed `PrepareLaunch` (e.g. allocation) also falls back for that kernel. `XSCHED_SM120_SIMULATE_UNSUPPORTED_DRIVER=1` simulates it (`SYN-no-engine`).
 
 ### Known limitation
 - **DEF-34 (hardware)**: an SM whose register file is allocated to the last register does not take the trap (0 of 61 evictions vs 45 of 59 with 1,024 registers free); suspension then waits for the kernel (data stays correct). Detected by geometry (`rf_full`), optional `XSCHED_SM120_RF_FULL=lv1`. Affects e.g. the vLLM Marlin AWQ GEMM and cutlass INT8 GEMM.
 - DEF-20b closed: ptxas never allocates R253 / R254 on sm_120, so R254 needs no saving.
 - Across processes the DEF-38 gate only serializes (host-wide `flock`, `XSCHED_SM120_HOST_PULSE_GATE`); two concurrently running Level-3 processes are not supported (DEF-41: pulses are withheld while a Level-3 peer is present).
 - DEF-40 detection polls every 100 ms: a foreign process that starts in between can still be hit until the next poll.
+
+### Validation
+- RTX 5080 (no display): final validation + full regression 297/297 (cross-process 4, foreign context 1, multi-queue 3, vLLM end to end 4, full regression 285), no Xid; final build targeted 34/34.
+- RTX 5060 (drives the desktop): full regressions 285/285 (twice); final build 285/286 (`SYN-event-bridge-lv1`: the test's native reference was non-deterministic, OBS-20, not reproduced in 80 controlled runs). The local regression environment no longer opts in to pulses on the desktop GPU (DEF-40): with the desktop in use they faulted a browser (Xid 31).
 
 ### Results
 - Two vLLM processes on an RTX 5080: HP E2E P50 29.9 ms with a 3B LP (solo 30.5, native 61.9), P99 30.3; with a 7B-AWQ LP 29.8-31.5 ms (native 67.4), P99 33.6-36.1 (Level-1: 56.8); LP keeps 88-92% of its solo throughput; HP 40/40 and every LP batch exact.

@@ -49,6 +49,7 @@ enum Sm120RouteStat : int {
     kRouteLv1GlobalSched,   // DEF-27: cross-process global scheduler (XSCHED_SCHEDULER=GLB) -> Level-1
     kRouteRfFull,           // DEF-34: killable kernel whose resident CTAs allocate the whole register file
     kRouteLv1RfFull,        // DEF-34: ... routed to the Level-1 boundary (XSCHED_SM120_RF_FULL=lv1)
+    kRouteLv1NoEngine,      // tier-1 item 4: trap engine unavailable (unknown driver layout) -> Level-1
     kRouteStatCount,
 };
 std::atomic<uint64_t> g_sm120_route_stats[kRouteStatCount] = {};
@@ -166,11 +167,19 @@ void CudaQueueLv3Trap::Launch(std::shared_ptr<HwCommand> hw_cmd)
             }
             std::lock_guard<std::mutex> lock(sm120::Sm120TrapEngine::LaunchMutex(context_));
             if (level_ >= kPreemptLevelDeactivate && kernel->killable) {
-                XASSERT(sm120_stream_->PrepareLaunch(
-                            kernel->kFuncHandle, kernel->BlockCnt(),
-                            kernel->ThreadCnt(), kernel->DynSmemBytes(),
-                            kidx, mode, kStream, kernel->kFunc),
-                        "sm120 PrepareLaunch failed");
+                if (!sm120_stream_->PrepareLaunch(kernel->kFuncHandle, kernel->BlockCnt(),
+                                                  kernel->ThreadCnt(), kernel->DynSmemBytes(),
+                                                  kidx, mode, kStream, kernel->kFunc)) {
+                    // e.g. control / arena allocation failed: run this kernel without the trap
+                    // (Interrupt() then waits for it at the Level-1 boundary) instead of aborting.
+                    static std::atomic<int> warned_prep{0};
+                    if (warned_prep.fetch_add(1) < 5) {
+                        XWARN("sm120 PrepareLaunch failed (idx=%llu): launching at the Level-1 boundary",
+                              static_cast<unsigned long long>(kidx));
+                    }
+                    kernel->killable = false;
+                    sm120::Sm120StreamContext::ClearDebuggerParams(kernel->kFuncHandle);
+                }
             } else {
                 sm120::Sm120StreamContext::ClearDebuggerParams(kernel->kFuncHandle);
             }
@@ -510,6 +519,23 @@ void CudaQueueLv3Trap::OnHwCommandSubmit(std::shared_ptr<preempt::HwCommand> hw_
                     XWARN("Thread block cluster (cluster=%u, blocks=%u, sm=%d), "
                           "routing cleanly to level-1 boundary",
                           cluster_sz, kernel->BlockCnt(), sm_count_);
+                }
+                return;
+            }
+            // Tier-1 item 4 (driver robustness): the trap engine validates the driver's trap-handler
+            // layout (export tables, ToolsMemory size, handler fingerprint, hook-site instructions)
+            // and refuses to patch anything it does not recognise. Kernels then take the Level-1
+            // boundary instead of aborting the process in PrepareLaunch().
+            if (sm120_engine_ == nullptr || (!sm120_engine_->IsReady() && !sm120_engine_->Init())) {
+                CountRoute(kRouteLv1NoEngine);
+                kernel->killable = false;
+                kernel->ClearProps(kCommandPropertyDeactivatable);
+                static std::atomic<bool> warned_engine{false};
+                if (!warned_engine.exchange(true)) {
+                    int drv = 0;
+                    Driver::DriverGetVersion(&drv);
+                    XWARN("sm120: Level-3 trap engine unavailable with this driver (CUDA driver API %d): "
+                          "kernels use the Level-1 boundary (preemption at kernel boundaries only)", drv);
                 }
                 return;
             }

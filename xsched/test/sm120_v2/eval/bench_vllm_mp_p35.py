@@ -54,7 +54,7 @@ def xsched_stats():
     import ctypes
     out = {}
     names = ["lv3_killable", "lv1_mbarrier", "lv1_coop", "lv1_cluster", "lv1_graph", "lv1_uninstr",
-             "lv1_short_cta", "lv1_glb", "rf_full", "lv1_rf_full"]
+             "lv1_short_cta", "lv1_glb", "rf_full", "lv1_rf_full", "lv1_no_engine"]
     try:
         f = ctypes.CDLL("libhalcuda.so").XSm120GetRouteStats
         f.argtypes = [ctypes.POINTER(ctypes.c_uint64), ctypes.c_int, ctypes.c_int]

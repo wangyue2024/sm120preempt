@@ -61,3 +61,31 @@ build: + DEF-41 peer rule
 <<< [SYN-multiq-lv3-r2] rc=0 wall=6.0s
 <<< [SYN-graph-relaunch-flat-r3] rc=0 wall=3.0s
 <<< [SYN-multiq-lv3-r3] rc=0 wall=6.0s
+
+## final build (+ tier-1 item 4 Level-1 fallback, SYN-no-engine): full regression
+| suite | pass / total | failing tests |
+|---|---:|---|
+| SYN | 20/21 | `SYN-event-bridge-lv1`(rc=1) |
+| S1 | 45/45 | - |
+| S4 | 6/6 | - |
+| S5 | 8/8 | - |
+| S6 | 9/9 | - |
+| S7 | 145/145 | - |
+| S8 | 16/16 | - |
+| S9 | 8/8 | - |
+| ACC | 28/28 | - |
+| **all** | **285/286** | |
+- `SYN-event-bridge-lv1`: rc=1 
+desktop Xid 31 (msedge x3, gnome-shell x1) during the S7/S8 Level-3 entries: pulses were allowed (XSCHED_SM120_FOREIGN_CTX=allow) while the desktop was in use; the local opt-in has been removed since
+SYN-event-bridge-lv1: native golden nondeterministic (OBS-20). Reruns:
+[EVENT-BRIDGE lv1 mode=1] PASS | iters 20 corrupted 0 | work 36.3 ms | wait_event caller blocked p50 96 us max 264 us | native deterministic True | {'lv1_gpu_wa
+<<< [SYN-event-bridge-lv1-r1] rc=0 wall=3.0s
+[EVENT-BRIDGE lv1 mode=1] PASS | iters 20 corrupted 0 | work 37.3 ms | wait_event caller blocked p50 95 us max 277 us | native deterministic True | {'lv1_gpu_wa
+<<< [SYN-event-bridge-lv1-r2] rc=0 wall=3.0s
+[EVENT-BRIDGE lv1 mode=1] PASS | iters 20 corrupted 0 | work 33.5 ms | wait_event caller blocked p50 100 us max 282 us | native deterministic True | {'lv1_gpu_w
+<<< [SYN-event-bridge-lv1-r3] rc=0 wall=3.0s
+[EVENT-BRIDGE lv1 mode=1] FAIL | iters 20 corrupted 20 | work 36.6 ms | wait_event caller blocked p50 100 us max 328 us | native deterministic False | {'lv1_gpu
+<<< [SYN-event-bridge-lv1-r4] rc=1 wall=3.0s
+[EVENT-BRIDGE lv1 mode=1] PASS | iters 20 corrupted 0 | work 34.3 ms | wait_event caller blocked p50 100 us max 291 us | native deterministic True | {'lv1_gpu_w
+<<< [SYN-event-bridge-lv1-r5] rc=0 wall=3.0s
+controlled: same computation 20x with shim, 20x native: 0 nondeterministic; test 20x tenant handler on, 20x off: 0 failures

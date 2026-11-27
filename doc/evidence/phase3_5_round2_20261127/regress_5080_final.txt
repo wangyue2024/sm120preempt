@@ -1,0 +1,65 @@
+# RTX 5080 final validation + full regression (build: DEF-38/39/40/41 + host-wide lock), guarded runner (QUIET_S 10 then 60 s while another user was active; one entry stopped by the guard after it had printed PASS)
+| suite | pass / total | failing tests |
+|---|---:|---|
+| XP | 4/4 | - |
+| FOREIGN | 1/1 | - |
+| MQ | 3/3 | - |
+| VLLM3B | 2/2 | - |
+| VLLM7B | 2/2 | - |
+| SYN | 20/20 | - |
+| S1 | 45/45 | - |
+| S4 | 6/6 | - |
+| S5 | 8/8 | - |
+| S6 | 9/9 | - |
+| S7 | 145/145 | - |
+| S8 | 16/16 | - |
+| S9 | 8/8 | - |
+| ACC | 28/28 | - |
+| **all** | **297/297** | |
+
+## key lines
+[XSCHED WARN @ T 2461996 @ 15:23:32.330469] sm120 DEF-40: GPU 0000:01:00.0 has context(s) outside XSched or other Level-3 processes (2461853 python (Level-3 peer)): Level-3 pulses withheld, suspension waits for running kernels (XSCHED_SM120_FOREIGN_CTX=allow /
+[XSCHED WARN @ T 2461999 @ 15:23:32.332725] sm120 DEF-40: GPU 0000:01:00.0 has context(s) outside XSched or other Level-3 processes (2461854 python (Level-3 peer)): Level-3 pulses withheld, suspension waits for running kernels (XSCHED_SM120_FOREIGN_CTX=allow /
+[MULTIQ-LV3 procs=2 host_gate=1] PASS 
+[XSCHED WARN @ T 2462338 @ 15:23:52.577293] sm120 DEF-40: GPU 0000:01:00.0 has context(s) outside XSched or other Level-3 processes (2462199 python (Level-3 peer)): Level-3 pulses withheld, suspension waits for running kernels (XSCHED_SM120_FOREIGN_CTX=allow /
+[XSCHED WARN @ T 2462341 @ 15:23:52.579202] sm120 DEF-40: GPU 0000:01:00.0 has context(s) outside XSched or other Level-3 processes (2462198 python (Level-3 peer)): Level-3 pulses withheld, suspension waits for running kernels (XSCHED_SM120_FOREIGN_CTX=allow /
+[MULTIQ-LV3 procs=2 host_gate=1] PASS 
+[XSCHED WARN @ T 2462684 @ 15:24:12.828082] sm120 DEF-40: GPU 0000:01:00.0 has context(s) outside XSched or other Level-3 processes (2462539 python (Level-3 peer)): Level-3 pulses withheld, suspension waits for running kernels (XSCHED_SM120_FOREIGN_CTX=allow /
+[XSCHED WARN @ T 2462686 @ 15:24:12.828099] sm120 DEF-40: GPU 0000:01:00.0 has context(s) outside XSched or other Level-3 processes (2462540 python (Level-3 peer)): Level-3 pulses withheld, suspension waits for running kernels (XSCHED_SM120_FOREIGN_CTX=allow /
+[MULTIQ-LV3 procs=2 host_gate=1] PASS 
+[XSCHED WARN @ T 2463029 @ 15:24:33.054383] sm120 DEF-40: GPU 0000:01:00.0 has context(s) outside XSched or other Level-3 processes (2462890 python (Level-3 peer)): Level-3 pulses withheld, suspension waits for running kernels (XSCHED_SM120_FOREIGN_CTX=allow /
+[XSCHED WARN @ T 2463032 @ 15:24:33.056269] sm120 DEF-40: GPU 0000:01:00.0 has context(s) outside XSched or other Level-3 processes (2462891 python (Level-3 peer)): Level-3 pulses withheld, suspension waits for running kernels (XSCHED_SM120_FOREIGN_CTX=allow /
+[MULTIQ-LV3 procs=2 host_gate=1] PASS 
+[FOREIGN-CTX aggressor lv3 gap 600 us] victim unaffected | victim iters 2645 wrong 0 rc 0 error '' 
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [899, 902, 886, 902] | wall 0.90s 
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [892, 892, 881, 894] | wall 0.89s 
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [893, 894, 883, 900] | wall 0.89s 
+[XSCHED WARN @ T 2464840 @ 15:26:29.791577] sm120 DEF-40: GPU 0000:01:00.0 has context(s) outside XSched or other Level-3 processes (2464267 python (Level-3 peer)): Level-3 pulses withheld, suspension waits for running kernels (XSCHED_SM120_FOREIGN_CTX=allow /
+[VLLM-MP glb-lv3 delay=0us] PASS | HP E2E p50 29.9 p99 31.8 max 31.8 ms, TTFT p50 3.3 p99 4.2 ms, exact 40/40 | LP iters 173 bad 0 tput 91.1% of solo 
+[XSCHED WARN @ T 2466377 @ 15:27:37.800424] sm120 DEF-40: GPU 0000:01:00.0 has context(s) outside XSched or other Level-3 processes (2465569 python (Level-3 peer)): Level-3 pulses withheld, suspension waits for running kernels (XSCHED_SM120_FOREIGN_CTX=allow /
+[VLLM-MP glb-lv3 delay=0us] PASS | HP E2E p50 30.1 p99 30.9 max 30.9 ms, TTFT p50 3.5 p99 4.3 ms, exact 40/40 | LP iters 8 bad 0 tput 88.3% of solo 
+[VLLM-MP glb-lv1 delay=0us] PASS | HP E2E p50 33.8 p99 39.3 max 39.3 ms, TTFT p50 7.1 p99 8.9 ms, exact 40/40 | LP iters 219 bad 0 tput 92.7% of solo 
+[VLLM-MP glb-lv1 delay=0us] PASS | HP E2E p50 49.6 p99 66.2 max 66.2 ms, TTFT p50 8.6 p99 8.9 ms, exact 40/40 | LP iters 11 bad 0 tput 92.3% of solo 
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 1500 | wrong queues [] | preemptions [201, 203, 196, 198] | wall 0.40s 
+>>> [S6-llm07:m5] ABORTED_FOREIGN_GPU_JOB
+
+Xid on the 5080 during this plan: none (last Xid 15:20:49, before the plan started at 15:23)
+
+## final build (+ tier-1 item 4, peer rule limited to Level-3 processes): targeted
+| suite | pass / total | failing tests |
+|---|---:|---|
+| XP | 2/2 | - |
+| FOREIGN | 1/1 | - |
+| VLLM3B | 1/1 | - |
+| VLLM7B | 1/1 | - |
+| SYN | 21/21 | - |
+| S9 | 8/8 | - |
+| **all** | **34/34** | |
+[MULTIQ-LV3 procs=2 host_gate=1] PASS 
+[MULTIQ-LV3 procs=2 host_gate=1] PASS 
+[FOREIGN-CTX aggressor lv3 gap 600 us] victim unaffected | victim iters 2648 wrong 0 rc 0 error '' 
+[VLLM-MP glb-lv3 delay=0us] PASS | HP E2E p50 30.0 p99 30.5 max 30.5 ms, TTFT p50 3.2 p99 3.7 ms, exact 40/40 | LP iters 175 bad 0 tput 92.6% of solo 
+[VLLM-MP glb-lv3 delay=0us] PASS | HP E2E p50 30.3 p99 30.8 max 30.8 ms, TTFT p50 3.4 p99 3.8 ms, exact 40/40 | LP iters 8 bad 0 tput 88.5% of solo 
+[XSCHED WARN @ T 2526485 @ 18:54:41.849268] sm120_trap_engine: trap-handler layout of this driver not recognised (CUDA driver API 13000, simulated); Level-3 disabled for this context
+[LV3-STRESS gemm lv3] PASS | calls 800 wrong 0 | preemptions 101 | kernel 1.28 ms 
+SYN-convbar-np3 rerun after the guard fix (T-28): rc=0, 12/12 sub-tests PASS, not stopped

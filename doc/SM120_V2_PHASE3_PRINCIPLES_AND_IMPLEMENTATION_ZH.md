@@ -544,6 +544,7 @@ BAR0 脉冲在**发出时驻留在 GPU 上的上下文**中生效。没有 MPS �
 | `XSCHED_SM120_CE_CONTROL` | 1 | DEF-39：门控镜像与控制块复位只用拷贝引擎（主机→设备拷贝）；0 = 旧的 memset 路径 |
 | `XSCHED_SM120_HOST_PULSE_GATE` / `_MS` | 1 / 500 | DEF-38 跨进程：同一 GPU 上所有 XSched 进程的 Trap 操作经主机级 `flock` 串行；等待上限（ms） |
 | `XSCHED_SM120_WATCHDOG_MS` | 0 | > 0：某个 Trap 操作（挂起 / 恢复准备）停留超过该时长时，打印所有队列的主机阶段、控制头与 CTA 状态统计（不加锁、经私有流、带超时）；也可调用导出函数 `XSm120DumpStreams()` |
+| `XSCHED_SM120_SIMULATE_UNSUPPORTED_DRIVER` | 0 | 测试用：模拟不认识的驱动布局，Level-3 退化为 Level-1 边界（第一梯队 4） |
 | `XSCHED_SM120_TRACE_LAUNCH` | 0 | 打印每次发射、每次恢复的诊断信息 |
 | `XSCHED_SM120_DUMP_DIR` | — | 插桩二进制转储目录（调试） |
 

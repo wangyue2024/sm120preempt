@@ -145,6 +145,7 @@ private:
     int sm_count_ = 84;
     int max_threads_per_sm_ = 1536;
     bool ready_ = false;
+    bool init_failed_ = false;
     Sm120Arena arena_;
     CUmodule helper_mod_ = nullptr;
     CUfunction cond_clear_fn_ = nullptr;
