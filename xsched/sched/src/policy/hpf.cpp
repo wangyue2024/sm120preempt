@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <map>
+#include <set>
 
 #include "xsched/utils/xassert.h"
 #include "xsched/sched/policy/hpf.h"
@@ -18,6 +19,24 @@ static std::chrono::microseconds ResumeDelay()
         return std::chrono::microseconds(v != nullptr ? std::atoll(v) : 0);
     }();
     return d;
+}
+
+static bool Lv3Exclusive()
+{
+    static const bool on = [] {
+        const char *v = std::getenv("XSCHED_HPF_LV3_EXCLUSIVE");
+        return v == nullptr || v[0] != '0';
+    }();
+    return on;
+}
+
+static std::chrono::microseconds Lv3Quantum()
+{
+    static const std::chrono::microseconds q = [] {
+        const char *v = std::getenv("XSCHED_HPF_LV3_QUANTUM_US");
+        return std::chrono::microseconds(v != nullptr ? std::atoll(v) : 20000);
+    }();
+    return q;
 }
 
 void HighestPriorityFirstPolicy::Sched(const Status &status)
@@ -40,6 +59,43 @@ void HighestPriorityFirstPolicy::Sched(const Status &status)
         }
     }
 
+    // DEF-41: choose the one process per device whose Level-3 queues at the top priority may run.
+    std::map<XDevice, PID> lv3_run;
+    if (Lv3Exclusive()) {
+        std::map<XDevice, std::set<PID>> ready_pids, any_pids;
+        for (auto &st : status.xqueue_status) {
+            const XQueueStatus &q = *st.second;
+            if (q.level < kPreemptLevelInterrupt) continue;
+            auto pm = running_prio_max.find(q.device);
+            const Priority top = pm == running_prio_max.end() ? PRIORITY_MIN : pm->second;
+            if (GetPriority(q.handle) < top) continue;
+            any_pids[q.device].insert(q.pid);
+            if (q.ready) ready_pids[q.device].insert(q.pid);
+        }
+        for (auto &[dev, pids] : any_pids) {
+            if (pids.size() < 2) continue;              // a single Level-3 process: nothing to arbitrate
+            const auto &ready = ready_pids[dev];
+            auto own = lv3_owner_.find(dev);
+            const bool have_owner = own != lv3_owner_.end() && pids.count(own->second);
+            const bool owner_ready = have_owner && ready.count(own->second);
+            const bool expired = have_owner && now >= lv3_owner_since_[dev] + Lv3Quantum();
+            PID next = have_owner ? own->second : *pids.begin();
+            if (!ready.empty() && (!owner_ready || expired)) {
+                // round robin: the first ready process after the current owner
+                auto it = ready.upper_bound(have_owner ? own->second : 0);
+                next = it != ready.end() ? *it : *ready.begin();
+            }
+            if (!have_owner || next != own->second) {
+                lv3_owner_[dev] = next;
+                lv3_owner_since_[dev] = now;
+            }
+            lv3_run[dev] = lv3_owner_[dev];
+            if (ready.size() > 1 || (ready.size() == 1 && !ready.count(lv3_owner_[dev]))) {
+                this->AddTimer(lv3_owner_since_[dev] + Lv3Quantum());
+            }
+        }
+    }
+
     // suspend all xqueues with lower priority
     // and resume all xqueues with higher priority
     for (auto &status : status.xqueue_status) {
@@ -54,6 +110,13 @@ void HighestPriorityFirstPolicy::Sched(const Status &status)
         if (priority < prio_max) {
             this->Suspend(handle);
             continue;
+        }
+        if (status.second->level >= kPreemptLevelInterrupt) {
+            auto run = lv3_run.find(status.second->device);
+            if (run != lv3_run.end() && run->second != status.second->pid) {
+                this->Suspend(handle);              // DEF-41: another process's turn
+                continue;
+            }
         }
         if (delay.count() > 0) {
             // A higher priority level that was ready recently keeps this queue suspended for now.

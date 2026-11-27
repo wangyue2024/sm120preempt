@@ -41,7 +41,9 @@ protected:
     std::unique_ptr<sm120::Sm120StreamContext> sm120_stream_ = nullptr;
     sm120::Sm120PreemptMode last_preempt_mode_ = sm120::Sm120PreemptMode::kTrapFrame;
     int sm_count_ = 0;
-    int rf_regs_per_sm_ = 0;   // CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_MULTIPROCESSOR (DEF-34)
+    int rf_regs_per_sm_ = 0;
+    int64_t starve_idx_ = -1;   // OBS-23 starvation guard: last kernel in flight at a suspension
+    int64_t starve_cnt_ = 0;   // CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_MULTIPROCESSOR (DEF-34)
     mutable std::mutex last_kernel_mtx_;
     std::shared_ptr<preempt::HwCommand> last_kernel_ = nullptr;
     bool relaunched_ = false;   // Reactivate relaunched a kernel this round

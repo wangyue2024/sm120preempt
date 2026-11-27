@@ -14,3 +14,4 @@ All files are sanitized (host names, user names, other users' processes and priv
 | `def38_def40_guarded.txt` | Gate-off watchdog dumps (one stuck CTA, 8 recovery pulses do not heal it), serialize-only gate 10/10, gate on, S7 on the 5080, foreign-context test WITH the guard (victim unaffected) |
 | `regress_5060_round2.txt` | RTX 5060 full regressions of the round (per build), reruns of the display-GPU failures, OBS-20 data |
 | `regress_5080_final.txt` | RTX 5080 final validation + full regression (297/297, no Xid) |
+| `round3_evidence.txt` | Round 3: injected pulses (OBS-21), DEF-40 synchronous check, DEF-41 peer rotation, corrected multi-queue test (T-30), OBS-23 characterization and starvation guard, co-running foreign context experiments, OBS-20 / T-29 reproduction, DEF-42 deadlock stacks |

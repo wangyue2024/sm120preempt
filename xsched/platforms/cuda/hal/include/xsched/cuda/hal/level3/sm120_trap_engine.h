@@ -233,6 +233,8 @@ public:
     /// no warp inside Cave 1). Cheap when no restore was prepared since the last positive answer.
     /// Takes mu_ with a bounded try-lock; returns false if it cannot be taken in time.
     bool RestoreQuiescent();
+    /// DEF-41: the queue was found idle while suspended (nothing of it on the GPU).
+    void NoteQuiescent();
     /// Diagnostics (DumpStreams): host-side stage of the trap operation in progress, 0 = none.
     int Stage(int64_t *since_us) const;
     void DiagDump(int idx) const;
@@ -286,6 +288,8 @@ private:
     uint32_t *mirror_stage_ = nullptr;        // pinned {cmd, is_restore_wave} x kGateMirrorEntries
     bool control_dirty_ = false;              // a pulse / restore touched the control block since reset
     bool marked_lv3_ = false;                 // DEF-40: registered as a Level-3 peer
+    std::atomic<bool> lv3_active_{false};     // DEF-41: trap-managed work possibly in flight
+    void SetLv3Active(bool active);
     uint32_t dirty_ctas_ = 0;                 // largest CTA count launched since the last reset
     bool CopyMirrorAsync(uint32_t cmd, uint32_t is_restore_wave, bool both_words, CUstream stream);
     std::atomic<int> stage_{0};

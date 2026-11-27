@@ -50,6 +50,7 @@ enum Sm120RouteStat : int {
     kRouteRfFull,           // DEF-34: killable kernel whose resident CTAs allocate the whole register file
     kRouteLv1RfFull,        // DEF-34: ... routed to the Level-1 boundary (XSCHED_SM120_RF_FULL=lv1)
     kRouteLv1NoEngine,      // tier-1 item 4: trap engine unavailable (unknown driver layout) -> Level-1
+    kRouteStarvationLv1,    // OBS-23: suspension that waited at the Level-1 boundary (starvation guard)
     kRouteStatCount,
 };
 std::atomic<uint64_t> g_sm120_route_stats[kRouteStatCount] = {};
@@ -290,6 +291,30 @@ void CudaQueueLv3Trap::Interrupt()
         // scheduler a vLLM process had 128 Level-3 queues (one per PyTorch pool stream), and each
         // high-priority request pulsed once per queue.
         if (cur == nullptr || Driver::StreamQuery(kStream) == CUDA_SUCCESS) {
+            sm120_stream_->NoteQuiescent();   // DEF-41: suspended and idle
+            return;
+        }
+        // OBS-23 starvation guard: a kernel with a huge grid (e.g. 500k CTAs of a 1 GiB elementwise
+        // kernel) pays a drain of all remaining CTAs at every suspension and a full-grid relaunch at
+        // every resume; if suspensions come faster than that cycle the kernel never finishes (256 MiB
+        // buffers, suspension every ~0.4 ms: no progress in 120 s). After XSCHED_SM120_STARVATION_LIMIT
+        // (default 8) consecutive suspensions with the same last kernel in flight, one suspension waits
+        // at the Level-1 boundary instead, so the kernel completes.
+        static const int64_t starve_limit = [] {
+            int64_t v = 8;
+            GetEnvInt64("XSCHED_SM120_STARVATION_LIMIT", v);
+            return v;
+        }();
+        const int64_t idx = cur->GetIdx();
+        if (idx == starve_idx_) {
+            ++starve_cnt_;
+        } else {
+            starve_idx_ = idx;
+            starve_cnt_ = 1;
+        }
+        if (starve_limit > 0 && starve_cnt_ > starve_limit) {
+            starve_cnt_ = 0;
+            CountRoute(kRouteStarvationLv1);
             return;
         }
         last_preempt_mode_ = SelectSm120Mode(cur);

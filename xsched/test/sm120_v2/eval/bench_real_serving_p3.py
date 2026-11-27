@@ -342,6 +342,7 @@ def run(args):
         "e2e_ms_p50": pct(e2e, 0.5), "e2e_ms_p99": pct(e2e, 0.99),
         "susp_ms_p50": pct(susp, 0.5), "susp_ms_p99": pct(susp, 0.99),
         "lp_iters": lp_iters[0], "lp_bad_iters": lp_bad[0], "wall_s": wall_s,
+        "recovery_pulses": _recovery_pulses(),
     })
     if wall_s and args.mode != "solo":
         busy_hp_s = sum(e2e) / 1000.0
@@ -397,6 +398,16 @@ def report(paths, md=None):
             fh.write(text + "\n")
 
 
+
+def _recovery_pulses():
+    try:
+        import ctypes
+        f = ctypes.CDLL("libhalcuda.so").XSm120RecoveryPulses
+        f.restype = ctypes.c_uint64
+        return int(f())
+    except Exception:
+        return -1
+
 def main():
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", required=True)
@@ -436,7 +447,7 @@ def main():
         "PASS" if res["hp_exact"] == res["n_req"] and res.get("lp_bad_iters", 0) == 0 else "FAIL")
     print(f"[SERVE mode={a.mode} policy={res.get('policy')} lp={a.lp}{(' lp_sms=' + str(res.get('lp_sms'))) if res.get('lp_sms') else ''}] {st} TTFT p50/p99={fmt(res.get('ttft_ms_p50'))}/{fmt(res.get('ttft_ms_p99'))}ms "
           f"TPOT p50/p99={fmt(res.get('tpot_ms_p50'))}/{fmt(res.get('tpot_ms_p99'))}ms hp_exact={res['hp_exact']}/{res['n_req']} "
-          f"lp_iters={res.get('lp_iters')} bad={res.get('lp_bad_iters')} lp_tput={fmt(res.get('lp_tput_pct_of_solo'), '{:.1f}%')} "
+          f"lp_iters={res.get('lp_iters')} bad={res.get('lp_bad_iters')} recov={res.get('recovery_pulses')} lp_tput={fmt(res.get('lp_tput_pct_of_solo'), '{:.1f}%')} "
           f"hp_duty={fmt(res.get('hp_duty_pct'), '{:.0f}%')}",
           flush=True)
 

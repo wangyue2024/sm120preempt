@@ -16,6 +16,17 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 
+
+def recovery_pulses():
+    """Recovery pulses fired by the SM120 trap engine so far (OBS-21 investigation)."""
+    try:
+        import ctypes
+        f = ctypes.CDLL("libhalcuda.so").XSm120RecoveryPulses
+        f.restype = ctypes.c_uint64
+        return int(f())
+    except Exception:
+        return -1
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--queues", type=int, default=3)
@@ -56,29 +67,43 @@ def main():
     torch.backends.cuda.matmul.allow_tf32 = False
     torch.manual_seed(0)
     streams = [torch.cuda.Stream() for _ in range(a.queues)]
-    A = [torch.randn(a.n, a.n, device="cuda") / a.n for _ in range(a.queues)]
-    T0 = [torch.randn(a.n, a.n, device="cuda") for _ in range(a.queues)]
+    # T-30: the first version (t.addmm_(A, t, beta=.5, alpha=.5) with A ~ randn/n) halved t every step
+    # (all zeros after ~150 steps, so later comparisons were vacuous) and aliased the GEMM output with
+    # its input (non-deterministic early steps). Now: a bounded chaotic recurrence without aliasing,
+    # two non-idempotent kernels per step (u = 0.5 u + 0.5 A t in place, then u = tanh(u) in place,
+    # swap t <-> u), checked at 12 checkpoints; any corruption spreads to every later checkpoint.
+    A = [torch.randn(a.n, a.n, device="cuda") * (1.5 / a.n ** 0.5) for _ in range(a.queues)]
+    T0 = [torch.randn(a.n, a.n, device="cuda") * 0.5 for _ in range(a.queues)]
     torch.cuda.synchronize()                      # T-26: inputs from the legacy stream
+    every = max(1, a.steps // 12)
 
-    def run_all(ts):
-        for _ in range(a.steps):
+    def run_all():
+        cps = [[] for _ in range(a.queues)]
+        ts, us = [None] * a.queues, [None] * a.queues
+        for q in range(a.queues):
+            with torch.cuda.stream(streams[q]):
+                ts[q], us[q] = T0[q].clone(), T0[q] * 0.25
+        for i in range(1, a.steps + 1):
             for q in range(a.queues):
                 with torch.cuda.stream(streams[q]):
-                    ts[q].addmm_(A[q], ts[q], beta=0.5, alpha=0.5)   # t = 0.5 t + 0.5 A t (in place)
+                    us[q].addmm_(A[q], ts[q], beta=0.5, alpha=0.5)
+                    us[q].tanh_()
+                    ts[q], us[q] = us[q], ts[q]
+                    if i % every == 0:
+                        cps[q].append(ts[q].clone())   # on the queue's stream (T-29)
         for s in streams:
             s.synchronize()
+        return cps
 
-    gold = [t.clone() for t in T0]
-    run_all(gold)
-    gold2 = [t.clone() for t in T0]
-    run_all(gold2)
-    det = all(torch.equal(x, y) for x, y in zip(gold, gold2))
+    gold = run_all()
+    gold2 = run_all()
+    det = all(torch.equal(x, y) for gq, g2q in zip(gold, gold2) for x, y in zip(gq, g2q))
+    valid = all(float(gq[-1].abs().mean()) > 0.05 for gq in gold)
 
     from bench_mp_serving_p34 import Bridge
     xs = Bridge()
     qs = [xs.create(s, 3) for s in streams]
-    warm = [t.clone() for t in T0]
-    run_all(warm)                                  # first launches (instrumentation)
+    run_all()                                      # first launches (instrumentation)
     stop = threading.Event()
     n_pre = [0] * a.queues
 
@@ -95,7 +120,6 @@ def main():
     ths = [threading.Thread(target=preemptor, args=(q,), daemon=True) for q in range(a.queues)]
     for th in ths:
         th.start()
-    got = [t.clone() for t in T0]
     torch.cuda.synchronize()
     finished = threading.Event()
 
@@ -121,7 +145,7 @@ def main():
         while len([f for f in os.listdir(a.sync_dir) if f.startswith("ready.")]) < a.procs and time.time() < t_wait:
             time.sleep(0.01)
     t0 = time.perf_counter()
-    run_all(got)
+    got = run_all()
     wall = time.perf_counter() - t0
     finished.set()
     stop.set()
@@ -129,12 +153,12 @@ def main():
         th.join()
     for hwq, xq in qs:
         xs.destroy(hwq, xq)
-    bad = [q for q in range(a.queues) if not torch.equal(got[q], gold[q])]
-    ok = det and not bad
+    bad = [q for q in range(a.queues) if any(not torch.equal(x, y) for x, y in zip(got[q], gold[q]))]
+    ok = det and valid and not bad
     mode = os.environ.get("XSCHED_SM120_CTX_PULSE_GATE", "1")
     tag = f" rank={a.rank}" if a.rank >= 0 else ""
     print(f"[MULTIQ-LV3 q={a.queues}{tag} pulse_gate={mode}] {'PASS' if ok else 'FAIL'} | steps {a.steps} | "
-          f"wrong queues {bad} | preemptions {n_pre} | wall {wall:.2f}s | native deterministic {det}", flush=True)
+          f"wrong queues {bad} | preemptions {n_pre} | recovery pulses {recovery_pulses()} | wall {wall:.2f}s | checkpoints {len(gold[0])} valid {valid} | native deterministic {det}", flush=True)
     return 0 if ok else 1
 
 

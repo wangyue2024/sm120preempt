@@ -200,7 +200,7 @@ Mode 1（`XSCHED_SM120_FORCE_MODE1=1` 或命令带“幂等”属性）不保存
 
 两项修复：
 
-- **DEF-38 脉冲门控**：引擎级互斥 `Sm120TrapEngine::PulseMutex()`，`PreemptStream()`（整段，含等待本流排空与恢复脉冲）与 `PrepareRestore()` 都持有它，同一上下文内不会有两个 Trap 操作交错；发脉冲前 `WaitOtherRestoresLocked()` 等待其他流的 Mode 5 恢复完成（`RestoreQuiescent()`：只读 `PrepareRestore` 之后尚未确认完成的流，上限 2 s）。**跨进程**：持有引擎互斥的线程再取一把主机级锁（`/dev/shm/xsched-sm120/<PCI>.pulse` 上的 `flock`，等待上限 `XSCHED_SM120_HOST_PULSE_GATE_MS` = 500 ms，超时告警后继续，避免卡住的对端拖住本进程），两个各自运行 Level-3 的进程也不会交错。只串行化、不等待恢复的对照模式（`XSCHED_SM120_CTX_PULSE_GATE=2`）同样消除了卡死，说明串行化是关键；跨进程只做串行化（两个**同时运行** Level-3 的进程之间还有上下文切换问题，见 §9.9 DEF-41，默认不在这种情况下发脉冲）。锁顺序：引擎互斥 → 主机锁 → 流注册表 → 流上下文互斥。代价：多个队列（进程）的挂起串行。
+- **DEF-38 脉冲门控**：引擎级互斥 `Sm120TrapEngine::PulseMutex()`，`PreemptStream()`（整段，含等待本流排空与恢复脉冲）与 `PrepareRestore()` 都持有它，同一上下文内不会有两个 Trap 操作交错；发脉冲前 `WaitOtherRestoresLocked()` 等待其他流的 Mode 5 恢复完成（`RestoreQuiescent()`：只读 `PrepareRestore` 之后尚未确认完成的流，上限 2 s）。**跨进程**：持有引擎互斥的线程再取一把主机级锁（`/dev/shm/xsched-sm120/<PCI>.pulse` 上的 `flock`，等待上限 `XSCHED_SM120_HOST_PULSE_GATE_MS` = 500 ms，超时告警后继续，避免卡住的对端拖住本进程），两个各自运行 Level-3 的进程也不会交错。只串行化、不等待恢复的对照模式（`XSCHED_SM120_CTX_PULSE_GATE=2`）同样消除了卡死，说明串行化是关键；跨进程只做串行化（两个**同时运行** Level-3 的进程之间还有上下文切换问题，见 §9.9 DEF-41，默认不在这种情况下发脉冲）。锁顺序：引擎互斥 → 主机锁 → 流注册表 → 流上下文互斥。代价：多个队列（进程）的挂起串行。门控开启后 4 队列 6/6、两进程 2/2 结果一致（第三轮改正后的检查：12 个非退化检查点；此前测试的负载会衰减为全零，见台账 T-30）。
 - **DEF-39 控制流只用拷贝引擎**：门控镜像用固定内存的 2D 主机→设备拷贝写入（宽 4 字节只写 cmd，或宽 8 字节写 {cmd, is_restore_wave}；行距 128 B），`ResetControlSync` 用主机→设备拷贝清零且只清自上次复位以来发射过的 CTA 范围，未发生脉冲 / 恢复时跳过。这样即使有 CTA 卡在 SM 上，脉冲与恢复脉冲仍能发出，残余的竞争（包括两个各自运行 Level-3 的**进程**之间，门控覆盖不到）可以自愈——但实测不能：门控关闭时 DEF-39 下恢复脉冲已能发出（日志 `stream still busy after 8 recovery pulses`），卡住的那个 CTA 仍不结束（看门狗：其余队列空闲，一个队列 83 个 CTA 已保存、54 个已排空，正好少一个 SM 上的 CTA；GPU 利用率 100%、功耗 48 W，即在等待而非计算）。所以竞争必须被预防，不能靠事后的脉冲修复。
 
 ### 3.6 控制平面：数据布局### 3.6 控制平面：数据布局
@@ -486,9 +486,12 @@ BAR0 脉冲在**发出时驻留在 GPU 上的上下文**中生效。没有 MPS �
 3. **外来上下文检测**：每 `XSCHED_SM120_FOREIGN_POLL_MS`（100）ms 经 NVML 列出该 GPU 上的计算与图形进程；存在未登记的进程时**不发脉冲**（`XSCHED_SM120_FOREIGN_CTX=block`，默认）。`PreemptStream()` 在写 cmd 之前就返回，挂起退化为 Level-1 语义（等正在运行的内核完成），恢复脉冲同样受限。状态变化时打印一行（列出外来进程的 PID 与名称）。NVML 不可用时，只在显示 GPU 上保守地禁止脉冲。
 4. **显式放行**：`XSCHED_SM120_FOREIGN_CTX=allow`（例如单用户桌面上的回归测试，自担 §9.7 的风险）。
 
-5. **Level-3 对等进程（DEF-41）**：运行 Level-2/3 内核的进程另建 `<…>.lv3` 标记。两个同时运行 Level-3 的进程是两个分时的上下文：时间片切换恰在一方的线程束位于 Trap 处理程序中时到达即超时（Xid 109，DEF-27 机理；两个进程各自高频挂起时 14/14 次运行出现，主机级脉冲锁无效）。就绪门控只覆盖等待挂起完成的 Level-1 对端。因此 GPU 上存在另一个 Level-3 进程时也不发脉冲（`XSCHED_SM120_LV3_PEERS=allow` 放行）。支持的形态：每块 GPU 一个 Level-3 进程，或所有 Level-3 工作在同一进程内。
+5. **Level-3 对等进程（DEF-41）**：运行 Level-2/3 内核的进程另建 `<…>.lv3` 标记。两个同时运行 Level-3 的进程是两个分时的上下文：时间片切换恰在一方的线程束位于 Trap 处理程序中时到达即超时（Xid 109，DEF-27 机理；两个进程各自高频挂起时 14/14 次运行出现，主机级脉冲锁无效）。就绪门控只覆盖等待挂起完成的 Level-1 对端。因此 GPU 上存在另一个**活动的** Level-3 进程（其 `.lv3` 字节为 '1'）时不发脉冲（`XSCHED_SM120_LV3_PEERS=allow` 放行）；配合下面第 7 条的 `xserver` 轮换，多个 Level-3 进程可以正常使用 Level-3。
 
-残留：检测是轮询的，外来进程启动后最多约 100 ms 内仍可能被打到；同一进程中没有 XQueue 的其他上下文不受保护。
+6. **发脉冲前同步检查**（第三轮）：每次发脉冲与恢复脉冲之前同步查询 NVML 进程列表（5080 约 6 µs / 列表，5060 约 50 µs；已登记租户的分类缓存 200 ms），外来上下文可能被打到的窗口只剩检查与 BAR0 写入之间的几微秒（`XSCHED_SM120_FOREIGN_SYNC_CHECK=0` 退回轮询状态）。
+7. **Level-3 对等进程的真正修复（DEF-41，第三轮）**：`xserver` 的 HPF 策略在同一设备最高优先级上一次只恢复一个进程的 Level-3 队列，每 `XSCHED_HPF_LV3_QUANTUM_US`（20 ms）轮换，其余进程的 Level-3 队列（包括空闲的）保持挂起；“先挂起后恢复”协议保证轮到的进程开始运行时，上一个进程已经驱逐完毕。每个 Level-3 进程在 `.lv3` 文件中发布一个字节（'1' 可能有 Level-3 工作在 GPU 上，'0' 全部挂起并排空：流上的 Trap 托管工作在 `PreemptStream` 排空后或挂起时发现空闲即置 0，下一次 Trap 托管发射置 1）；对端为 '0' 时允许发脉冲。这样对等进程不会在一方的线程束处于 Trap 处理程序时被调度上 GPU。
+
+残留：同一进程中没有 XQueue 的其他上下文不受保护；不经 `xserver` 的两个 Level-3 进程只能靠 '0'/'1' 字节，检查与脉冲之间对端恰好恢复的窗口仍在（微秒级）。
 
 ## 10. 调度策略与理论上限## 10. 调度策略与理论上限
 
@@ -539,6 +542,9 @@ BAR0 脉冲在**发出时驻留在 GPU 上的上下文**中生效。没有 MPS �
 | `XSCHED_SM120_CTX_PULSE_GATE` | 1 | DEF-38：同一上下文内各 Level-3 队列的脉冲与恢复准备串行化，且在其他队列的 Mode 5 恢复波次完成前不发脉冲；0 = 关闭（诊断用） |
 | `XSCHED_SM120_FOREIGN_CTX` | `block` | DEF-40：GPU 上有不属于 XSched 租户的上下文（其他用户的作业、桌面）时不发脉冲（挂起退化为 Level-1）；`allow` = 放行 |
 | `XSCHED_SM120_FOREIGN_POLL_MS` | 100 | DEF-40：NVML 进程列表轮询间隔 |
+| `XSCHED_SM120_FOREIGN_SYNC_CHECK` | 1 | DEF-40：发脉冲前同步查询 GPU 进程列表；0 = 只用轮询状态 |
+| `XSCHED_SM120_STARVATION_LIMIT` | 8 | OBS-23：同一内核连续这么多次挂起时仍在执行，则下一次挂起在 Level-1 边界等它完成（0 = 关闭） |
+| `XSCHED_SM120_RECOVERY_STALL_US` / `XSCHED_SM120_TEST_EXTRA_PULSES` | 15000 / — | 测试用：恢复脉冲的停滞阈值；`k,us` 在驱逐 / 排空进行中额外发 k 个脉冲 |
 | `XSCHED_SM120_LV3_PEERS` | `block` | DEF-41：GPU 上有另一个运行 Level-2/3 内核的进程时不发脉冲；`allow` = 放行（两个 Level-3 进程同时运行时会出现 Xid 109） |
 | `XSCHED_SM120_TENANT_HANDLER` | 1 | DEF-40：任何级别的 XQueue 都为其上下文安装 Trap 处理程序并登记为租户 |
 | `XSCHED_SM120_CE_CONTROL` | 1 | DEF-39：门控镜像与控制块复位只用拷贝引擎（主机→设备拷贝）；0 = 旧的 memset 路径 |
@@ -577,6 +583,7 @@ BAR0 脉冲在**发出时驻留在 GPU 上的上下文**中生效。没有 MPS �
 | `XSCHED_AUTO_XQUEUE*` | — | 自动为流创建 XQueue 及其级别、优先级、阈值（上游功能） |
 | `XSCHED_AUTO_XQUEUE_LAZY` | 1 | DEF-36：自动 XQueue 在流**第一次提交**时才创建（PyTorch 每进程预建 128 条池流，绝大多数从不使用）；0 = 创建流时即建 |
 | `XSCHED_AUTO_XQUEUE_LEGACY` | 1 | DEF-37：自动 XQueue 模式下，传统默认流上的异步工作转到每个上下文一个带 XQueue 的阻塞代理流；同步拷贝 / 置零 API 先排空阻塞 XQueue；应用一旦创建自己的阻塞流即退回原路径。0 = 默认流工作照旧绕过 XSched |
+| `XSCHED_HPF_LV3_EXCLUSIVE` / `XSCHED_HPF_LV3_QUANTUM_US` | 1 / 20000 | DEF-41：`xserver` HPF 在同一设备最高优先级上一次只运行一个进程的 Level-3 队列，按该时长轮换 |
 | `XSCHED_HPF_RESUME_DELAY_US` | 0 | `xserver` HPF 策略：高优先级队列在该时间内就绪过时，低优先级队列保持挂起（迟滞，避免 decode 步之间反复恢复 / 挂起）；DEF-37 修复后不再需要 |
 
 ---

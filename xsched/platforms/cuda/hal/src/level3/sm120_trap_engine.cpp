@@ -712,9 +712,13 @@ void Sm120TrapEngine::RestoreOriginal()
     ready_ = false;
 }
 
+static std::atomic<uint64_t> g_pulses_fired{0};
+
 bool Sm120TrapEngine::FireEvictPulse()
 {
-    return arena_.FireEvictPulse();
+    const bool ok = arena_.FireEvictPulse();
+    if (ok) g_pulses_fired.fetch_add(1, std::memory_order_relaxed);
+    return ok;
 }
 
 bool Sm120TrapEngine::EmitStaticHandler()
@@ -1443,9 +1447,24 @@ public:
         it->second.marked_lv3 = true;
         it->second.state = 0;        // the peer rule applies from now on: re-poll before the next pulse
         const std::string f = TenantFile(it->second.bus, getpid(), ProcStartTime(getpid())) + ".lv3";
-        const int fd = open(f.c_str(), O_CREAT | O_WRONLY | O_CLOEXEC, 0644);
-        if (fd >= 0) close(fd);
+        it->second.lv3_fd = open(f.c_str(), O_CREAT | O_RDWR | O_CLOEXEC, 0644);
+        WriteActivity(it->second);
         own_files_.push_back(f);
+    }
+
+    /// DEF-41: this process's trap-managed work went from none to some in flight (+1) or a stream
+    /// context became quiescent (-1). The aggregate is published as one byte in the `.lv3` file
+    /// ('1' = may have Level-3 work on the GPU, '0' = every Level-3 queue suspended / drained): a peer
+    /// may pulse while this process is quiescent (it has no runnable context to time-slice to).
+    void AdjustActive(CUdevice dev, int delta)
+    {
+        std::lock_guard<std::mutex> lk(mu_);
+        auto it = devs_.find(dev);
+        if (it == devs_.end()) return;
+        Dev &d = it->second;
+        const bool before = d.active > 0;
+        d.active = std::max(0, d.active + delta);
+        if ((d.active > 0) != before) WriteActivity(d);
     }
 
     static bool PeersAllowed()
@@ -1458,16 +1477,32 @@ public:
     }
 
     /// False while a process that is not a registered XSched tenant has a context on `dev`, or (unless
-    /// XSCHED_SM120_LV3_PEERS=allow) another process with Level-2/3 queues does.
+    /// XSCHED_SM120_LV3_PEERS=allow) another process with Level-2/3 queues does. By default the GPU's
+    /// process list is queried synchronously right before every pulse (NVML: ~6 us per list on the
+    /// RTX 5080, ~50 us on the RTX 5060; tenants are cached for 200 ms), so the window in which a newly
+    /// started foreign context can be hit is the few microseconds between this check and the BAR0
+    /// write. XSCHED_SM120_FOREIGN_SYNC_CHECK=0 falls back to the poller's cached state.
     bool PulseAllowed(CUdevice dev)
     {
         if (!Enabled()) return true;
-        std::unique_lock<std::mutex> lk(mu_);
-        auto it = devs_.find(dev);
-        if (it == devs_.end()) return true;           // not attached (should not happen)
-        Dev &d = it->second;
-        if (d.state == 0) { lk.unlock(); PollAll(); lk.lock(); }
-        return d.state == 1;
+        static const bool sync_check = GetEnvOption("XSCHED_SM120_FOREIGN_SYNC_CHECK", true);
+        std::string bus;
+        NvmlDev nvml = nullptr;
+        bool display = false, self_lv3 = false;
+        {
+            std::unique_lock<std::mutex> lk(mu_);
+            auto it = devs_.find(dev);
+            if (it == devs_.end()) return true;       // not attached (should not happen)
+            if (!sync_check && it->second.state != 0) return it->second.state == 1;
+            bus = it->second.bus;
+            nvml = it->second.nvml;
+            display = it->second.display;
+            for (auto &kv : devs_) self_lv3 = self_lv3 || kv.second.marked_lv3;
+        }
+        std::string desc;
+        const bool foreign = CheckDevice(bus, nvml, display, self_lv3, &desc);
+        Update(dev, foreign, desc);
+        return !foreign;
     }
 
 private:
@@ -1480,14 +1515,135 @@ private:
         std::string last_desc;
         int logs = 0;
         bool marked_lv3 = false;
+        int peer_logs = 0;
+        bool last_peer_only = false;
+        int lv3_fd = -1;           // our `.lv3` file (activity byte)
+        int active = 0;            // stream contexts with trap-managed work possibly in flight
     };
+
+    static void WriteActivity(const Dev &d)
+    {
+        if (d.lv3_fd < 0) return;
+        const char c = d.active > 0 ? '1' : '0';
+        ssize_t r = pwrite(d.lv3_fd, &c, 1, 0);
+        (void)r;
+    }
+
+    /// '0' in a peer's `.lv3` file: all its Level-3 queues are suspended / drained.
+    static bool PeerQuiescent(const std::string &lv3_file)
+    {
+        const int fd = open(lv3_file.c_str(), O_RDONLY | O_CLOEXEC);
+        if (fd < 0) return false;
+        char c = '1';
+        const ssize_t r = pread(fd, &c, 1, 0);
+        close(fd);
+        return r == 1 && c == '0';
+    }
+
+    struct PidClass
+    {
+        int cls = 0;               // 0 XSched tenant, 1 foreign, 2 Level-3 peer
+        int64_t checked_us = 0;
+        std::string lv3_file;      // cls 2: its activity byte, read on every check
+    };
+
+    static int64_t MonoUs()
+    {
+        return std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::steady_clock::now().time_since_epoch()).count();
+    }
+
+    /// True if a context outside XSched (or a Level-3 peer) is on the GPU; fills `desc`.
+    bool CheckDevice(const std::string &bus, NvmlDev nvml, bool display, bool self_lv3, std::string *desc)
+    {
+        Nvml &n = Nvml::Get();
+        if (!n.ok || nvml == nullptr) {
+            const bool foreign = display && !ForeignAllowed();   // no process list: conservative on a display GPU
+            if (foreign) *desc = "display GPU and NVML unavailable";
+            return foreign;
+        }
+        bool foreign = false;
+        unsigned int pids[512];
+        unsigned int np = 0;
+        NvmlProcInfo info[256];
+        for (auto fn : {n.compute, n.graphics}) {
+            unsigned int cnt = 256;
+            if (fn(nvml, &cnt, info) == 0) {
+                for (unsigned int k = 0; k < cnt && np < 512; ++k) pids[np++] = info[k].pid;
+            } else if (!ForeignAllowed()) {
+                foreign = true;                        // too many processes or an error: block
+                *desc = "NVML process query failed";
+            }
+        }
+        const int64_t now = MonoUs();
+        std::lock_guard<std::mutex> lk(cache_mu_);
+        for (unsigned int k = 0; k < np; ++k) {
+            const unsigned int pid = pids[k];
+            if (static_cast<int>(pid) == getpid()) continue;
+            PidClass &pc = cache_[pid];
+            if (pc.checked_us == 0 || now - pc.checked_us > 200000) {
+                const std::string st = ProcStartTime(static_cast<int>(pid));
+                const std::string tf = st.empty() ? "" : TenantFile(bus, static_cast<int>(pid), st);
+                if (tf.empty() || access(tf.c_str(), F_OK) != 0) {
+                    pc.cls = 1;
+                } else if (access((tf + ".lv3").c_str(), F_OK) == 0) {
+                    pc.cls = 2;
+                    pc.lv3_file = tf + ".lv3";
+                } else {
+                    pc.cls = 0;
+                }
+                pc.checked_us = now;
+            }
+            const char *why = nullptr;
+            if (pc.cls == 1 && !ForeignAllowed()) {
+                why = "";
+            } else if (pc.cls == 2 && self_lv3 && !PeersAllowed() && !PeerQuiescent(pc.lv3_file)) {
+                // Two busy Level-3 processes are two time-sliced contexts: a context switch that
+                // arrives while one's warps are in the trap handler times out (Xid 109, DEF-27 class;
+                // 14/14 runs with two independent Level-3 processes). The ready gate only covers
+                // Level-1 peers that wait for the suspension.
+                why = " (Level-3 peer)";
+            }
+            if (why == nullptr) continue;
+            foreign = true;
+            if (desc->size() < 160) *desc += (desc->empty() ? "" : ", ") + std::to_string(pid) + " " +
+                                             ProcComm(static_cast<int>(pid)) + why;
+        }
+        if (cache_.size() > 4096) cache_.clear();
+        return foreign;
+    }
+
+    void Update(CUdevice dev, bool foreign, const std::string &desc)
+    {
+        std::lock_guard<std::mutex> lk(mu_);
+        Dev &d = devs_[dev];
+        const int state = foreign ? 2 : 1;
+        // A Level-3 peer that is merely active flips with every rotation turn (DEF-41): log those
+        // transitions a few times only; contexts outside XSched keep the higher limit.
+        const bool peer_only = desc.find("(Level-3 peer)") != std::string::npos &&
+                               desc.find(") ") == std::string::npos && desc.find(", ") == std::string::npos;
+        const int limit = (peer_only || (!foreign && d.last_peer_only)) ? 3 : 40;
+        int &count = (peer_only || (!foreign && d.last_peer_only)) ? d.peer_logs : d.logs;
+        if (foreign) d.last_peer_only = peer_only;
+        if (state != d.state || (foreign && desc != d.last_desc)) {
+            if (d.marked_lv3 && count++ < limit) {
+                if (foreign) {
+                    XWARN("sm120 DEF-40/41: GPU %s has context(s) outside XSched or active Level-3 processes (%s): "
+                          "Level-3 pulses withheld, suspension waits for running kernels "
+                          "(XSCHED_SM120_FOREIGN_CTX=allow / XSCHED_SM120_LV3_PEERS=allow to override)",
+                          d.bus.c_str(), desc.c_str());
+                } else if (d.state == 2) {
+                    XINFO("sm120 DEF-40: GPU %s has only XSched tenants again: Level-3 pulses enabled", d.bus.c_str());
+                }
+            }
+            d.last_desc = desc;
+        }
+        d.state = state;
+    }
 
     void PollAll()
     {
-        Nvml &n = Nvml::Get();
         std::vector<std::tuple<CUdevice, std::string, NvmlDev, bool>> todo;
-        // Only a process that runs trap-managed kernels ever pulses: the peer rule and the log lines
-        // concern it alone (a Level-1 HP process must not warn about its Level-3 LP peer).
         bool self_lv3 = false;
         {
             std::lock_guard<std::mutex> lk(mu_);
@@ -1497,65 +1653,14 @@ private:
             }
         }
         for (auto &[dev, bus, nvml, display] : todo) {
-            // NVML and /proc queries outside the lock: PulseAllowed() never waits for a poll.
             std::string desc;
-            bool foreign = false;
-            if (!n.ok || nvml == nullptr) {
-                foreign = display && !ForeignAllowed(); // no process list: conservative on a display GPU
-                if (foreign) desc = "display GPU and NVML unavailable";
-            } else {
-                std::set<unsigned int> pids;
-                NvmlProcInfo info[256];
-                for (auto fn : {n.compute, n.graphics}) {
-                    unsigned int cnt = 256;
-                    if (fn(nvml, &cnt, info) == 0) {
-                        for (unsigned int i = 0; i < cnt; ++i) pids.insert(info[i].pid);
-                    } else if (!ForeignAllowed()) {
-                        foreign = true;                // too many processes or an error: block
-                        desc = "NVML process query failed";
-                    }
-                }
-                for (unsigned int pid : pids) {
-                    if (static_cast<int>(pid) == getpid()) continue;
-                    const std::string st = ProcStartTime(static_cast<int>(pid));
-                    const std::string tf = st.empty() ? "" : TenantFile(bus, static_cast<int>(pid), st);
-                    const char *why = nullptr;
-                    if (tf.empty() || access(tf.c_str(), F_OK) != 0) {
-                        if (!ForeignAllowed()) why = "";
-                    } else if (self_lv3 && !PeersAllowed() && access((tf + ".lv3").c_str(), F_OK) == 0) {
-                        // Two busy Level-3 processes are two time-sliced contexts: a context switch that
-                        // arrives while one's warps are in the trap handler times out (Xid 109, DEF-27
-                        // class; 14/14 runs with two independent Level-3 processes). The ready gate only
-                        // covers Level-1 peers that wait for the suspension.
-                        why = " (Level-3 peer)";
-                    }
-                    if (why == nullptr) continue;
-                    foreign = true;
-                    if (desc.size() < 160) desc += (desc.empty() ? "" : ", ") + std::to_string(pid) + " " +
-                                                   ProcComm(static_cast<int>(pid)) + why;
-                }
-            }
-            std::lock_guard<std::mutex> lk(mu_);
-            Dev &d = devs_[dev];
-            const int state = foreign ? 2 : 1;
-            if (state != d.state || (foreign && desc != d.last_desc)) {
-                if (d.marked_lv3 && d.logs < 40) {
-                    ++d.logs;
-                    if (foreign) {
-                        XWARN("sm120 DEF-40: GPU %s has context(s) outside XSched or other Level-3 processes (%s): "
-                              "Level-3 pulses withheld, suspension waits for running kernels "
-                              "(XSCHED_SM120_FOREIGN_CTX=allow / XSCHED_SM120_LV3_PEERS=allow to override)",
-                              d.bus.c_str(), desc.c_str());
-                    } else if (d.state == 2) {
-                        XINFO("sm120 DEF-40: GPU %s has only XSched tenants again: Level-3 pulses enabled", d.bus.c_str());
-                    }
-                }
-                d.last_desc = desc;
-            }
-            d.state = state;
+            const bool foreign = CheckDevice(bus, nvml, display, self_lv3, &desc);
+            Update(dev, foreign, desc);
         }
     }
 
+    std::mutex cache_mu_;
+    std::map<unsigned int, PidClass> cache_;
     std::mutex mu_;
     std::map<CUdevice, Dev> devs_;
     std::vector<std::string> own_files_;
@@ -1640,6 +1745,9 @@ struct HostPulseGuard
     ~HostPulseGuard() { HostPulseLock::Unlock(fd); }
 };
 } // namespace
+
+// Recovery pulses fired by PreemptStream() (XSm120RecoveryPulses()).
+static std::atomic<uint64_t> g_recovery_pulses{0};
 
 static int64_t NowUs()
 {
@@ -1739,6 +1847,18 @@ void Sm120TrapEngine::DumpStreams(const char *why)
     // Racy by design: a stuck thread may hold a context's mutex. Contexts are never destroyed while
     // a queue is stuck inside one of them.
     for (size_t i = 0; i < copy.size(); ++i) copy[i]->DiagDump(static_cast<int>(i));
+    FLUSH_XLOG();   // the dump is mostly needed when the process is about to be killed
+}
+
+void Sm120StreamContext::SetLv3Active(bool active)
+{
+    if (!marked_lv3_ && active) return;
+    if (lv3_active_.exchange(active) != active) TenantGuard::Instance().AdjustActive(dev_, active ? +1 : -1);
+}
+
+void Sm120StreamContext::NoteQuiescent()
+{
+    SetLv3Active(false);
 }
 
 int Sm120StreamContext::Stage(int64_t *since_us) const
@@ -2136,6 +2256,7 @@ bool Sm120StreamContext::PrepareLaunch(CUfunction func,
         marked_lv3_ = true;
         TenantGuard::Instance().MarkLv3(dev_);
     }
+    SetLv3Active(true);
     ++launch_seq_;
     if (stream != nullptr) last_stream_ = stream;
 
@@ -2374,6 +2495,22 @@ bool Sm120StreamContext::PreemptStream(Sm120PreemptMode mode)
     }
 
     SetStage(6);
+    // Test knob (OBS-21 investigation): XSCHED_SM120_TEST_EXTRA_PULSES="k,us" fires up to k additional
+    // pulses, `us` microseconds apart, while the stream is still busy (what a recovery pulse does
+    // during an eviction / drain in progress).
+    static const std::pair<int, int> extra = [] {
+        const char *v = getenv("XSCHED_SM120_TEST_EXTRA_PULSES");
+        int k = 0, us = 0;
+        if (v != nullptr && sscanf(v, "%d,%d", &k, &us) < 1) k = 0;
+        return std::make_pair(k, us);
+    }();
+    for (int e = 0; e < extra.first && last_stream_ != nullptr; ++e) {
+        if (extra.second > 0) std::this_thread::sleep_for(std::chrono::microseconds(extra.second));
+        if (Driver::StreamQuery(last_stream_) != CUDA_ERROR_NOT_READY) break;
+        if (!TenantGuard::Instance().PulseAllowed(dev_)) break;
+        g_recovery_pulses.fetch_add(1, std::memory_order_relaxed);
+        engine_->FireEvictPulse();
+    }
     // Progress-aware bounded confirmation: on the normal fast path StreamQuery returns
     // CUDA_SUCCESS in < 1 ms with ZERO extra DMA overhead; only sample counters via CE DMA
     // every 2 ms if the stream stays active (display/shared GPU recovery protection).
@@ -2387,7 +2524,12 @@ bool Sm120StreamContext::PreemptStream(Sm120PreemptMode mode)
             const auto now = std::chrono::steady_clock::now();
             const int64_t since_sample_us =
                 std::chrono::duration_cast<std::chrono::microseconds>(now - last_sample_tp).count();
-            if (since_sample_us >= 2000LL) {
+            static const int64_t sample_us = [] {
+                int64_t v = 15000;
+                GetEnvInt64("XSCHED_SM120_RECOVERY_STALL_US", v);
+                return std::min<int64_t>(2000LL, std::max<int64_t>(v / 4, 20));
+            }();
+            if (since_sample_us >= sample_us) {
                 last_sample_tp = now;
                 if (ReadHeaderLocked(&hdr)) {
                     const uint32_t prog = hdr.evicted_slots + hdr.drained_cnt + hdr.mode1_exit_cnt;
@@ -2397,7 +2539,15 @@ bool Sm120StreamContext::PreemptStream(Sm120PreemptMode mode)
                     } else {
                         const int64_t stall_us =
                             std::chrono::duration_cast<std::chrono::microseconds>(now - last_prog_tp).count();
-                        const int64_t threshold_us = std::min<int64_t>(15000LL << std::min(retries, 2), 60000LL);
+                        // XSCHED_SM120_RECOVERY_STALL_US (default 15000): test knob for the recovery
+                        // path (OBS-21 investigation: makes recovery pulses frequent).
+                        static const int64_t stall_base_us = [] {
+                            int64_t v = 15000;
+                            GetEnvInt64("XSCHED_SM120_RECOVERY_STALL_US", v);
+                            return std::max<int64_t>(v, 50);
+                        }();
+                        const int64_t threshold_us =
+                            std::min<int64_t>(stall_base_us << std::min(retries, 2), std::max<int64_t>(60000LL, stall_base_us));
                         if (stall_us >= threshold_us) {
                             if (retries >= kMaxRecoveryPulses) {
                                 XWARN("sm120_trap_engine: stream still busy after %d recovery pulses "
@@ -2412,6 +2562,7 @@ bool Sm120StreamContext::PreemptStream(Sm120PreemptMode mode)
                                 continue;
                             }
                             ++retries;
+                            g_recovery_pulses.fetch_add(1, std::memory_order_relaxed);
                             XDEBG("sm120_trap_engine: recovery pulse #%d after %lld us stall "
                                   "(ev=%u dr=%u m1=%u)",
                                   retries, static_cast<long long>(stall_us),
@@ -2425,6 +2576,9 @@ bool Sm120StreamContext::PreemptStream(Sm120PreemptMode mode)
             std::this_thread::yield();
         }
     }
+    // DEF-41: the stream drained (evicted / drained / completed): no Level-3 work of ours is on the
+    // GPU until the next trap-managed launch.
+    if (last_stream_ == nullptr || Driver::StreamQuery(last_stream_) == CUDA_SUCCESS) SetLv3Active(false);
     return true;
 }
 
@@ -2737,4 +2891,16 @@ bool Sm120StreamContext::ReadCtaEntries(std::vector<Sm120CtaEntry> &out, uint32_
 extern "C" __attribute__((visibility("default"))) void XSm120DumpStreams()
 {
     xsched::cuda::sm120::Sm120TrapEngine::DumpAll("XSm120DumpStreams");
+}
+
+/// Number of recovery pulses fired so far (PreemptStream stall recovery).
+extern "C" __attribute__((visibility("default"))) uint64_t XSm120RecoveryPulses()
+{
+    return xsched::cuda::sm120::g_recovery_pulses.load();
+}
+
+/// Number of BAR0 pulses this process has fired (tests: pulses were not withheld).
+extern "C" __attribute__((visibility("default"))) uint64_t XSm120Pulses()
+{
+    return xsched::cuda::sm120::g_pulses_fired.load();
 }

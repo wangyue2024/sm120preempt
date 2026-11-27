@@ -606,7 +606,9 @@ def test_llm06_qos_prefill_decode(mode: str):
                 ref_lp = model(input_ids=lp_ids, use_cache=False).logits[:, -1, :]
         lp_stream.synchronize()
         lp_solo_s = (time.perf_counter() - t_s0) / 5.0
-        ref_lp = ref_lp.clone()
+        with torch.cuda.stream(lp_stream):      # T-29: clone on the stream that owns ref_lp
+            ref_lp = ref_lp.clone()
+        lp_stream.synchronize()
 
         # Golden HP decode output (clone KV cache on hp_stream + sync!)
         with torch.cuda.stream(hp_stream):
@@ -844,8 +846,8 @@ def test_llm08_multi_stream_concurrent():
                 with torch.cuda.stream(lp1_s):
                     for _ in range(3):
                         y = m1(input_ids=x1, use_cache=False).logits[:, -1, :]
+                    res["y1"] = y.clone()          # T-29: clone on the owning stream
                 lp1_s.synchronize()
-                res["y1"] = y.clone()
             except Exception as e:
                 errs.append(e)
             finally:
@@ -857,8 +859,8 @@ def test_llm08_multi_stream_concurrent():
                 with torch.cuda.stream(lp2_s):
                     for _ in range(3):
                         y = m2(input_ids=x2, use_cache=False).logits[:, -1, :]
+                    res["y2"] = y.clone()          # T-29: clone on the owning stream
                 lp2_s.synchronize()
-                res["y2"] = y.clone()
             except Exception as e:
                 errs.append(e)
             finally:

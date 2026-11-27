@@ -101,6 +101,13 @@ def plan(args):
             # pulse rate: the RTX 5060 drives the desktop, see OBS-14).
             L("SYN-multiq-lv3", 600, "XSCHED_SM120_WATCHDOG_MS=5000 $PY $EVAL/test_multiqueue_lv3_p35.py --queues 4 "
                                      "--steps 1500 --gap-us 1500 --hold-us 300")
+            # DEF-41: two Level-3 LP processes + a Level-1 HP process under xserver (HPF Level-3 peer
+            # rotation, quiescent peers may be pulsed); no Xid, every checkpoint exact.
+            L("SYN-lv3-peers-glb", 600, f"NATIVE_LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu $PY $EVAL/test_lv3_peers_glb_p35.py "
+                                        f"--seconds 15 --ref {out_dir}/lv3_peers_ref.json")
+            # Driver-internal memset / copy kernels under pulses, and the OBS-23 starvation guard
+            # (256 MiB buffers, suspension every ~0.4 ms: no progress without the guard).
+            L("SYN-driver-kernels", 600, "$PY $EVAL/test_lv3_driver_kernels_p35.py --mib 256 --iters 60 --gap-us 400")
             # Tier-1 item 4: an unrecognised driver trap-handler layout must degrade to the Level-1
             # boundary (one warning, correct results), never abort.
             L("SYN-no-engine", 600, "XSCHED_SM120_SIMULATE_UNSUPPORTED_DRIVER=1 $PY $EVAL/test_lv3_stress_kernel_p35.py "

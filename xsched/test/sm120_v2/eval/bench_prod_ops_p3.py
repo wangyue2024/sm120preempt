@@ -532,11 +532,16 @@ def bench_one(op_name, mode, args):
 
     # Native golden (computed BEFORE any XQueue exists) + native determinism check
     def golden_once():
+        # T-29 (OBS-20 root cause): clone on the LP stream. A clone on the legacy default stream
+        # (the current stream outside the `with`) was still pending when `out` was freed back to
+        # the LP stream's pool and the second golden run on LP reused the block (e.g. as CUB scan
+        # temp storage): "non-deterministic" native goldens under GPU contention.
         with torch.cuda.stream(lp):
             op.reset()
             out = op.run()
+            res_t = out_tensors(op, out)
         lp.synchronize()
-        return out_tensors(op, out)
+        return res_t
 
     g1 = golden_once()
     g2 = golden_once()

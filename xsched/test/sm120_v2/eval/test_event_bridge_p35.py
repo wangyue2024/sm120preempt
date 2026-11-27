@@ -69,6 +69,10 @@ def main():
         lp_work()
     torch.cuda.synchronize()
     gold = Y.clone()
+    # T-29 (OBS-20 root cause): the clone runs on the legacy default stream; without this the next
+    # Y.zero_() on the non-blocking LP stream can overtake it under GPU contention (all-zero golden,
+    # 20/20 under a background GEMM load, 0/20 with the synchronize).
+    torch.cuda.synchronize()
     t0 = time.perf_counter()
     with torch.cuda.stream(lp):
         lp_work()
@@ -133,11 +137,22 @@ def main():
     xs.destroy(hwq, xq)
     block_us.sort()
     st = stats()
+    pulses = -1
+    try:
+        f = ctypes.CDLL("libhalcuda.so").XSm120Pulses
+        f.restype = ctypes.c_uint64
+        pulses = int(f())
+    except Exception:
+        pass
+    skipped = False
     if a.expect_fail:
-        ok = bad > 0
+        # The hazard needs real evictions. With pulses withheld (DEF-40: e.g. the desktop's contexts on
+        # a display GPU) the queue behaves like Level-1 and the hazard cannot be demonstrated.
+        skipped = bad == 0 and pulses == 0 and a.level >= 3
+        ok = bad > 0 or skipped
     else:
         ok = bad == 0
-    print(f"[EVENT-BRIDGE lv{a.level} mode={mode}{' no-preempt' if a.no_preempt else ''}{' module-load' if a.module_load else ''}] {'PASS' if ok else 'FAIL'} | iters {a.iters} corrupted {bad} | "
+    print(f"[EVENT-BRIDGE lv{a.level} mode={mode}{' no-preempt' if a.no_preempt else ''}{' module-load' if a.module_load else ''}] {'SKIP (no pulses fired)' if skipped else ('PASS' if ok else 'FAIL')} | iters {a.iters} corrupted {bad} | pulses {pulses} | "
           f"work {work_ms:.1f} ms | wait_event caller blocked p50 {block_us[len(block_us)//2]:.0f} us "
           f"max {block_us[-1]:.0f} us | native deterministic {native_det} | {st}", flush=True)
     if diag:

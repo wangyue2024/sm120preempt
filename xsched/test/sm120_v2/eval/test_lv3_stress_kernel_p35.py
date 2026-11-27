@@ -39,6 +39,17 @@ def make(kind, seed=0):
     return lambda: torch.mm(a, b)
 
 
+
+def recovery_pulses():
+    """Recovery pulses fired by the SM120 trap engine so far (OBS-21 investigation)."""
+    try:
+        import ctypes
+        f = ctypes.CDLL("libhalcuda.so").XSm120RecoveryPulses
+        f.restype = ctypes.c_uint64
+        return int(f())
+    except Exception:
+        return -1
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--kernel", default="flash", choices=["flash", "flash128", "gemm"])
@@ -100,7 +111,7 @@ def main():
     ok = bad == 0 and det
     extra = f" first bad iter {first[0]} ({first[1]}/{first[2]} elements)" if first else ""
     print(f"[LV3-STRESS {a.kernel} lv{a.level}] {'PASS' if ok else 'FAIL'} | calls {a.iters * a.chain} wrong {bad} | "
-          f"preemptions {n_pre[0]} | kernel {k_ms:.2f} ms | native deterministic {det}{extra}", flush=True)
+          f"preemptions {n_pre[0]} | recovery pulses {recovery_pulses()} | kernel {k_ms:.2f} ms | native deterministic {det}{extra}", flush=True)
     return 0 if ok else 1
 
 

@@ -1,0 +1,244 @@
+# Phase 3.5 round 3 evidence (RTX 5080 unless noted), sanitized
+# round3: injected pulses (EX-*), DEF-40 synchronous check (SC-*); round4: DEF-41 peers (PEERS-*), corrected multi-queue (MQV-*);
+# lv: OBS-23 characterization (no guard); sg: starvation guard; co / cob: S8 with a co-running native GEMM (allow = pulses despite it); obs21: recovery-stall knob
+=== round3 (round3_20261127_124849.log)
+>>> [EX-flash-1] 19:49:49
+[LV3-STRESS flash lv3] PASS | calls 4800 wrong 0 | preemptions 409 | recovery pulses 179 | kernel 0.11 ms 
+<<< [EX-flash-1] rc=0 wall=2.0s
+>>> [EX-flash-2] 19:50:51
+[LV3-STRESS flash lv3] PASS | calls 4800 wrong 0 | preemptions 408 | recovery pulses 166 | kernel 0.11 ms 
+<<< [EX-flash-2] rc=0 wall=2.0s
+>>> [EX-gemm-1] 19:51:54
+[LV3-STRESS gemm lv3] PASS | calls 2400 wrong 0 | preemptions 2108 | recovery pulses 913 | kernel 1.28 ms 
+<<< [EX-gemm-1] rc=0 wall=6.1s
+>>> [EX-gemm-2] 19:53:00
+[LV3-STRESS gemm lv3] PASS | calls 2400 wrong 0 | preemptions 2106 | recovery pulses 899 | kernel 1.28 ms 
+<<< [EX-gemm-2] rc=0 wall=6.1s
+>>> [EX-rp255-1] 19:54:06
+[REGPRESS255 lv3 nacc=250 ctas/sm=2] PASS | calls 600 wrong 0 | preemptions 295 | kernel 0.75 ms 
+<<< [EX-rp255-1] rc=0 wall=2.0s
+>>> [EX-rp255-2] 19:55:08
+[REGPRESS255 lv3 nacc=250 ctas/sm=2] PASS | calls 600 wrong 0 | preemptions 295 | kernel 0.75 ms 
+<<< [EX-rp255-2] rc=0 wall=2.0s
+>>> [EX-mq-1] 19:56:11
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [784, 785, 771, 782] | recovery pulses 94 | wall 0.85s 
+<<< [EX-mq-1] rc=0 wall=5.1s
+>>> [EX-mq-2] 19:57:16
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [793, 798, 785, 793] | recovery pulses 108 | wall 0.86s 
+<<< [EX-mq-2] rc=0 wall=5.1s
+>>> [EX-mq-3] 19:58:21
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [783, 787, 780, 782] | recovery pulses 93 | wall 0.86s 
+<<< [EX-mq-3] rc=0 wall=5.1s
+>>> [EX-S8-1] 19:59:27
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.52/10.65ms TPOT p50/p99=6.28/8.65ms hp_exact=20/20 lp_iters=161 bad=0 recov=14 lp_tput=72.1% hp_duty=23%
+<<< [EX-S8-1] rc=0 wall=15.3s
+>>> [EX-S8-2] 20:00:42
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.92/11.41ms TPOT p50/p99=6.66/8.60ms hp_exact=20/20 lp_iters=159 bad=0 recov=11 lp_tput=71.2% hp_duty=24%
+<<< [EX-S8-2] rc=0 wall=15.3s
+>>> [EX-S8-3] 20:01:58
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.66/8.48ms TPOT p50/p99=6.42/9.74ms hp_exact=20/20 lp_iters=160 bad=0 recov=10 lp_tput=71.6% hp_duty=23%
+<<< [EX-S8-3] rc=0 wall=15.3s
+>>> [EX-S8-4] 20:03:13
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.55/8.27ms TPOT p50/p99=6.24/8.72ms hp_exact=20/20 lp_iters=162 bad=0 recov=13 lp_tput=72.6% hp_duty=23%
+<<< [EX-S8-4] rc=0 wall=15.3s
+>>> [SC-S8-1] 20:04:29
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.84/8.39ms TPOT p50/p99=6.63/7.98ms hp_exact=20/20 lp_iters=159 bad=0 recov=0 lp_tput=71.1% hp_duty=24%
+<<< [SC-S8-1] rc=0 wall=15.3s
+>>> [SC-S8-2] 20:05:44
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.91/11.51ms TPOT p50/p99=6.72/8.26ms hp_exact=20/20 lp_iters=158 bad=0 recov=0 lp_tput=70.7% hp_duty=24%
+<<< [SC-S8-2] rc=0 wall=15.3s
+>>> [SC-S8-3] 20:07:00
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.48/10.18ms TPOT p50/p99=6.29/8.21ms hp_exact=20/20 lp_iters=161 bad=0 recov=0 lp_tput=72.1% hp_duty=23%
+<<< [SC-S8-3] rc=0 wall=15.3s
+>>> [SC-FOREIGN-1] 20:08:15
+[FOREIGN-CTX aggressor lv3 gap 600 us] victim unaffected | victim iters 2645 wrong 0 rc 0 error '' 
+<<< [SC-FOREIGN-1] rc=0 wall=20.4s
+>>> [SC-FOREIGN-2] 20:09:36
+[FOREIGN-CTX aggressor lv3 gap 600 us] victim unaffected | victim iters 2644 wrong 0 rc 0 error '' 
+<<< [SC-FOREIGN-2] rc=0 wall=20.4s
+>>> [PEERS-x1-1] 20:10:57
+<<< [PEERS-x1-1] rc=1 wall=23.5s
+>>> [PEERS-x1-2] 20:12:20
+<<< [PEERS-x1-2] rc=1 wall=23.5s
+>>> [PEERS-x1-3] 20:13:44
+<<< [PEERS-x1-3] rc=1 wall=23.5s
+>>> [PEERS-x0-1] 20:15:08
+<<< [PEERS-x0-1] rc=1 wall=23.5s
+=== round4 (round4_20261127_134325.log)
+>>> [PEERS-x1-1] 20:44:25
+[LV3-PEERS-GLB exclusive=1] PASS | LP rounds [176, 176] bad [0, 0] pulses [874, 937] | HP requests 2352 bad 0 P50/P99 0.33/1.51 ms | withheld warnings 40 
+<<< [PEERS-x1-1] rc=0 wall=26.6s
+>>> [PEERS-x1-2] 20:45:52
+[LV3-PEERS-GLB exclusive=1] PASS | LP rounds [178, 178] bad [0, 0] pulses [978, 916] | HP requests 2348 bad 0 P50/P99 0.33/1.47 ms | withheld warnings 40 
+<<< [PEERS-x1-2] rc=0 wall=26.6s
+>>> [PEERS-x1-3] 20:47:19
+[LV3-PEERS-GLB exclusive=1] PASS | LP rounds [176, 176] bad [0, 0] pulses [910, 988] | HP requests 2345 bad 0 P50/P99 0.33/1.51 ms | withheld warnings 41 
+<<< [PEERS-x1-3] rc=0 wall=26.6s
+>>> [PEERS-x0-1] 20:48:45
+[LV3-PEERS-GLB exclusive=0] PASS | LP rounds [194, 195] bad [0, 0] pulses [597, 505] | HP requests 2331 bad 0 P50/P99 0.39/1.6 ms | withheld warnings 44 
+<<< [PEERS-x0-1] rc=0 wall=26.6s
+>>> [MQV-on-1] 20:50:12
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [905, 901, 892, 900] | recovery pulses 0 | wall 0.93s | checkpoints 12 valid True 
+<<< [MQV-on-1] rc=0 wall=5.1s
+>>> [MQV-on-2] 20:51:18
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [895, 899, 892, 900] | recovery pulses 0 | wall 0.92s | checkpoints 12 valid True 
+<<< [MQV-on-2] rc=0 wall=5.1s
+>>> [MQV-on-3] 20:52:23
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [899, 903, 890, 905] | recovery pulses 0 | wall 0.93s | checkpoints 12 valid True 
+<<< [MQV-on-3] rc=0 wall=5.1s
+>>> [MQV-on-4] 20:53:28
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [902, 900, 892, 916] | recovery pulses 0 | wall 0.93s | checkpoints 12 valid True 
+<<< [MQV-on-4] rc=0 wall=5.1s
+>>> [MQV-on-5] 20:54:34
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [899, 901, 891, 904] | recovery pulses 0 | wall 0.92s | checkpoints 12 valid True 
+<<< [MQV-on-5] rc=0 wall=5.1s
+>>> [MQV-on-6] 20:55:39
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [896, 899, 883, 901] | recovery pulses 0 | wall 0.92s | checkpoints 12 valid True 
+<<< [MQV-on-6] rc=0 wall=5.1s
+>>> [MQV-xp-1] 20:56:44
+[MULTIQ-LV3 q=2 rank=1 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [990, 990] | recovery pulses 0 | wall 1.06s | checkpoints 12 valid True 
+[MULTIQ-LV3 q=2 rank=0 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [1002, 1017] | recovery pulses 0 | wall 1.07s | checkpoints 12 valid True 
+[MULTIQ-LV3 procs=2 host_gate=1] PASS 
+<<< [MQV-xp-1] rc=0 wall=6.1s
+>>> [MQV-xp-2] 20:57:50
+[MULTIQ-LV3 q=2 rank=1 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [983, 1011] | recovery pulses 0 | wall 1.07s | checkpoints 12 valid True 
+[MULTIQ-LV3 q=2 rank=0 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [1001, 1013] | recovery pulses 0 | wall 1.07s | checkpoints 12 valid True 
+[MULTIQ-LV3 procs=2 host_gate=1] PASS 
+<<< [MQV-xp-2] rc=0 wall=6.1s
+=== sg (sg_20261127_150902.log)
+>>> [SG-m256-g400] 22:10:03
+[LV3-DRIVER-KERNELS lv3 ops=memset,copy] PASS | iters 100 x 256 MiB memset+copy | wrong bytes memset 0 copy 0 | suspensions 2198 pulses 1993 | wall 5.11s 
+<<< [SG-m256-g400] rc=0 wall=7.1s
+>>> [SG-m1024-g400] 22:11:10
+[LV3-DRIVER-KERNELS lv3 ops=memset,copy] PASS | iters 100 x 1024 MiB memset+copy | wrong bytes memset 0 copy 0 | suspensions 4704 pulses 4499 | wall 19.89s 
+<<< [SG-m1024-g400] rc=0 wall=21.4s
+>>> [SG-m1024-g2000] 22:12:32
+[LV3-DRIVER-KERNELS lv3 ops=memset,copy] PASS | iters 100 x 1024 MiB memset+copy | wrong bytes memset 0 copy 0 | suspensions 2528 pulses 2331 | wall 15.36s 
+<<< [SG-m1024-g2000] rc=0 wall=17.3s
+>>> [SG-flash] 22:13:49
+[LV3-STRESS flash lv3] PASS | calls 4800 wrong 0 | preemptions 408 | recovery pulses 0 | kernel 0.11 ms 
+<<< [SG-flash] rc=0 wall=2.0s
+>>> [SG-gemm] 22:14:51
+[LV3-STRESS gemm lv3] PASS | calls 2400 wrong 0 | preemptions 2922 | recovery pulses 0 | kernel 1.28 ms 
+<<< [SG-gemm] rc=0 wall=6.1s
+>>> [SG-mq] 22:15:58
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [898, 900, 887, 902] | recovery pulses 0 | wall 0.92s | checkpoints 12 valid True 
+<<< [SG-mq] rc=0 wall=5.1s
+=== lv (lv_20261127_150100.log)
+>>> [LV-m64-g400] 22:02:00
+[LV3-DRIVER-KERNELS lv3 ops=memset,copy] PASS | iters 100 x 64 MiB memset+copy | wrong bytes memset 0 copy 0 | suspensions 754 pulses 743 | wall 0.87s 
+<<< [LV-m64-g400] rc=0 wall=2.0s
+>>> [LV-m256-g400] 22:03:03
+<<< [LV-m256-g400] rc=0 wall=120.2s
+>>> [LV-m1024-g5000] 22:06:03
+[LV3-DRIVER-KERNELS lv3 ops=memset,copy] PASS | iters 100 x 1024 MiB memset+copy | wrong bytes memset 0 copy 0 | suspensions 1147 pulses 1144 | wall 9.68s 
+<<< [LV-m1024-g5000] rc=0 wall=11.2s
+>>> [LV-m1024-g2000] 22:07:14
+[LV3-DRIVER-KERNELS lv3 ops=memset,copy] PASS | iters 100 x 1024 MiB memset+copy | wrong bytes memset 0 copy 0 | suspensions 3301 pulses 3299 | wall 17.93s 
+<<< [LV-m1024-g2000] rc=0 wall=19.4s
+=== co (co_20261127_140902.log)
+>>> [CO-allow-1] 21:10:22
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=12.39/26.72ms TPOT p50/p99=9.88/16.29ms hp_exact=20/20 lp_iters=15 bad=0 recov=0 lp_tput=13.0% hp_duty=38%
+<<< [CO-allow-1] rc=0 wall=20.4s
+>>> [CO-allow-2] 21:11:43
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=12.01/4312.47ms TPOT p50/p99=9.82/15.62ms hp_exact=20/20 lp_iters=19 bad=0 recov=0 lp_tput=11.5% hp_duty=57%
+<<< [CO-allow-2] rc=0 wall=24.7s
+>>> [CO-allow-3] 21:13:08
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=12.46/26.56ms TPOT p50/p99=9.84/15.62ms hp_exact=20/20 lp_iters=15 bad=0 recov=0 lp_tput=13.0% hp_duty=38%
+<<< [CO-allow-3] rc=0 wall=20.4s
+>>> [CO-allow-4] 21:14:29
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=12.34/26.51ms TPOT p50/p99=9.86/16.64ms hp_exact=20/20 lp_iters=15 bad=0 recov=0 lp_tput=13.0% hp_duty=38%
+<<< [CO-allow-4] rc=0 wall=20.4s
+>>> [CO-block-1] 21:15:49
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=12.68/13.20ms TPOT p50/p99=9.84/16.29ms hp_exact=20/20 lp_iters=16 bad=0 recov=0 lp_tput=13.9% hp_duty=36%
+<<< [CO-block-1] rc=0 wall=21.4s
+>>> [CO-block-2] 21:17:11
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=12.33/14.06ms TPOT p50/p99=9.84/16.38ms hp_exact=20/20 lp_iters=16 bad=0 recov=0 lp_tput=13.9% hp_duty=36%
+<<< [CO-block-2] rc=0 wall=21.4s
+=== cob (cob_20261127_141826.log)
+>>> [COB-allow-1] 21:19:27
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=12.44/24.53ms TPOT p50/p99=10.98/16.52ms hp_exact=20/20 lp_iters=36 bad=0 recov=0 lp_tput=32.6% hp_duty=37%
+<<< [COB-allow-1] rc=0 wall=20.4s
+>>> [COB-allow-2] 21:20:47
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=12.62/24.96ms TPOT p50/p99=10.99/16.57ms hp_exact=20/20 lp_iters=36 bad=0 recov=0 lp_tput=28.7% hp_duty=37%
+<<< [COB-allow-2] rc=0 wall=20.4s
+>>> [COB-allow-3] 21:22:08
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=13.56/24.95ms TPOT p50/p99=10.99/16.63ms hp_exact=20/20 lp_iters=36 bad=0 recov=0 lp_tput=28.7% hp_duty=38%
+<<< [COB-allow-3] rc=0 wall=20.4s
+>>> [COB-allow-4] 21:23:28
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=12.01/24.28ms TPOT p50/p99=10.99/16.76ms hp_exact=20/20 lp_iters=36 bad=0 recov=0 lp_tput=30.2% hp_duty=37%
+<<< [COB-allow-4] rc=0 wall=20.4s
+>>> [COB-allow-5] 21:24:49
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=12.79/27.40ms TPOT p50/p99=10.99/16.81ms hp_exact=20/20 lp_iters=36 bad=0 recov=0 lp_tput=30.2% hp_duty=37%
+<<< [COB-allow-5] rc=0 wall=20.4s
+>>> [COB-allow-6] 21:26:10
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=13.21/26.87ms TPOT p50/p99=10.99/16.51ms hp_exact=20/20 lp_iters=37 bad=0 recov=0 lp_tput=29.2% hp_duty=38%
+<<< [COB-allow-6] rc=0 wall=20.4s
+>>> [COB-allow-7] 21:27:30
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=13.09/25.21ms TPOT p50/p99=10.99/16.74ms hp_exact=20/20 lp_iters=37 bad=0 recov=0 lp_tput=32.5% hp_duty=38%
+<<< [COB-allow-7] rc=0 wall=20.4s
+>>> [COB-allow-8] 21:28:51
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=12.33/24.57ms TPOT p50/p99=10.99/16.38ms hp_exact=20/20 lp_iters=36 bad=0 recov=0 lp_tput=31.9% hp_duty=37%
+<<< [COB-allow-8] rc=0 wall=20.4s
+>>> [COB-allow-9] 21:30:11
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=12.58/27.41ms TPOT p50/p99=10.99/16.78ms hp_exact=20/20 lp_iters=37 bad=0 recov=0 lp_tput=34.0% hp_duty=38%
+<<< [COB-allow-9] rc=0 wall=20.4s
+>>> [COB-allow-10] 21:31:32
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=13.04/27.57ms TPOT p50/p99=10.99/16.76ms hp_exact=20/20 lp_iters=36 bad=0 recov=0 lp_tput=31.7% hp_duty=38%
+<<< [COB-allow-10] rc=0 wall=20.4s
+=== obs21 (obs21_20261127_122919.log)
+>>> [RC-flash-1] 19:30:20
+[LV3-STRESS flash lv3] PASS | calls 4800 wrong 0 | preemptions 412 | recovery pulses 0 | kernel 0.11 ms 
+<<< [RC-flash-1] rc=0 wall=2.0s
+>>> [RC-flash-2] 19:31:22
+[LV3-STRESS flash lv3] PASS | calls 4800 wrong 0 | preemptions 412 | recovery pulses 0 | kernel 0.11 ms 
+<<< [RC-flash-2] rc=0 wall=2.0s
+>>> [RC-flash-3] 19:32:24
+[LV3-STRESS flash lv3] PASS | calls 4800 wrong 0 | preemptions 412 | recovery pulses 0 | kernel 0.11 ms 
+<<< [RC-flash-3] rc=0 wall=2.0s
+>>> [RC-gemm-1] 19:33:26
+[LV3-STRESS gemm lv3] PASS | calls 2400 wrong 0 | preemptions 2146 | recovery pulses 0 | kernel 1.28 ms 
+<<< [RC-gemm-1] rc=0 wall=6.1s
+>>> [RC-gemm-2] 19:34:33
+[LV3-STRESS gemm lv3] PASS | calls 2400 wrong 0 | preemptions 2141 | recovery pulses 0 | kernel 1.28 ms 
+<<< [RC-gemm-2] rc=0 wall=6.1s
+>>> [RC-rp255-1] 19:35:39
+[REGPRESS255 lv3 nacc=250 ctas/sm=2] PASS | calls 600 wrong 0 | preemptions 300 | kernel 0.75 ms 
+<<< [RC-rp255-1] rc=0 wall=2.0s
+>>> [RC-rp255-2] 19:36:41
+[REGPRESS255 lv3 nacc=250 ctas/sm=2] PASS | calls 600 wrong 0 | preemptions 300 | kernel 0.75 ms 
+<<< [RC-rp255-2] rc=0 wall=2.0s
+>>> [RC-mq-1] 19:37:43
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [886, 890, 880, 893] | recovery pulses 43 | wall 0.89s 
+<<< [RC-mq-1] rc=0 wall=5.1s
+>>> [RC-mq-2] 19:38:49
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [892, 896, 881, 894] | recovery pulses 51 | wall 0.89s 
+<<< [RC-mq-2] rc=0 wall=5.1s
+>>> [RC-mq-3] 19:39:54
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [890, 883, 872, 883] | recovery pulses 63 | wall 0.88s 
+<<< [RC-mq-3] rc=0 wall=5.1s
+>>> [RC-S8-1] 19:40:59
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.52/10.16ms TPOT p50/p99=6.37/10.06ms hp_exact=20/20 lp_iters=161 bad=0 recov=1 lp_tput=72.1% hp_duty=23%
+<<< [RC-S8-1] rc=0 wall=15.3s
+>>> [RC-S8-2] 19:42:15
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.59/9.14ms TPOT p50/p99=6.44/8.97ms hp_exact=20/20 lp_iters=160 bad=0 recov=0 lp_tput=71.6% hp_duty=23%
+<<< [RC-S8-2] rc=0 wall=15.3s
+>>> [RC-S8-3] 19:43:30
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.35/10.50ms TPOT p50/p99=6.25/7.96ms hp_exact=20/20 lp_iters=162 bad=0 recov=0 lp_tput=72.5% hp_duty=23%
+<<< [RC-S8-3] rc=0 wall=15.3s
+>>> [DF-S8-1] 19:44:46
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.84/8.14ms TPOT p50/p99=6.64/8.66ms hp_exact=20/20 lp_iters=160 bad=0 recov=0 lp_tput=71.6% hp_duty=24%
+<<< [DF-S8-1] rc=0 wall=15.3s
+>>> [DF-S8-2] 19:46:01
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.39/10.74ms TPOT p50/p99=6.30/8.12ms hp_exact=20/20 lp_iters=161 bad=0 recov=0 lp_tput=72.1% hp_duty=23%
+<<< [DF-S8-2] rc=0 wall=15.3s
+>>> [DF-S8-3] 19:47:17
+[SERVE mode=lv3 policy=slo lp=prefill] PASS TTFT p50/p99=7.44/10.67ms TPOT p50/p99=6.25/7.95ms hp_exact=20/20 lp_iters=161 bad=0 recov=0 lp_tput=72.1% hp_duty=23%
+<<< [DF-S8-3] rc=0 wall=15.3s
+
+## OBS-20 / T-29 (RTX 5060, background GEMM load, no XSched pulses)
+event-bridge golden pattern: native 18/25, shim 22/25 non-deterministic (gold all zero); with a synchronize after the clone 0/20 (unfixed 20/20)
+S7 cumsum_64m native golden under load: old 9/10 non-deterministic, fixed 0/10; fixed event-bridge test under load 0/10 failures
+
+## DEF-42 (RTX 5060): LP process deadlocked at exit - main thread: Py_Exit -> ~SchedAgent -> GlobalScheduler::Stop (join); worker: Resume -> Reactivate -> CudaQueueLv1::Synchronize -> CUDA_ASSERT -> exit() blocked on __exit_lock
+## Co-runner (allow) Xid: Xid 109 CTX SWITCH TIMEOUT once (21:11:46), TTFT P99 4312 ms in that run
