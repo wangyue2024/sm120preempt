@@ -1,0 +1,35 @@
+# Round 3 final regressions (code of commit a8db3e8 + hazard-test SKIP fix)
+## RTX 5080 full regression (Level-3 pulses active)
+| suite | pass / total | failing tests |
+|---|---:|---|
+| SYN | 23/23 | - |
+| S1 | 45/45 | - |
+| S4 | 6/6 | - |
+| S5 | 8/8 | - |
+| S6 | 9/9 | - |
+| S7 | 145/145 | - |
+| S8 | 16/16 | - |
+| S9 | 8/8 | - |
+| ACC | 28/28 | - |
+| **all** | **288/288** | |
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 1500 | wrong queues [] | preemptions [208, 211, 205, 206] | recovery pulses 0 | wall 0.43s | checkpoints 12 valid True | native deterministic True
+[LV3-PEERS-GLB exclusive=1] PASS | LP rounds [137, 137] bad [0, 0] pulses [731, 670] | HP requests 1776 bad 0 P50/P99 0.33/1.47 ms | withheld warnings 8 | new Xid 0
+[LV3-DRIVER-KERNELS lv3 ops=memset,copy] PASS | iters 60 x 256 MiB memset+copy | wrong bytes memset 0 copy 0 | suspensions 1313 pulses 1188 | wall 3.08s | native ok True
+[AUTO-LEGACY] PASS | proxy xqueue yes | steps 60 wrong 0 | suspensions 423 | commands legacy 0 unmanaged 0 xqueue 2344
+[EVENT-BRIDGE lv3 mode=2] PASS | iters 10 corrupted 1 | work 10.0 ms | wait_event caller blocked p50 10965 us max 11398 us | native deterministic True 
+Xid during the run: none. The host was rebooted 31 min after the run by unattended-upgrades (nvidia-container-toolkit upgrade; driver unchanged 580.95.05); post-reboot smoke 3/3 PASS, Xid 0.
+
+## RTX 5060 full regression (desktop GPU: pulses withheld by DEF-40, Level-3 entries run with Level-1 semantics)
+| suite | pass / total | failing tests |
+|---|---:|---|
+| SYN | 22/23 | `SYN-event-bridge-hazard`(rc=1) |
+| S1 | 45/45 | - |
+| S4 | 6/6 | - |
+| S5 | 8/8 | - |
+| S6 | 9/9 | - |
+| S7 | 145/145 | - |
+| S8 | 16/16 | - |
+| S9 | 8/8 | - |
+| ACC | 28/28 | - |
+| **all** | **287/288** | |
+SYN-event-bridge-hazard needs real evictions to demonstrate the hazard; it now reports SKIP when no pulse fired (rerun: SKIP, rc 0). On the RTX 5080 it demonstrates the corruption (PASS).

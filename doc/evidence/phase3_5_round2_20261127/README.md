@@ -15,3 +15,4 @@ All files are sanitized (host names, user names, other users' processes and priv
 | `regress_5060_round2.txt` | RTX 5060 full regressions of the round (per build), reruns of the display-GPU failures, OBS-20 data |
 | `regress_5080_final.txt` | RTX 5080 final validation + full regression (297/297, no Xid) |
 | `round3_evidence.txt` | Round 3: injected pulses (OBS-21), DEF-40 synchronous check, DEF-41 peer rotation, corrected multi-queue test (T-30), OBS-23 characterization and starvation guard, co-running foreign context experiments, OBS-20 / T-29 reproduction, DEF-42 deadlock stacks |
+| `regress_round3.txt` | Round 3 final regressions: RTX 5080 288/288 (pulses active), RTX 5060 287/288 (pulses withheld on the desktop GPU; hazard demo reports SKIP) |
