@@ -1,0 +1,74 @@
+# DEF-38 baseline (before the pulse gate), RTX 5080, test_multiqueue_lv3_p35.py
+## first observation (3 x q=4 steps 600, then other tests)
+>>> [MQ4-1] 10:30:16
+<<< [MQ4-1] rc=124 wall=904.1s
+>>> [MQ4-2] 10:45:20
+[MULTIQ-LV3 q=4 ctx_restore_wait=1] PASS | steps 600 | wrong queues [] | preemptions [191, 190, 187, 185] | wall 0.18s | native deterministic True
+<<< [MQ4-2] rc=0 wall=1.6s
+>>> [MQ4-3] 10:45:22
+[MULTIQ-LV3 q=4 ctx_restore_wait=1] PASS | steps 600 | wrong queues [] | preemptions [192, 192, 187, 186] | wall 0.18s | native deterministic True
+<<< [MQ4-3] rc=0 wall=1.6s
+>>> [MQ3] 10:45:24
+[MULTIQ-LV3 q=3 ctx_restore_wait=1] PASS | steps 600 | wrong queues [] | preemptions [59, 65, 59] | wall 0.12s | native deterministic True
+<<< [MQ3] rc=0 wall=1.5s
+>>> [AL-ref] 10:45:25
+[AUTO-LEGACY ref] written
+<<< [AL-ref] rc=0 wall=1.8s
+>>> [AL-lv3] 10:45:27
+[AUTO-LEGACY] PASS | proxy xqueue yes | steps 60 wrong 0 | suspensions 425 | commands legacy 0 unmanaged 0 xqueue 2344
+<<< [AL-lv3] rc=0 wall=2.0s
+>>> [RP255] 10:45:29
+[REGPRESS255 lv3 nacc=250 ctas/sm=2] PASS | calls 600 wrong 0 | preemptions 242 | kernel 0.75 ms | native deterministic True
+<<< [RP255] rc=0 wall=2.0s
+>>> [FLASH] 10:45:31
+[LV3-STRESS flash lv3] PASS | calls 4800 wrong 0 | preemptions 413 | kernel 0.11 ms | native deterministic True
+<<< [FLASH] rc=0 wall=1.7s
+## hang rate: q=4 / q=2, steps 3000, gap 600 us, hold 150 us, 60 s timeout (rc=124 = hung)
+<<< [BASE-q4-1] rc=124 wall=64.1s
+[MULTIQ-LV3 q=4 ctx_restore_wait=1] PASS | steps 3000 | wrong queues [] | preemptions [935, 926, 917, 932] | wall 0.90s | native deterministic True
+<<< [BASE-q4-2] rc=0 wall=4.1s
+<<< [BASE-q4-3] rc=124 wall=64.1s
+<<< [BASE-q4-4] rc=124 wall=64.1s
+[MULTIQ-LV3 q=4 ctx_restore_wait=1] PASS | steps 3000 | wrong queues [] | preemptions [926, 920, 911, 926] | wall 0.90s | native deterministic True
+<<< [BASE-q4-5] rc=0 wall=4.1s
+<<< [BASE-q4-6] rc=124 wall=64.1s
+<<< [BASE-q4-7] rc=124 wall=64.1s
+[MULTIQ-LV3 q=4 ctx_restore_wait=1] PASS | steps 3000 | wrong queues [] | preemptions [922, 917, 908, 924] | wall 0.90s | native deterministic True
+<<< [BASE-q4-8] rc=0 wall=4.1s
+[MULTIQ-LV3 q=2 ctx_restore_wait=1] PASS | steps 3000 | wrong queues [] | preemptions [530, 533] | wall 0.50s | native deterministic True
+<<< [BASE-q2-1] rc=0 wall=2.6s
+[MULTIQ-LV3 q=2 ctx_restore_wait=1] PASS | steps 3000 | wrong queues [] | preemptions [530, 535] | wall 0.50s | native deterministic True
+<<< [BASE-q2-2] rc=0 wall=2.6s
+[MULTIQ-LV3 q=2 ctx_restore_wait=1] PASS | steps 3000 | wrong queues [] | preemptions [531, 534] | wall 0.50s | native deterministic True
+<<< [BASE-q2-3] rc=0 wall=2.6s
+[MULTIQ-LV3 q=2 ctx_restore_wait=1] PASS | steps 3000 | wrong queues [] | preemptions [534, 537] | wall 0.50s | native deterministic True
+<<< [BASE-q2-4] rc=0 wall=2.6s
+[MULTIQ-LV3 q=2 ctx_restore_wait=1] PASS | steps 3000 | wrong queues [] | preemptions [531, 534] | wall 0.50s | native deterministic True
+<<< [BASE-q2-5] rc=0 wall=2.6s
+[MULTIQ-LV3 q=2 ctx_restore_wait=1] PASS | steps 3000 | wrong queues [] | preemptions [531, 534] | wall 0.50s | native deterministic True
+<<< [BASE-q2-6] rc=0 wall=2.6s
+[MULTIQ-LV3 q=2 ctx_restore_wait=1] PASS | steps 3000 | wrong queues [] | preemptions [536, 538] | wall 0.51s | native deterministic True
+<<< [BASE-q2-7] rc=0 wall=2.6s
+[MULTIQ-LV3 q=2 ctx_restore_wait=1] PASS | steps 3000 | wrong queues [] | preemptions [533, 536] | wall 0.50s | native deterministic True
+<<< [BASE-q2-8] rc=0 wall=2.6s
+## q=3 (another user's job started during BASE-q3-1: Xid 109 CTX SWITCH TIMEOUT on our context, error 719)
+[GUARD] GPU busy (other users' processes: <redacted>), waiting...
+[GUARD] GPU busy (other users' processes: <redacted>), waiting...
+[GUARD] GPU busy (other users' processes: <redacted>), waiting...
+[GUARD] GPU busy (other users' processes: <redacted>), waiting...
+<<< [CEPROBE] rc=127 wall=0.0s
+[XSCHED ERRO @ T 2409537 @ 13:13:59.160345] cuda error 719: unspecified launch failure @ ~/workspace/sm120preempt/xsched/platforms/cuda/hal/src/level1/cuda_queue.cpp:52
+[XSCHED ERRO @ T 2409544 @ 13:13:59.160351] cuda error 719: unspecified launch failure @ ~/workspace/sm120preempt/xsched/platforms/cuda/hal/src/level3/cuda_queue.cpp:195
+[XSCHED ERRO @ T 2409538 @ 13:13:59.160353] cuda error 719: unspecified launch failure @ ~/workspace/sm120preempt/xsched/platforms/cuda/hal/src/level1/cuda_queue.cpp:52
+[XSCHED ERRO @ T 2409542 @ 13:13:59.160355] cuda error 719: unspecified launch failure @ ~/workspace/sm120preempt/xsched/platforms/cuda/hal/src/level1/cuda_queue.cpp:52
+<<< [BASE-q3-1] rc=139 wall=8.2s
+[GUARD] GPU busy (other users' processes: <redacted>), waiting...
+[GUARD] GPU busy (other users' processes: <redacted>), waiting...
+[GUARD] GPU busy (other users' processes: <redacted>), waiting...
+[MULTIQ-LV3 q=3 ctx_restore_wait=1] PASS | steps 3000 | wrong queues [] | preemptions [708, 708, 697] | wall 0.68s | native deterministic True
+<<< [BASE-q3-2] rc=0 wall=3.4s
+[MULTIQ-LV3 q=3 ctx_restore_wait=1] PASS | steps 3000 | wrong queues [] | preemptions [709, 712, 700] | wall 0.68s | native deterministic True
+<<< [BASE-q3-3] rc=0 wall=3.4s
+[MULTIQ-LV3 q=3 ctx_restore_wait=1] PASS | steps 3000 | wrong queues [] | preemptions [715, 714, 704] | wall 0.68s | native deterministic True
+<<< [BASE-q3-4] rc=0 wall=3.4s
+[MULTIQ-LV3 q=3 ctx_restore_wait=1] PASS | steps 3000 | wrong queues [] | preemptions [709, 711, 702] | wall 0.68s | native deterministic True

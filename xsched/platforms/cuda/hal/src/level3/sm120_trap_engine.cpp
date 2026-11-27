@@ -12,6 +12,17 @@
 #include <vector>
 
 #include <cuxtra/cuxtra.h>
+#include <dlfcn.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <sys/file.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <cerrno>
+#include <cstdio>
+#include <set>
+#include <tuple>
+#include <string>
 
 #include "xsched/cuda/hal/common/cuda_assert.h"
 #include "xsched/cuda/hal/common/driver.h"
@@ -182,8 +193,10 @@ std::vector<Ins> BuildRegCascadeCave(bool is_save, uint64_t cave_va, uint64_t re
     const int br_too_low = static_cast<int>(c.size());
     c.push_back(nop());
 
-    // Handle R253 explicitly only when SR_REGALLOC >= 256 (r_top >= 253),
-    // avoiding trap-reserved R253 if hardware ever reports SR_REGALLOC == 255.
+    // R253 (32-bit) when SR_REGALLOC >= 254 (r_top >= 253).
+    // DEF-20b (closed, Phase 3.5): R254 is not saved. It is unreachable: ptxas for sm_120 never
+    // allocates R253 / R254, even when it reports 255 registers -- the highest register in all 272
+    // PyTorch flash-attention kernels (reported 255) and in a synthetic 255-register kernel is R252.
     c.push_back(isetp_ge_u32_imm(4, 253));
     if (is_save) {
         c.push_back(st_e_32(6, 0x434, 253, kP0));
@@ -525,16 +538,38 @@ Cave8Layout BuildSmemHwFrameCave(uint64_t cave_va,
 
 } // namespace
 
+static std::mutex &EngineMapMutex()
+{
+    static auto *m = new std::mutex();
+    return *m;
+}
+
+static std::map<CUcontext, std::shared_ptr<Sm120TrapEngine>> &EngineMap()
+{
+    static auto *m = new std::map<CUcontext, std::shared_ptr<Sm120TrapEngine>>();
+    return *m;
+}
+
+void Sm120TrapEngine::DumpAll(const char *why)
+{
+    std::vector<std::shared_ptr<Sm120TrapEngine>> engines;
+    {
+        std::lock_guard<std::mutex> lock(EngineMapMutex());
+        for (auto &kv : EngineMap()) engines.push_back(kv.second);
+    }
+    for (auto &e : engines) e->DumpStreams(why);
+}
+
 std::shared_ptr<Sm120TrapEngine> Sm120TrapEngine::Instance(CUcontext ctx)
 {
-    static std::mutex s_mtx;
+    std::mutex &s_mtx = EngineMapMutex();
     // DEF-33: intentionally leaked. Engines used to be destroyed by static destruction at process
     // exit, where ~Sm120TrapEngine wrote the original trap handler back into ToolsMemory
     // (cuXtraMemcpyHtoD) - after exit handlers of the CUDA runtime / libraries (e.g. cuFFT) may
     // already have torn the context down: heap corruption inside libcuda (RTX 5080, LIB-12,
     // "malloc(): invalid size", 5-8 of 8 runs). The trap handler lives in the context's own
     // ToolsMemory, so restoring it at exit is unnecessary; the driver reclaims it with the context.
-    static auto *s_map = new std::map<CUcontext, std::shared_ptr<Sm120TrapEngine>>();
+    auto *s_map = &EngineMap();
     std::lock_guard<std::mutex> lock(s_mtx);
     auto it = s_map->find(ctx);
     if (it != s_map->end()) return it->second;
@@ -1239,6 +1274,546 @@ struct ScopedCudaCtx
 
 } // namespace
 
+// ---------------------------------------------------------------------------------------------
+// DEF-40 (Phase 3.5): foreign-tenant guard.
+// The BAR0 pulse traps the warps of whatever context is resident on the GPU at that instant. A
+// context without the XSched trap handler (another user's job, the desktop, any process outside
+// XSched) has no handler to return through: its work dies (RTX 5080: a native GEMM process was
+// killed with CUDA error 719 / Xid 109 within seconds in 2 of 2 runs; RTX 5060: desktop Xid 31 at
+// address 0, Xid 109, once a frozen desktop). Every XSched process on sm_120 therefore installs the
+// handler for its contexts (a pulse then returns through the unmanaged-kernel no-op path) and
+// registers itself in /dev/shm/xsched-sm120/<pci>.<pid>.<starttime>; a poller lists the processes
+// on the GPU through NVML every XSCHED_SM120_FOREIGN_POLL_MS (100) ms and pulses are withheld while
+// an unregistered one is present (XSCHED_SM120_FOREIGN_CTX=block, default; =allow opts out).
+namespace
+{
+struct NvmlProcInfo { unsigned int pid; unsigned long long mem; unsigned int gi; unsigned int ci; };
+using NvmlDev = void *;
+
+struct Nvml
+{
+    bool ok = false;
+    int (*by_bus)(const char *, NvmlDev *) = nullptr;
+    int (*compute)(NvmlDev, unsigned int *, NvmlProcInfo *) = nullptr;
+    int (*graphics)(NvmlDev, unsigned int *, NvmlProcInfo *) = nullptr;
+
+    static Nvml &Get()
+    {
+        static Nvml *n = [] {
+            auto *x = new Nvml();
+            void *h = dlopen("libnvidia-ml.so.1", RTLD_NOW | RTLD_LOCAL);
+            if (h == nullptr) return x;
+            auto init = reinterpret_cast<int (*)()>(dlsym(h, "nvmlInit_v2"));
+            x->by_bus = reinterpret_cast<int (*)(const char *, NvmlDev *)>(dlsym(h, "nvmlDeviceGetHandleByPciBusId_v2"));
+            x->compute = reinterpret_cast<int (*)(NvmlDev, unsigned int *, NvmlProcInfo *)>(
+                dlsym(h, "nvmlDeviceGetComputeRunningProcesses_v3"));
+            x->graphics = reinterpret_cast<int (*)(NvmlDev, unsigned int *, NvmlProcInfo *)>(
+                dlsym(h, "nvmlDeviceGetGraphicsRunningProcesses_v3"));
+            x->ok = init && x->by_bus && x->compute && x->graphics && init() == 0;
+            return x;
+        }();
+        return *n;
+    }
+};
+
+constexpr const char *kTenantDir = "/dev/shm/xsched-sm120";
+
+std::string ProcStartTime(int pid)
+{
+    char path[64];
+    snprintf(path, sizeof(path), "/proc/%d/stat", pid);
+    FILE *f = fopen(path, "r");
+    if (f == nullptr) return "";
+    char buf[1024];
+    const size_t n = fread(buf, 1, sizeof(buf) - 1, f);
+    fclose(f);
+    buf[n] = '\0';
+    const char *p = strrchr(buf, ')');            // comm may contain spaces
+    if (p == nullptr) return "";
+    // fields after ')': 3 state ... 22 starttime
+    int field = 2;
+    for (const char *q = p + 1; *q; ++q) {
+        if (*q == ' ') {
+            ++field;
+            if (field == 22) {
+                const char *e = q + 1;
+                while (*e && *e != ' ') ++e;
+                return std::string(q + 1, e);
+            }
+        }
+    }
+    return "";
+}
+
+std::string ProcComm(int pid)
+{
+    char path[64];
+    snprintf(path, sizeof(path), "/proc/%d/comm", pid);
+    FILE *f = fopen(path, "r");
+    if (f == nullptr) return "?";
+    char buf[64] = {};
+    if (fgets(buf, sizeof(buf), f) == nullptr) buf[0] = '\0';
+    fclose(f);
+    buf[strcspn(buf, "\n")] = '\0';
+    return buf;
+}
+
+std::string TenantFile(const std::string &bus, int pid, const std::string &start)
+{
+    return std::string(kTenantDir) + "/" + bus + "." + std::to_string(pid) + "." + start;
+}
+
+class TenantGuard
+{
+public:
+    static TenantGuard &Instance()
+    {
+        static auto *g = new TenantGuard();   // leaked (DEF-33)
+        return *g;
+    }
+
+    static bool ForeignAllowed()
+    {
+        static const bool allow = [] {
+            const char *v = getenv("XSCHED_SM120_FOREIGN_CTX");
+            return v != nullptr && strcasecmp(v, "allow") == 0;
+        }();
+        return allow;
+    }
+
+    /// The poller runs unless both checks (foreign contexts, Level-3 peers) are switched off.
+    static bool Enabled() { return !(ForeignAllowed() && PeersAllowed()); }
+
+    /// Register this process as a tenant of `dev` (its handler is installed) and start the poller.
+    void Attach(CUdevice dev)
+    {
+        char bus[32] = {};
+        if (Driver::DeviceGetPCIBusId(bus, sizeof(bus), dev) != CUDA_SUCCESS) return;
+        std::lock_guard<std::mutex> lk(mu_);
+        auto &d = devs_[dev];
+        if (!d.bus.empty()) return;
+        d.bus = bus;
+        for (auto &c : d.bus) c = static_cast<char>(tolower(c));
+        int timeout = 0;
+        Driver::DeviceGetAttribute(&timeout, CU_DEVICE_ATTRIBUTE_KERNEL_EXEC_TIMEOUT, dev);
+        d.display = timeout != 0;
+        mkdir(kTenantDir, 01777);
+        chmod(kTenantDir, 01777);
+        const std::string f = TenantFile(d.bus, getpid(), ProcStartTime(getpid()));
+        const int fd = open(f.c_str(), O_CREAT | O_WRONLY | O_CLOEXEC, 0644);
+        if (fd >= 0) close(fd);
+        own_files_.push_back(f);
+        static bool hooked = false;
+        if (!hooked) {
+            hooked = true;
+            atexit([] { for (auto &f : TenantGuard::Instance().own_files_) unlink(f.c_str()); });
+        }
+        if (!Enabled()) return;
+        Nvml &n = Nvml::Get();
+        if (n.ok) n.by_bus(d.bus.c_str(), &d.nvml);
+        if (!poller_) {
+            poller_ = true;
+            int64_t ms = 100;
+            GetEnvInt64("XSCHED_SM120_FOREIGN_POLL_MS", ms);
+            std::thread([this, ms] {
+                while (true) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(std::max<int64_t>(ms, 10)));
+                    PollAll();
+                }
+            }).detach();
+        }
+    }
+
+    /// Mark this process as running Level-2/3 queues on `dev` (a "Level-3 peer" for the others).
+    void MarkLv3(CUdevice dev)
+    {
+        std::lock_guard<std::mutex> lk(mu_);
+        auto it = devs_.find(dev);
+        if (it == devs_.end() || it->second.marked_lv3) return;
+        it->second.marked_lv3 = true;
+        it->second.state = 0;        // the peer rule applies from now on: re-poll before the next pulse
+        const std::string f = TenantFile(it->second.bus, getpid(), ProcStartTime(getpid())) + ".lv3";
+        const int fd = open(f.c_str(), O_CREAT | O_WRONLY | O_CLOEXEC, 0644);
+        if (fd >= 0) close(fd);
+        own_files_.push_back(f);
+    }
+
+    static bool PeersAllowed()
+    {
+        static const bool allow = [] {
+            const char *v = getenv("XSCHED_SM120_LV3_PEERS");
+            return v != nullptr && strcasecmp(v, "allow") == 0;
+        }();
+        return allow;
+    }
+
+    /// False while a process that is not a registered XSched tenant has a context on `dev`, or (unless
+    /// XSCHED_SM120_LV3_PEERS=allow) another process with Level-2/3 queues does.
+    bool PulseAllowed(CUdevice dev)
+    {
+        if (!Enabled()) return true;
+        std::unique_lock<std::mutex> lk(mu_);
+        auto it = devs_.find(dev);
+        if (it == devs_.end()) return true;           // not attached (should not happen)
+        Dev &d = it->second;
+        if (d.state == 0) { lk.unlock(); PollAll(); lk.lock(); }
+        return d.state == 1;
+    }
+
+private:
+    struct Dev
+    {
+        std::string bus;
+        NvmlDev nvml = nullptr;
+        bool display = false;
+        int state = 0;             // 0 unknown, 1 only XSched tenants, 2 foreign present / Level-3 peer
+        std::string last_desc;
+        int logs = 0;
+        bool marked_lv3 = false;
+    };
+
+    void PollAll()
+    {
+        Nvml &n = Nvml::Get();
+        std::vector<std::tuple<CUdevice, std::string, NvmlDev, bool>> todo;
+        // Only a process that runs trap-managed kernels ever pulses: the peer rule and the log lines
+        // concern it alone (a Level-1 HP process must not warn about its Level-3 LP peer).
+        bool self_lv3 = false;
+        {
+            std::lock_guard<std::mutex> lk(mu_);
+            for (auto &kv : devs_) {
+                todo.emplace_back(kv.first, kv.second.bus, kv.second.nvml, kv.second.display);
+                self_lv3 = self_lv3 || kv.second.marked_lv3;
+            }
+        }
+        for (auto &[dev, bus, nvml, display] : todo) {
+            // NVML and /proc queries outside the lock: PulseAllowed() never waits for a poll.
+            std::string desc;
+            bool foreign = false;
+            if (!n.ok || nvml == nullptr) {
+                foreign = display && !ForeignAllowed(); // no process list: conservative on a display GPU
+                if (foreign) desc = "display GPU and NVML unavailable";
+            } else {
+                std::set<unsigned int> pids;
+                NvmlProcInfo info[256];
+                for (auto fn : {n.compute, n.graphics}) {
+                    unsigned int cnt = 256;
+                    if (fn(nvml, &cnt, info) == 0) {
+                        for (unsigned int i = 0; i < cnt; ++i) pids.insert(info[i].pid);
+                    } else if (!ForeignAllowed()) {
+                        foreign = true;                // too many processes or an error: block
+                        desc = "NVML process query failed";
+                    }
+                }
+                for (unsigned int pid : pids) {
+                    if (static_cast<int>(pid) == getpid()) continue;
+                    const std::string st = ProcStartTime(static_cast<int>(pid));
+                    const std::string tf = st.empty() ? "" : TenantFile(bus, static_cast<int>(pid), st);
+                    const char *why = nullptr;
+                    if (tf.empty() || access(tf.c_str(), F_OK) != 0) {
+                        if (!ForeignAllowed()) why = "";
+                    } else if (self_lv3 && !PeersAllowed() && access((tf + ".lv3").c_str(), F_OK) == 0) {
+                        // Two busy Level-3 processes are two time-sliced contexts: a context switch that
+                        // arrives while one's warps are in the trap handler times out (Xid 109, DEF-27
+                        // class; 14/14 runs with two independent Level-3 processes). The ready gate only
+                        // covers Level-1 peers that wait for the suspension.
+                        why = " (Level-3 peer)";
+                    }
+                    if (why == nullptr) continue;
+                    foreign = true;
+                    if (desc.size() < 160) desc += (desc.empty() ? "" : ", ") + std::to_string(pid) + " " +
+                                                   ProcComm(static_cast<int>(pid)) + why;
+                }
+            }
+            std::lock_guard<std::mutex> lk(mu_);
+            Dev &d = devs_[dev];
+            const int state = foreign ? 2 : 1;
+            if (state != d.state || (foreign && desc != d.last_desc)) {
+                if (d.marked_lv3 && d.logs < 40) {
+                    ++d.logs;
+                    if (foreign) {
+                        XWARN("sm120 DEF-40: GPU %s has context(s) outside XSched or other Level-3 processes (%s): "
+                              "Level-3 pulses withheld, suspension waits for running kernels "
+                              "(XSCHED_SM120_FOREIGN_CTX=allow / XSCHED_SM120_LV3_PEERS=allow to override)",
+                              d.bus.c_str(), desc.c_str());
+                    } else if (d.state == 2) {
+                        XINFO("sm120 DEF-40: GPU %s has only XSched tenants again: Level-3 pulses enabled", d.bus.c_str());
+                    }
+                }
+                d.last_desc = desc;
+            }
+            d.state = state;
+        }
+    }
+
+    std::mutex mu_;
+    std::map<CUdevice, Dev> devs_;
+    std::vector<std::string> own_files_;
+    bool poller_ = false;
+};
+/// DEF-38 across processes: one host-wide lock per GPU (flock on /dev/shm/xsched-sm120/<pci>.pulse)
+/// taken by the holder of an engine's PulseMutex around PreemptStream() / PrepareRestore(), so that
+/// two processes never interleave a cmd write with the other's pulse. Bounded wait
+/// (XSCHED_SM120_HOST_PULSE_GATE_MS, 500): a peer stuck while holding it cannot block this process.
+class HostPulseLock
+{
+public:
+    static HostPulseLock &Instance()
+    {
+        static auto *l = new HostPulseLock();   // leaked (DEF-33)
+        return *l;
+    }
+
+    static bool Enabled()
+    {
+        static const bool on = GetEnvOption("XSCHED_SM120_HOST_PULSE_GATE", true);
+        return on;
+    }
+
+    /// Returns the fd that was locked (-1: not locked).
+    int Lock(CUdevice dev)
+    {
+        if (!Enabled()) return -1;
+        const int fd = Fd(dev);
+        if (fd < 0) return -1;
+        static const int64_t limit_ms = [] { int64_t v = 500; GetEnvInt64("XSCHED_SM120_HOST_PULSE_GATE_MS", v); return v; }();
+        const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(limit_ms);
+        while (flock(fd, LOCK_EX | LOCK_NB) != 0) {
+            if (errno != EWOULDBLOCK && errno != EINTR) return -1;
+            if (std::chrono::steady_clock::now() >= deadline) {
+                static std::atomic<int> warned{0};
+                if (warned.fetch_add(1) < 10) {
+                    XWARN("sm120_trap_engine: host-wide pulse lock busy for %lld ms (another process's trap "
+                          "operation stalled?); proceeding", static_cast<long long>(limit_ms));
+                }
+                return -1;
+            }
+            std::this_thread::sleep_for(std::chrono::microseconds(20));
+        }
+        return fd;
+    }
+
+    static void Unlock(int fd)
+    {
+        if (fd >= 0) flock(fd, LOCK_UN);
+    }
+
+private:
+    int Fd(CUdevice dev)
+    {
+        std::lock_guard<std::mutex> lk(mu_);
+        auto it = fds_.find(dev);
+        if (it != fds_.end()) return it->second;
+        char bus[32] = {};
+        int fd = -1;
+        if (Driver::DeviceGetPCIBusId(bus, sizeof(bus), dev) == CUDA_SUCCESS) {
+            std::string b = bus;
+            for (auto &c : b) c = static_cast<char>(tolower(c));
+            mkdir(kTenantDir, 01777);
+            chmod(kTenantDir, 01777);
+            const std::string path = std::string(kTenantDir) + "/" + b + ".pulse";
+            fd = open(path.c_str(), O_CREAT | O_RDWR | O_CLOEXEC, 0666);
+            if (fd >= 0) fchmod(fd, 0666);    // every user's XSched processes share it (umask)
+        }
+        fds_[dev] = fd;
+        return fd;
+    }
+
+    std::mutex mu_;
+    std::map<CUdevice, int> fds_;
+};
+
+struct HostPulseGuard
+{
+    int fd = -1;
+    void Lock(CUdevice dev) { fd = HostPulseLock::Instance().Lock(dev); }
+    ~HostPulseGuard() { HostPulseLock::Unlock(fd); }
+};
+} // namespace
+
+static int64_t NowUs()
+{
+    return std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::steady_clock::now().time_since_epoch()).count();
+}
+
+// XSCHED_SM120_CTX_PULSE_GATE: 1 (default) = serialize trap operations of the context and wait for
+// other queues' Mode 5 restores before a pulse; 2 = serialize only (diagnostics); 0 = off.
+static int64_t CtxPulseGateMode()
+{
+    static const int64_t mode = [] {
+        int64_t v = 1;
+        GetEnvInt64("XSCHED_SM120_CTX_PULSE_GATE", v);
+        return v;
+    }();
+    return mode;
+}
+
+bool Sm120TrapEngine::CtxPulseGate()
+{
+    return CtxPulseGateMode() != 0;
+}
+
+void Sm120TrapEngine::RegisterStream(Sm120StreamContext *st)
+{
+    {
+        std::lock_guard<std::mutex> lk(streams_mu_);
+        streams_.push_back(st);
+    }
+    int64_t ms = 0;
+    if (GetEnvInt64("XSCHED_SM120_WATCHDOG_MS", ms) && ms > 0 && !watchdog_started_.exchange(true)) {
+        std::thread([this, ms] { WatchdogLoop(ms); }).detach();   // engines are never destroyed (DEF-33)
+    }
+}
+
+void Sm120TrapEngine::UnregisterStream(Sm120StreamContext *st)
+{
+    std::lock_guard<std::mutex> lk(streams_mu_);
+    streams_.erase(std::remove(streams_.begin(), streams_.end(), st), streams_.end());
+}
+
+void Sm120TrapEngine::WaitOtherRestoresLocked(const Sm120StreamContext *self)
+{
+    if (CtxPulseGateMode() == 2) return;
+    std::lock_guard<std::mutex> lk(streams_mu_);
+    const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(2);
+    for (Sm120StreamContext *st : streams_) {
+        if (st == self) continue;
+        while (!st->RestoreQuiescent()) {
+            if (std::chrono::steady_clock::now() >= deadline) {
+                XWARN("sm120_trap_engine: pulse gate timed out waiting for the restore of another queue "
+                      "of this context; pulsing anyway");
+                return;
+            }
+            std::this_thread::sleep_for(std::chrono::microseconds(20));
+        }
+    }
+}
+
+void Sm120TrapEngine::WatchdogLoop(int64_t stall_ms)
+{
+    bool dumped = false;
+    while (true) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        bool stalled = false;
+        {
+            std::unique_lock<std::mutex> lk(streams_mu_, std::try_to_lock);
+            if (!lk.owns_lock()) {
+                continue;   // checked again in 200 ms (a stuck holder shows up as a stalled stage)
+            }
+            const int64_t now = NowUs();
+            for (Sm120StreamContext *st : streams_) {
+                int64_t since = 0;
+                if (st->Stage(&since) != 0 && now - since > stall_ms * 1000) stalled = true;
+            }
+        }
+        if (stalled && !dumped) {
+            DumpStreams("watchdog: trap operation stalled");
+            dumped = true;
+        } else if (!stalled) {
+            dumped = false;
+        }
+    }
+}
+
+void Sm120TrapEngine::DumpStreams(const char *why)
+{
+    std::vector<Sm120StreamContext *> copy;
+    for (int i = 0; i < 50 && copy.empty(); ++i) {
+        std::unique_lock<std::mutex> lk(streams_mu_, std::try_to_lock);
+        if (lk.owns_lock()) { copy = streams_; break; }
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    }
+    XWARN("sm120_dump_streams (%s): %zu stream contexts%s", why, copy.size(),
+          copy.empty() ? " (registry busy or empty)" : "");
+    // Racy by design: a stuck thread may hold a context's mutex. Contexts are never destroyed while
+    // a queue is stuck inside one of them.
+    for (size_t i = 0; i < copy.size(); ++i) copy[i]->DiagDump(static_cast<int>(i));
+}
+
+int Sm120StreamContext::Stage(int64_t *since_us) const
+{
+    if (since_us) *since_us = stage_since_us_.load(std::memory_order_relaxed);
+    return stage_.load(std::memory_order_relaxed);
+}
+
+void Sm120StreamContext::SetStage(int stage)
+{
+    stage_since_us_.store(NowUs(), std::memory_order_relaxed);
+    stage_.store(stage, std::memory_order_relaxed);
+}
+
+void Sm120StreamContext::DiagDump(int idx) const
+{
+    int64_t since = 0;
+    const int stage = Stage(&since);
+    ScopedCudaCtx guard(ctx_);
+    const CUdeviceptr ctrl = ctrl_dev_;
+    const uint32_t cap = std::min<uint32_t>(ctrl_cta_cap_, 65536u);
+    const char *uq = "-";
+    if (last_stream_ != nullptr) {
+        const CUresult q = Driver::StreamQuery(last_stream_);
+        uq = (q == CUDA_SUCCESS) ? "idle" : (q == CUDA_ERROR_NOT_READY) ? "busy" : "error";
+    }
+    const int64_t age_ms = stage ? (NowUs() - since) / 1000 : 0;
+    if (ctrl == 0) {
+        XWARN("sm120_dump[%d]: stage=%d (%lld ms) stream=%s no control block", idx, stage,
+              static_cast<long long>(age_ms), uq);
+        return;
+    }
+    static void *pin = nullptr;
+    const size_t bytes = sizeof(Sm120ControlHeader) + static_cast<size_t>(cap) * sizeof(Sm120CtaEntry);
+    if (pin == nullptr && Driver::MemHostAlloc(&pin, sizeof(Sm120ControlHeader) + 65536u * sizeof(Sm120CtaEntry),
+                                               CU_MEMHOSTALLOC_PORTABLE) != CUDA_SUCCESS) {
+        pin = nullptr;
+    }
+    CUstream ds = nullptr;
+    bool ok = pin != nullptr && Driver::StreamCreate(&ds, CU_STREAM_NON_BLOCKING) == CUDA_SUCCESS &&
+              Driver::MemcpyDtoHAsync_v2(pin, ctrl, bytes, ds) == CUDA_SUCCESS;
+    const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(1);
+    CUresult q = CUDA_ERROR_NOT_READY;
+    while (ok && (q = Driver::StreamQuery(ds)) == CUDA_ERROR_NOT_READY &&
+           std::chrono::steady_clock::now() < deadline) {
+        std::this_thread::sleep_for(std::chrono::microseconds(100));
+    }
+    if (!ok || q != CUDA_SUCCESS) {
+        XWARN("sm120_dump[%d]: stage=%d (%lld ms) stream=%s ctrl=%#llx: header read %s", idx, stage,
+              static_cast<long long>(age_ms), uq, static_cast<unsigned long long>(ctrl),
+              ok ? "did not complete within 1 s (copy engine blocked?)" : "could not be issued");
+        return;   // the private stream is leaked on purpose: destroying it could block
+    }
+    Driver::StreamDestroy_v2(ds);
+    Sm120ControlHeader hdr{};
+    memcpy(&hdr, pin, sizeof(hdr));
+    const auto *ent = reinterpret_cast<const Sm120CtaEntry *>(static_cast<uint8_t *>(pin) + sizeof(hdr));
+    uint32_t st[8] = {}, dec4 = 0, masked = 0;
+    for (uint32_t b = 0; b < cap; ++b) {
+        st[std::min(ent[b].state, 7u)]++;
+        if (ent[b].entry_dec == 4) ++dec4;
+        if (ent[b].warp_mask != 0) ++masked;
+    }
+    XWARN("sm120_dump[%d]: stage=%d (%lld ms) stream=%s restore_pending=%d | cmd=%u evicted=%u restored=%u "
+          "drained=%u m1exit=%u inflight=%u restore_wave=%u active=%llu max_slots=%u ovf=%u | CTA states "
+          "0:%u 1:%u 2:%u 3:%u 5:%u other:%u entry_dec=4:%u warp_mask!=0:%u", idx, stage,
+          static_cast<long long>(age_ms), uq, restore_pending_.load() ? 1 : 0, hdr.cmd, hdr.evicted_slots,
+          hdr.restored_slots, hdr.drained_cnt, hdr.mode1_exit_cnt, hdr.trap_inflight, hdr.is_restore_wave,
+          static_cast<unsigned long long>(hdr.active_kernel_idx), hdr.max_slots, hdr.overflow_err,
+          st[0], st[1], st[2], st[3], st[5], st[4] + st[6] + st[7], dec4, masked);
+}
+
+bool Sm120StreamContext::RestoreQuiescent()
+{
+    if (!restore_pending_.load(std::memory_order_acquire)) return true;
+    std::unique_lock<std::mutex> lock(mu_, std::try_to_lock);
+    if (!lock.owns_lock()) return false;
+    Sm120ControlHeader hdr{};
+    if (!ReadHeaderLocked(&hdr)) return true;
+    const uint32_t target = (hdr.max_slots > 0) ? std::min(hdr.evicted_slots, hdr.max_slots) : hdr.evicted_slots;
+    const bool done = hdr.trap_inflight == 0u && (hdr.cmd != kCmdMode5Restore || hdr.restored_slots >= target);
+    if (done) restore_pending_.store(false, std::memory_order_release);
+    return done;
+}
+
 Sm120StreamContext::Sm120StreamContext(CUcontext ctx, CUdevice dev,
                                        std::shared_ptr<Sm120TrapEngine> engine)
     : ctx_(ctx), dev_(dev), engine_(std::move(engine))
@@ -1261,6 +1836,11 @@ Sm120StreamContext::Sm120StreamContext(CUcontext ctx, CUdevice dev,
         ctrl_host_ = reinterpret_cast<Sm120ControlHeader *>(hdr_pin);
     }
 
+    void *ms = nullptr;
+    if (Driver::MemHostAlloc(&ms, 8u * kGateMirrorEntries, CU_MEMHOSTALLOC_PORTABLE) == CUDA_SUCCESS && ms) {
+        mirror_stage_ = static_cast<uint32_t *>(ms);
+    }
+
     void *stage = nullptr;
     if (Driver::MemHostAlloc(&stage, kLayoutStageBytes, CU_MEMHOSTALLOC_PORTABLE) == CUDA_SUCCESS && stage) {
         memset(stage, 0, kLayoutStageBytes);
@@ -1268,10 +1848,16 @@ Sm120StreamContext::Sm120StreamContext(CUcontext ctx, CUdevice dev,
     }
 
     EnsureControlCapacity(65536);
+    if (engine_) engine_->RegisterStream(this);
+    // DEF-40: every XSched queue's context gets the trap handler (pulses from other XSched processes
+    // then return through its unmanaged-kernel path) and the process registers as a tenant.
+    static const bool tenant_handler = GetEnvOption("XSCHED_SM120_TENANT_HANDLER", true);
+    if (engine_ && tenant_handler && (engine_->IsReady() || engine_->Init())) TenantGuard::Instance().Attach(dev_);
 }
 
 Sm120StreamContext::~Sm120StreamContext()
 {
+    if (engine_) engine_->UnregisterStream(this);
     CUcontext cur = nullptr;
     if (Driver::CtxGetCurrent(&cur) == CUDA_ERROR_DEINITIALIZED) {
         return;
@@ -1307,6 +1893,10 @@ Sm120StreamContext::~Sm120StreamContext()
     if (layout_stage_ != nullptr) {
         Driver::MemFreeHost(layout_stage_);
         layout_stage_ = nullptr;
+    }
+    if (mirror_stage_ != nullptr) {
+        Driver::MemFreeHost(mirror_stage_);
+        mirror_stage_ = nullptr;
     }
 }
 
@@ -1531,6 +2121,11 @@ bool Sm120StreamContext::PrepareLaunch(CUfunction func,
     if (!EnsureControlCapacity(num_ctas)) return false;
 
     last_kernel_idx_ = kernel_idx;
+    dirty_ctas_ = std::max(dirty_ctas_, num_ctas);
+    if (!marked_lv3_) {                       // DEF-40: this process now runs trap-managed kernels
+        marked_lv3_ = true;
+        TenantGuard::Instance().MarkLv3(dev_);
+    }
     ++launch_seq_;
     if (stream != nullptr) last_stream_ = stream;
 
@@ -1656,8 +2251,24 @@ bool Sm120StreamContext::PrepareLaunch(CUfunction func,
 
 bool Sm120StreamContext::PreemptStream(Sm120PreemptMode mode)
 {
+    // DEF-38: one trap operation per context at a time, and no pulse during another queue's restore
+    // (lock order: engine pulse mutex -> engine stream registry -> stream context mutex).
+    std::unique_lock<std::mutex> pulse_lock(engine_->PulseMutex(), std::defer_lock);
+    struct StageReset { Sm120StreamContext *c; ~StageReset() { c->SetStage(0); } } stage_reset{this};
+    HostPulseGuard host_lock;   // destroyed before pulse_lock: host lock released first
+    if (Sm120TrapEngine::CtxPulseGate()) {
+        SetStage(1);
+        pulse_lock.lock();
+        host_lock.Lock(dev_);
+        SetStage(2);
+        engine_->WaitOtherRestoresLocked(this);
+    }
+    SetStage(3);
     std::lock_guard<std::mutex> lock(mu_);
     if (!engine_->IsReady() || ctrl_dev_ == 0) return false;
+    // DEF-40: no pulse while a context outside XSched is on the GPU (before any cmd write, so the
+    // suspension behaves exactly like Level 1: running kernels complete).
+    if (!TenantGuard::Instance().PulseAllowed(dev_)) return false;
     ScopedCudaCtx guard(ctx_);
 
     Sm120ControlHeader hdr{};
@@ -1694,6 +2305,7 @@ bool Sm120StreamContext::PreemptStream(Sm120PreemptMode mode)
     const bool was_restore_wave = (hdr.cmd == kCmdMode5Restore || hdr.cmd == kCmdMode1Replay);
     const uint32_t new_cmd = (mode == Sm120PreemptMode::kEarlyExit)
                            ? kCmdMode1Evict : kCmdMode5Evict;
+    control_dirty_ = true;
     ctrl_host_->cmd = new_cmd;
     ctrl_host_->evicted_slots = 0u;
     ctrl_host_->restored_slots = 0u;
@@ -1718,7 +2330,9 @@ bool Sm120StreamContext::PreemptStream(Sm120PreemptMode mode)
     // header itself only gets cmd from this function. Mirrors therefore follow exactly the header's
     // writers: cmd here, {cmd, is_restore_wave} in PrepareRestore / clear kernel / reset.
     WriteGateMirrorCmdAsync(new_cmd, ctrl_op_stream_);
+    SetStage(4);
     Driver::StreamSynchronize(ctrl_op_stream_);
+    SetStage(5);
 
     if (was_mode5_restore) {
         std::this_thread::sleep_for(std::chrono::microseconds(30));
@@ -1749,6 +2363,7 @@ bool Sm120StreamContext::PreemptStream(Sm120PreemptMode mode)
         return false;
     }
 
+    SetStage(6);
     // Progress-aware bounded confirmation: on the normal fast path StreamQuery returns
     // CUDA_SUCCESS in < 1 ms with ZERO extra DMA overhead; only sample counters via CE DMA
     // every 2 ms if the stream stays active (display/shared GPU recovery protection).
@@ -1782,6 +2397,10 @@ bool Sm120StreamContext::PreemptStream(Sm120PreemptMode mode)
                                       hdr.trap_inflight, (unsigned long long)ctrl_dev_);
                                 break;
                             }
+                            if (!TenantGuard::Instance().PulseAllowed(dev_)) {   // DEF-40
+                                last_prog_tp = std::chrono::steady_clock::now();
+                                continue;
+                            }
                             ++retries;
                             XDEBG("sm120_trap_engine: recovery pulse #%d after %lld us stall "
                                   "(ev=%u dr=%u m1=%u)",
@@ -1801,6 +2420,15 @@ bool Sm120StreamContext::PreemptStream(Sm120PreemptMode mode)
 
 uint64_t Sm120StreamContext::PrepareRestore(Sm120PreemptMode mode)
 {
+    std::unique_lock<std::mutex> pulse_lock(engine_->PulseMutex(), std::defer_lock);
+    struct StageReset { Sm120StreamContext *c; ~StageReset() { c->SetStage(0); } } stage_reset{this};
+    HostPulseGuard host_lock;
+    SetStage(10);
+    if (Sm120TrapEngine::CtxPulseGate()) {                    // DEF-38: no restore setup during a pulse
+        pulse_lock.lock();
+        host_lock.Lock(dev_);
+    }
+    SetStage(11);
     std::lock_guard<std::mutex> lock(mu_);
     if (ctrl_dev_ == 0) return 0;
     ScopedCudaCtx guard(ctx_);
@@ -1826,6 +2454,7 @@ uint64_t Sm120StreamContext::PrepareRestore(Sm120PreemptMode mode)
 
     // Update restored_slots=0 (+0x10), is_restore_wave=1 (+0x1c), then cmd=restore_cmd (+0x00)
     // atomically in GPU VRAM via high-priority Copy Engine stream.
+    control_dirty_ = true;
     ctrl_host_->restored_slots = 0u;
     ctrl_host_->is_restore_wave = 1u;
     ctrl_host_->cmd = restore_cmd;
@@ -1836,19 +2465,63 @@ uint64_t Sm120StreamContext::PrepareRestore(Sm120PreemptMode mode)
     Driver::MemcpyHtoDAsync_v2(ctrl_dev_ + offsetof(Sm120ControlHeader, cmd),
                                &ctrl_host_->cmd, sizeof(uint32_t), ctrl_op_stream_);
     WriteGateMirrorAsync(restore_cmd, 1u, ctrl_op_stream_);   // before the restore-wave relaunch
+    if (mode == Sm120PreemptMode::kTrapFrame) restore_pending_.store(true, std::memory_order_release);
+    SetStage(12);
     Driver::StreamSynchronize(ctrl_op_stream_);
     return idx;
+}
+
+static bool CeControl()
+{
+    static const bool on = GetEnvOption("XSCHED_SM120_CE_CONTROL", true);
+    return on;
+}
+
+// DEF-39: a pinned zero page for copy-engine clears (host-to-device copies never need an SM).
+static constexpr size_t kZeroPinnedBytes = 1u << 20;
+static const void *ZeroPinned()
+{
+    static const void *z = [] {
+        void *p = nullptr;
+        if (Driver::MemHostAlloc(&p, kZeroPinnedBytes, CU_MEMHOSTALLOC_PORTABLE) != CUDA_SUCCESS) return
+            static_cast<void *>(nullptr);
+        memset(p, 0, kZeroPinnedBytes);
+        return p;
+    }();
+    return z;
+}
+
+bool Sm120StreamContext::CopyMirrorAsync(uint32_t cmd, uint32_t is_restore_wave, bool both_words, CUstream stream)
+{
+    // Caller holds mu_ and synchronizes `stream` before the stage is written again.
+    if (!CeControl() || mirror_stage_ == nullptr || ctrl_dev_ == 0) return false;
+    for (uint32_t i = 0; i < kGateMirrorEntries; ++i) {
+        mirror_stage_[2 * i] = cmd;
+        mirror_stage_[2 * i + 1] = is_restore_wave;
+    }
+    CUDA_MEMCPY2D c = {};
+    c.srcMemoryType = CU_MEMORYTYPE_HOST;
+    c.srcHost = mirror_stage_;
+    c.srcPitch = 8;
+    c.dstMemoryType = CU_MEMORYTYPE_DEVICE;
+    c.dstDevice = ctrl_dev_ - kGateMirrorBytes;
+    c.dstPitch = kGateMirrorStride;
+    c.WidthInBytes = both_words ? 8 : 4;
+    c.Height = kGateMirrorEntries;
+    return Driver::Memcpy2DAsync_v2(&c, stream) == CUDA_SUCCESS;
 }
 
 void Sm120StreamContext::WriteGateMirrorCmdAsync(uint32_t cmd, CUstream stream)
 {
     if (ctrl_dev_ == 0) return;
+    if (CopyMirrorAsync(cmd, 0u, false, stream)) return;
     Driver::MemsetD2D32Async(ctrl_dev_ - kGateMirrorBytes, kGateMirrorStride, cmd, 1, kGateMirrorEntries, stream);
 }
 
 void Sm120StreamContext::WriteGateMirrorAsync(uint32_t cmd, uint32_t is_restore_wave, CUstream stream)
 {
     if (ctrl_dev_ == 0) return;
+    if (CopyMirrorAsync(cmd, is_restore_wave, true, stream)) return;
     const CUdeviceptr base = ctrl_dev_ - kGateMirrorBytes;
     // Strided 32-bit memsets: word 0 (cmd) and word 1 (is_restore_wave) of every 128 B mirror line.
     Driver::MemsetD2D32Async(base, kGateMirrorStride, cmd, 1, kGateMirrorEntries, stream);
@@ -1884,16 +2557,46 @@ void Sm120StreamContext::ResetControlSync()
     if (ctrl_dev_ == 0 || ctrl_op_stream_ == nullptr) return;
     ScopedCudaCtx guard(ctx_);
 
-    Driver::MemsetD8Async(ctrl_dev_ - kGateMirrorBytes, 0, kGateMirrorBytes, ctrl_op_stream_);
-    Driver::MemsetD8Async(ctrl_dev_, 0, 32, ctrl_op_stream_);
-    Driver::MemsetD8Async(ctrl_dev_ + offsetof(Sm120ControlHeader, overflow_err), 0, 8, ctrl_op_stream_);
-    const size_t entries_bytes = static_cast<size_t>(ctrl_cta_cap_) * sizeof(Sm120CtaEntry);
-    if (entries_bytes > 0) {
-        Driver::MemsetD8Async(ctrl_dev_ + sizeof(Sm120ControlHeader), 0, entries_bytes, ctrl_op_stream_);
+    const void *zero = CeControl() ? ZeroPinned() : nullptr;
+    if (zero != nullptr && mirror_stage_ != nullptr && ctrl_host_ != nullptr) {
+        // DEF-39: nothing to reset if no pulse / restore touched the control block since the last
+        // reset (the Guardian and the trap handler write it only when cmd != 0).
+        if (!control_dirty_) {
+            restore_pending_.store(false, std::memory_order_release);
+            return;
+        }
+        // Copy-engine only: mirror words 0..1 (the only mirror bytes ever written), header run state,
+        // overflow_err, the CTA entries launched since the last reset, and max_ctas.
+        CopyMirrorAsync(0u, 0u, true, ctrl_op_stream_);
+        Driver::MemcpyHtoDAsync_v2(ctrl_dev_, zero, 32, ctrl_op_stream_);
+        Driver::MemcpyHtoDAsync_v2(ctrl_dev_ + offsetof(Sm120ControlHeader, overflow_err), zero, 8, ctrl_op_stream_);
+        size_t left = static_cast<size_t>(std::min(dirty_ctas_, ctrl_cta_cap_)) * sizeof(Sm120CtaEntry);
+        for (size_t off = 0; left > 0;) {
+            const size_t n = std::min(left, kZeroPinnedBytes);
+            Driver::MemcpyHtoDAsync_v2(ctrl_dev_ + sizeof(Sm120ControlHeader) + off, zero, n, ctrl_op_stream_);
+            off += n;
+            left -= n;
+        }
+        ctrl_host_->max_ctas = ctrl_cta_cap_;
+        Driver::MemcpyHtoDAsync_v2(ctrl_dev_ + offsetof(Sm120ControlHeader, max_ctas), &ctrl_host_->max_ctas,
+                                   sizeof(uint32_t), ctrl_op_stream_);
+    } else {
+        Driver::MemsetD8Async(ctrl_dev_ - kGateMirrorBytes, 0, kGateMirrorBytes, ctrl_op_stream_);
+        Driver::MemsetD8Async(ctrl_dev_, 0, 32, ctrl_op_stream_);
+        Driver::MemsetD8Async(ctrl_dev_ + offsetof(Sm120ControlHeader, overflow_err), 0, 8, ctrl_op_stream_);
+        const size_t entries_bytes = static_cast<size_t>(ctrl_cta_cap_) * sizeof(Sm120CtaEntry);
+        if (entries_bytes > 0) {
+            Driver::MemsetD8Async(ctrl_dev_ + sizeof(Sm120ControlHeader), 0, entries_bytes, ctrl_op_stream_);
+        }
+        Driver::MemsetD32Async(ctrl_dev_ + offsetof(Sm120ControlHeader, max_ctas),
+                               ctrl_cta_cap_, 1, ctrl_op_stream_);
     }
-    Driver::MemsetD32Async(ctrl_dev_ + offsetof(Sm120ControlHeader, max_ctas),
-                           ctrl_cta_cap_, 1, ctrl_op_stream_);
+    control_dirty_ = false;
+    dirty_ctas_ = 0;
+    SetStage(20);
     Driver::StreamSynchronize(ctrl_op_stream_);
+    SetStage(0);
+    restore_pending_.store(false, std::memory_order_release);
 }
 
 Sm120StreamTelemetry Sm120StreamContext::Telemetry() const
@@ -1908,6 +2611,7 @@ Sm120StreamTelemetry Sm120StreamContext::Telemetry() const
     t.drained_cnt       = hdr.drained_cnt;
     t.mode1_exit_cnt    = hdr.mode1_exit_cnt;
     t.overflow_err      = hdr.overflow_err;
+    t.trap_inflight     = hdr.trap_inflight;
     t.is_restore_wave   = hdr.is_restore_wave;
     t.active_kernel_idx = hdr.active_kernel_idx;
     t.arena_bytes       = arena_bytes_;
@@ -2017,3 +2721,10 @@ bool Sm120StreamContext::ReadCtaEntries(std::vector<Sm120CtaEntry> &out, uint32_
 }
 
 } // namespace xsched::cuda::sm120
+
+/// Diagnostics: dump all SM120 Level-3 stream contexts of every context (see DumpStreams). Safe to
+/// call from a thread without a current CUDA context.
+extern "C" __attribute__((visibility("default"))) void XSm120DumpStreams()
+{
+    xsched::cuda::sm120::Sm120TrapEngine::DumpAll("XSm120DumpStreams");
+}

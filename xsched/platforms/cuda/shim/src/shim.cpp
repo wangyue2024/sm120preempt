@@ -1,10 +1,13 @@
 #include <list>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 #include <mutex>
 #include <atomic>
 #include <functional>
 
 #include "xsched/utils/log.h"
+#include "xsched/protocol/def.h"
 #include "xsched/utils/map.h"
 #include "xsched/preempt/hal/hw_queue.h"
 #include "xsched/preempt/xqueue/xqueue.h"
@@ -57,6 +60,105 @@ void WaitBlockingXQueues()
     });
     XASSERT(res == kXSchedSuccess, "Fail to submit wait all commands");
     for (auto &cmd : wait_cmds) cmd->Wait();
+}
+
+static std::atomic<int> g_user_blocking_streams {0};
+static std::mutex g_lazy_mtx;
+static std::unordered_set<CUstream> g_lazy_streams;
+static std::atomic<size_t> g_lazy_cnt {0};
+
+static bool AutoXQueueEnabled()
+{
+    static const bool on = GetEnvOption(XSCHED_AUTO_XQUEUE_ENV_NAME, false);
+    return on;
+}
+
+void AutoXQueueOnStreamCreate(CUstream stream)
+{
+    if (!AutoXQueueEnabled() || stream == nullptr) return;
+    unsigned int flags = 0;
+    if (Driver::StreamGetFlags(stream, &flags) == CUDA_SUCCESS && !(flags & CU_STREAM_NON_BLOCKING)) {
+        if (g_user_blocking_streams.fetch_add(1) == 0) {
+            XINFO("blocking stream %p created: legacy default-stream work stays on the legacy stream", (void *)stream);
+        }
+    }
+    static const bool lazy = GetEnvOption("XSCHED_AUTO_XQUEUE_LAZY", true);
+    if (!lazy) {
+        XQueueManager::AutoCreate([&](HwQueueHandle *hwq) { return CudaQueueCreate(hwq, stream); });
+        return;
+    }
+    std::lock_guard<std::mutex> lk(g_lazy_mtx);
+    if (g_lazy_streams.insert(stream).second) g_lazy_cnt.fetch_add(1, std::memory_order_release);
+}
+
+void AutoXQueueOnStreamDestroy(CUstream stream)
+{
+    if (g_lazy_cnt.load(std::memory_order_acquire) == 0) return;
+    std::lock_guard<std::mutex> lk(g_lazy_mtx);
+    if (g_lazy_streams.erase(stream) > 0) g_lazy_cnt.fetch_sub(1, std::memory_order_release);
+}
+
+std::atomic<uint64_t> g_shim_legacy_cmds{0}, g_shim_unmanaged_cmds{0}, g_shim_managed_cmds{0};
+
+std::shared_ptr<XQueue> StreamXQueue(CUstream stream)
+{
+    auto xq = HwQueueManager::GetXQueue(GetHwQueueHandle(stream));
+    if (xq != nullptr) {
+        g_shim_managed_cmds.fetch_add(1, std::memory_order_relaxed);
+        return xq;
+    }
+    if (g_lazy_cnt.load(std::memory_order_acquire) == 0) {
+        g_shim_unmanaged_cmds.fetch_add(1, std::memory_order_relaxed);
+        return nullptr;
+    }
+    {
+        std::lock_guard<std::mutex> lk(g_lazy_mtx);
+        if (g_lazy_streams.erase(stream) == 0) {
+            g_shim_unmanaged_cmds.fetch_add(1, std::memory_order_relaxed);
+            return nullptr;
+        }
+        g_lazy_cnt.fetch_sub(1, std::memory_order_release);
+        ScopedStreamContext scoped_ctx(stream);
+        XQueueManager::AutoCreate([&](HwQueueHandle *hwq) { return CudaQueueCreate(hwq, stream); });
+    }
+    return HwQueueManager::GetXQueue(GetHwQueueHandle(stream));
+}
+
+static std::mutex g_proxy_mtx;
+static std::unordered_map<CUcontext, CUstream> g_legacy_proxies;
+static std::atomic<int> g_blocking_xqueues {0};   // > 0 once a blocking stream has an XQueue (proxy)
+
+CUstream LegacyProxyStream()
+{
+    static const bool on = AutoXQueueEnabled() && GetEnvOption("XSCHED_AUTO_XQUEUE_LEGACY", true);
+    if (!on || GetCaptureCounter() > 0) return nullptr;
+    // The legacy stream implicitly synchronizes with blocking streams; a proxy stream does not. Once
+    // the application created a blocking stream of its own, keep legacy work on the legacy stream
+    // (whose path flushes blocking XQueues, the proxy included, before every operation).
+    if (g_user_blocking_streams.load(std::memory_order_acquire) > 0) return nullptr;
+    CUcontext ctx = nullptr;
+    if (Driver::CtxGetCurrent(&ctx) != CUDA_SUCCESS || ctx == nullptr) return nullptr;
+    std::lock_guard<std::mutex> lk(g_proxy_mtx);
+    auto it = g_legacy_proxies.find(ctx);
+    if (it != g_legacy_proxies.end()) return it->second;
+    CUstream s = nullptr;
+    if (Driver::StreamCreate(&s, CU_STREAM_DEFAULT) != CUDA_SUCCESS) return nullptr;   // blocking
+    XQueueManager::AutoCreate([&](HwQueueHandle *hwq) { return CudaQueueCreate(hwq, s); });
+    if (HwQueueManager::GetXQueue(GetHwQueueHandle(s)) == nullptr) {
+        Driver::StreamDestroy_v2(s);
+        g_legacy_proxies[ctx] = nullptr;
+        return nullptr;
+    }
+    g_blocking_xqueues.fetch_add(1, std::memory_order_release);
+    g_legacy_proxies[ctx] = s;
+    XINFO("legacy default stream work of context %p goes to XQueue-managed proxy stream %p (DEF-37)",
+          (void *)ctx, (void *)s);
+    return s;
+}
+
+void SyncApiPrologue()
+{
+    if (g_blocking_xqueues.load(std::memory_order_acquire) > 0 && GetCaptureCounter() == 0) WaitBlockingXQueues();
 }
 
 static std::mutex g_capture_mutex;
@@ -123,7 +225,7 @@ template <typename CmdT, typename... Args>
 CUresult XLaunchKernelImpl(CUstream stream, Args&&... args)
 {
     ScopedStreamContext scoped_ctx(stream);
-    auto xq = HwQueueManager::GetXQueue(GetHwQueueHandle(stream));
+    auto xq = StreamXQueue(stream);
     auto kernel = std::make_shared<CmdT>(std::forward<Args>(args)..., xq != nullptr);
     if (xq == nullptr) return DirectLaunch(kernel, stream);
     xq->Submit(kernel);
@@ -219,7 +321,7 @@ CUresult XLaunchKernelEx_ptsz(const CUlaunchConfig *config, CUfunction f, void *
 static inline CUresult XLaunchHostFuncImpl(CUstream stream, CUhostFn fn, void *data)
 {
     // stream is the first arg, different from other XLaunch* functions.
-    auto xq = HwQueueManager::GetXQueue(GetHwQueueHandle(stream));
+    auto xq = StreamXQueue(stream);
     if (xq == nullptr) return Driver::LaunchHostFunc(stream, fn, data);
     ScopedStreamContext scoped_ctx(stream);
     auto hw_cmd = std::make_shared<CudaHostFuncCommand>(fn, data);
@@ -322,11 +424,12 @@ static CUresult XEventRecordImpl(std::shared_ptr<CudaEventRecordCommand> xevent,
     CUresult result;
     if (GetCaptureCounter() > 0) {
         result = xevent->LaunchWrapper(stream);
-    } else if (stream == CU_STREAM_LEGACY) {
+    } else if (stream == CU_STREAM_LEGACY && LegacyProxyStream() == nullptr) {
         WaitBlockingXQueues();
         result = xevent->LaunchWrapper(stream);
     } else {
-        auto xq = HwQueueManager::GetXQueue(GetHwQueueHandle(stream));
+        if (stream == CU_STREAM_LEGACY) stream = LegacyProxyStream();   // DEF-37
+        auto xq = StreamXQueue(stream);
         if (xq == nullptr) {
             result = xevent->LaunchWrapper(stream);
         } else {
@@ -418,6 +521,7 @@ static CUresult XStreamWaitEventImpl(CUstream stream, CUevent event, unsigned in
         return Driver::StreamWaitEvent(stream, event, flags);
     }
 
+    if (stream == CU_STREAM_LEGACY && LegacyProxyStream() != nullptr) stream = LegacyProxyStream();  // DEF-37
     if (stream == CU_STREAM_LEGACY) {
         // sync a event on legacy default stream
         WaitBlockingXQueues();
@@ -425,7 +529,7 @@ static CUresult XStreamWaitEventImpl(CUstream stream, CUevent event, unsigned in
         return Driver::StreamWaitEvent(stream, event, flags);
     }
 
-    auto xq = HwQueueManager::GetXQueue(GetHwQueueHandle(stream));
+    auto xq = StreamXQueue(stream);
     if (xq == nullptr) {
         // waiting stream is not an xqueue
         if (xevent->GetXQueueHandle() == 0) {
@@ -562,7 +666,7 @@ CUresult XStreamCreate(CUstream *stream, unsigned int flags)
     if (!GetCudaSingleStreamPerProcessEnabled()) {
         CUresult res = Driver::StreamCreate(stream, flags);
         if (res != CUDA_SUCCESS) return res;
-        XQueueManager::AutoCreate([&](HwQueueHandle *hwq) {return CudaQueueCreate(hwq, *stream);});
+        AutoXQueueOnStreamCreate(*stream);
         XDEBG("XStreamCreate(stream: %p, flags: 0x%x) = %d", *stream, flags, res);
         return res;
     }
@@ -571,7 +675,7 @@ CUresult XStreamCreate(CUstream *stream, unsigned int flags)
     if (g_single_stream_ref_cnt == 0) {
         CUresult res = Driver::StreamCreate(stream, flags);
         if (res != CUDA_SUCCESS) return res;
-        XQueueManager::AutoCreate([&](HwQueueHandle *hwq) {return CudaQueueCreate(hwq, *stream);});
+        AutoXQueueOnStreamCreate(*stream);
         g_single_stream = *stream;
     }
 
@@ -587,7 +691,7 @@ CUresult XStreamCreateWithPriority(CUstream *stream, unsigned int flags, int pri
     if (!GetCudaSingleStreamPerProcessEnabled()) {
         CUresult res = Driver::StreamCreateWithPriority(stream, flags, priority);
         if (res != CUDA_SUCCESS) return res;
-        XQueueManager::AutoCreate([&](HwQueueHandle *hwq) {return CudaQueueCreate(hwq, *stream);});
+        AutoXQueueOnStreamCreate(*stream);
         XDEBG("XStreamCreateWithPriority(stream: %p, flags: 0x%x, priority: %d) = %d",
               *stream, flags, priority, res);
         return res;
@@ -597,7 +701,7 @@ CUresult XStreamCreateWithPriority(CUstream *stream, unsigned int flags, int pri
     if (g_single_stream_ref_cnt == 0) {
         CUresult res = Driver::StreamCreateWithPriority(stream, flags, priority);
         if (res != CUDA_SUCCESS) return res;
-        XQueueManager::AutoCreate([&](HwQueueHandle *hwq) {return CudaQueueCreate(hwq, *stream);});
+        AutoXQueueOnStreamCreate(*stream);
         g_single_stream = *stream;
     }
 
@@ -613,7 +717,10 @@ CUresult XStreamDestroy(CUstream stream)
     if (!GetCudaSingleStreamPerProcessEnabled()) {
         XDEBG("XStreamDestroy(stream: %p)", stream);
         StreamPromotionOnDestroy(stream);
-        XQueueManager::AutoDestroy(GetHwQueueHandle(stream));
+        AutoXQueueOnStreamDestroy(stream);
+        if (HwQueueManager::GetXQueue(GetHwQueueHandle(stream)) != nullptr) {
+            XQueueManager::AutoDestroy(GetHwQueueHandle(stream));
+        }
         return Driver::StreamDestroy(stream);
     }
 
@@ -622,7 +729,10 @@ CUresult XStreamDestroy(CUstream stream)
     g_single_stream_ref_cnt--;
     if (g_single_stream_ref_cnt == 0) {
         StreamPromotionOnDestroy(stream);
-        XQueueManager::AutoDestroy(GetHwQueueHandle(stream));
+        AutoXQueueOnStreamDestroy(stream);
+        if (HwQueueManager::GetXQueue(GetHwQueueHandle(stream)) != nullptr) {
+            XQueueManager::AutoDestroy(GetHwQueueHandle(stream));
+        }
         res = Driver::StreamDestroy(g_single_stream);
         g_single_stream = nullptr;
     }
@@ -636,7 +746,10 @@ CUresult XStreamDestroy_v2(CUstream stream)
     if (!GetCudaSingleStreamPerProcessEnabled()) {
         XDEBG("XStreamDestroy_v2(stream: %p)", stream);
         StreamPromotionOnDestroy(stream);
-        XQueueManager::AutoDestroy(GetHwQueueHandle(stream));
+        AutoXQueueOnStreamDestroy(stream);
+        if (HwQueueManager::GetXQueue(GetHwQueueHandle(stream)) != nullptr) {
+            XQueueManager::AutoDestroy(GetHwQueueHandle(stream));
+        }
         return Driver::StreamDestroy_v2(stream);
     }
 
@@ -645,7 +758,10 @@ CUresult XStreamDestroy_v2(CUstream stream)
     g_single_stream_ref_cnt--;
     if (g_single_stream_ref_cnt == 0) {
         StreamPromotionOnDestroy(stream);
-        XQueueManager::AutoDestroy(GetHwQueueHandle(stream));
+        AutoXQueueOnStreamDestroy(stream);
+        if (HwQueueManager::GetXQueue(GetHwQueueHandle(stream)) != nullptr) {
+            XQueueManager::AutoDestroy(GetHwQueueHandle(stream));
+        }
         res = Driver::StreamDestroy_v2(g_single_stream);
         g_single_stream = nullptr;
     }
@@ -655,3 +771,26 @@ CUresult XStreamDestroy_v2(CUstream stream)
 }
 
 } // namespace xsched::cuda
+
+/// Counters: [commands on the legacy default stream, commands on streams without an XQueue,
+/// commands submitted to XQueues]. Returns the number written.
+EXPORT_C_FUNC int XCudaShimStats(uint64_t *out, int n, int reset)
+{
+    using namespace xsched::cuda;
+    std::atomic<uint64_t> *c[3] = {&g_shim_legacy_cmds, &g_shim_unmanaged_cmds, &g_shim_managed_cmds};
+    int k = n < 3 ? n : 3;
+    for (int i = 0; i < k; ++i) out[i] = reset ? c[i]->exchange(0) : c[i]->load();
+    return k;
+}
+
+/// Test hook (DEF-37): XQueue handle of the current context's legacy proxy stream, creating it if
+/// needed; 0 when legacy proxying is disabled.
+EXPORT_C_FUNC uint64_t XCudaLegacyProxyXQueue()
+{
+    using namespace xsched::cuda;
+    using namespace xsched::preempt;
+    CUstream s = LegacyProxyStream();
+    if (s == nullptr) return 0;
+    auto xq = HwQueueManager::GetXQueue(GetHwQueueHandle(s));
+    return xq == nullptr ? 0 : static_cast<uint64_t>(xq->GetHandle());
+}

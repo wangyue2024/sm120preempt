@@ -80,7 +80,10 @@ bool BinaryIsLoopFree(const uint8_t *bin, size_t bytes)
         memcpy(&w1, bin + i * 16 + 8, sizeof(w1));
         const uint32_t op12 = static_cast<uint32_t>(w0 & 0xfffU);
         if (op12 == 0x949U) return false;           // BRX (indirect branch)
-        if (op12 != 0x947U) continue;               // BRA / BRA.U
+        // BRA (0x947) and BRA.U with a uniform predicate (0x547, e.g. "BRA.U UP0, target" closing a
+        // loop whose counter lives in a uniform register). DEF-35: 0x547 was not recognised, so such
+        // loops were classified loop-free. The offset field layout is the same for both encodings.
+        if (op12 != 0x947U && op12 != 0x547U) continue;
         // Relative offset in 4-byte units, relative to the next instruction:
         // bits [16,24) of w0 = low 8 bits, bits [34,74) of the 128-bit word = high 40 bits.
         const uint64_t lo = (w0 >> 16) & 0xffULL;
@@ -447,7 +450,7 @@ const Sm120KernelRecord *Sm120GuardianRegistry::EnsureInstrumented(CUfunction fu
     const uint32_t clamped_bars = std::max(raw_bars, 1u);
     // DEF-20 fix (2026-11-25): round the register allocation up to an EVEN count so the trap engine's
     // 64-bit register-pair cascade (Cave 2/5) never straddles the allocation boundary. 255 is the
-    // per-thread maximum and is left as is (known residual: R254 of a 255-register kernel is not saved).
+    // per-thread maximum and is left as is (its R253 / R254 are never allocated by ptxas, DEF-20b).
     int clamped_regs = std::max(raw_regs, 16);
     if (clamped_regs < 255) clamped_regs = (clamped_regs + 1) & ~1;
 

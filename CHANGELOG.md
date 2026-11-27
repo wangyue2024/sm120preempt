@@ -2,6 +2,36 @@
 
 All notable changes to the Blackwell (`sm_120`) Level-3 transparent preemption and scheduling system are documented in this file.
 
+## [Unreleased] - 2026-11-27 — Phase 3.5 round 2: transparent multi-process vLLM end to end
+
+Doc: `doc/SM120_V2_PHASE3_5_TIER1_ZH.md` §8; ledger §10.13; environment variables in the principles doc §11.
+
+### Added
+- `bench_vllm_mp_p35.py`: two unmodified vLLM 0.34 processes under XSched (HP Qwen2.5-0.5B with Poisson short requests, LP Qwen2.5-7B-AWQ or 3B with long-document prefill batches compared to a reference), modes ref / solo / native / glb-solo / glb-lv1 / glb-lv3; only environment variables (`XSCHED_SCHEDULER=GLB`, `XSCHED_AUTO_XQUEUE=1`) and `xserver` HPF.
+- Tests: `test_auto_legacy_p35.py` (default-stream PyTorch under automatic XQueues), `test_regpress255_p35.py` + `kernels/regpress255.cu` (register-file pressure), `test_lv3_stress_kernel_p35.py` (flash-attention / GEMM under frequent preemption), `test_multiqueue_lv3_p35.py` (several Level-3 queues in one process suspended independently), `kernels/ce_vs_sm_probe.cu`; Suite 9 `auto-lv1` / `auto-lv3` (no explicit XQueues); regression `SYN-regpress255`, `SYN-flash-stress`.
+- `test_foreign_ctx_p35.py` (a native victim process next to a Level-3 aggressor).
+- Diagnostics: `XCudaShimStats()` (commands on the legacy stream / on streams without an XQueue / on XQueues), `XSCHED_SM120_WATCHDOG_MS` + `XSm120DumpStreams()` (per-queue host stage, control header and CTA state histogram when a trap operation stalls), `rf_full` route statistic.
+- `xserver` HPF: `XSCHED_HPF_RESUME_DELAY_US` (keep lower priorities suspended for a while after a higher priority was ready; default 0).
+- `p3_guarded_run.sh`: requires `QUIET_S` (60 s) of an idle GPU before each entry and stops the running test as soon as a compute process outside the test's own process tree appears (`ABORTED_FOREIGN_GPU_JOB`); `GUARD_IGNORE` for desktop processes.
+
+### Fixed
+- **DEF-40 (P0 safety)**: a BAR0 pulse traps the warps of whatever context is resident on the GPU at that instant; a context without the XSched trap handler cannot return. A native GEMM process on the RTX 5080 was killed (CUDA error 719, Xid 109 on its channel) in 2 of 2 runs under Level-3 suspension pressure (control: unaffected); the desktop Xid 31 faults at address 0 on the RTX 5060 (OBS-8 / OBS-14) are the same mechanism. Now every sm_120 XQueue (any level) installs the handler for its context and registers the process in `/dev/shm/xsched-sm120/` (`XSCHED_SM120_TENANT_HANDLER`), and an NVML poller (`XSCHED_SM120_FOREIGN_POLL_MS`, 100 ms) withholds pulses while an unregistered process has a context on the GPU - suspension then has Level-1 semantics (`XSCHED_SM120_FOREIGN_CTX=block` default, `allow` to opt out).
+- **DEF-41 (mitigated)**: two processes that both run Level-3 queues on one GPU are two time-sliced contexts; a context switch that arrives while one of them has warps in the trap handler times out (Xid 109, the DEF-27 mechanism): 14/14 runs of `test_multiqueue_lv3_p35.py --procs 2` with the host-wide pulse lock off and on. The ready gate only covers Level-1 peers that wait for the suspension. Processes running Level-2/3 kernels now add a `.lv3` mark to their tenant registration and a Level-3 process withholds pulses while another one is on the GPU (`XSCHED_SM120_LV3_PEERS=allow` to opt out). Supported: one Level-3 process per GPU (others Level-1 under the GLB ready gate), or all Level-3 work in one process.
+- **DEF-39**: the gate-mirror write (`cuMemsetD2D32Async`) and the control-block reset (32 KB / 1 MB memsets) are executed by the driver as SM kernels and cannot start while every SM is occupied (`kernels/ce_vs_sm_probe.cu`): with stuck CTAs no pulse or recovery pulse could be issued, and normally every suspension waited for an SM to have room. They are now pinned host-to-device copies (pitched 2D for the mirror), the reset clears only the CTA range launched since the last reset and is skipped when no pulse / restore happened (`XSCHED_SM120_CE_CONTROL`, default on).
+- **DEF-38 (GPU wedge)**: several Level-3 queues of one process suspended / resumed independently could wedge the GPU (4 queues, ~6,600 pulses/s: RTX 5080 5 of 8 runs hung, RTX 5060 Xid 109). The BAR0 pulse is GPU-wide and one-shot - a warp inside the trap handler is not trapped again - so another queue's pulse landing while a queue's warps were in the handler (restore wave in Cave 1, or a collateral no-op trap just before the queue's own cmd write and pulse) made warps miss their pulse or cut a restore, leaving CTAs at `BAR.SYNC.TRAP`. Pulses and restore set-up are now serialized per context and a pulse waits for other queues' Mode 5 restores (`XSCHED_SM120_CTX_PULSE_GATE`, default on); across processes the trap operations are serialized by a host-wide `flock` on `/dev/shm/xsched-sm120/<pci>.pulse` with a bounded wait. Gate on: 26/26 runs without a hang (gate off: 13/23 hung; serialize-only: 10/10).
+- **DEF-37**: work on the legacy default stream always bypassed XSched (46% of the commands of a 3B vLLM LP; HP 46 ms vs 30.5 ms solo). Under `XSCHED_AUTO_XQUEUE` it now goes to one blocking proxy stream per context with an XQueue (`XSCHED_AUTO_XQUEUE_LEGACY`, default on); 57 synchronous memcpy / memset APIs first drain the blocking XQueues; legacy semantics fall back to the old path once the application creates a blocking stream of its own.
+- **DEF-36**: automatic XQueues were created for every stream (128 per PyTorch process) and suspending an idle Level-3 queue still fired a GPU-wide pulse: transparent vLLM Level-3 corrupted an LP batch and made HP slower than native. Automatic XQueues are created on a stream's first submission (`XSCHED_AUTO_XQUEUE_LAZY`, default on) and idle queues no longer pulse.
+- **DEF-35**: the loop detector missed uniform-predicate branches `BRA.U` (`0x547`).
+
+### Known limitation
+- **DEF-34 (hardware)**: an SM whose register file is allocated to the last register does not take the trap (0 of 61 evictions vs 45 of 59 with 1,024 registers free); suspension then waits for the kernel (data stays correct). Detected by geometry (`rf_full`), optional `XSCHED_SM120_RF_FULL=lv1`. Affects e.g. the vLLM Marlin AWQ GEMM and cutlass INT8 GEMM.
+- DEF-20b closed: ptxas never allocates R253 / R254 on sm_120, so R254 needs no saving.
+- Across processes the DEF-38 gate only serializes (host-wide `flock`, `XSCHED_SM120_HOST_PULSE_GATE`); two concurrently running Level-3 processes are not supported (DEF-41: pulses are withheld while a Level-3 peer is present).
+- DEF-40 detection polls every 100 ms: a foreign process that starts in between can still be hit until the next poll.
+
+### Results
+- Two vLLM processes on an RTX 5080: HP E2E P50 29.9 ms with a 3B LP (solo 30.5, native 61.9), P99 30.3; with a 7B-AWQ LP 29.8-31.5 ms (native 67.4), P99 33.6-36.1 (Level-1: 56.8); LP keeps 88-92% of its solo throughput; HP 40/40 and every LP batch exact.
+
 ## [Unreleased] - 2026-11-26 — Phase 3.5 (tier 1): Level-3 value, CUDA Graph in-graph preemption, vLLM
 
 Doc: `doc/SM120_V2_PHASE3_5_TIER1_ZH.md`; mechanisms in `doc/SM120_V2_PHASE3_PRINCIPLES_AND_IMPLEMENTATION_ZH.md` §3.5, §5, §5.1, §5.2, §7.3; ledger §10.12.

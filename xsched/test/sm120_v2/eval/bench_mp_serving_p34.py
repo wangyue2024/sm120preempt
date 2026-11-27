@@ -13,6 +13,9 @@ i.e. separate CUDA contexts that the GPU time-slices.
          glb-lv1  XSched global scheduler: xserver (HPF) + XSCHED_SCHEDULER=GLB in both processes;
          glb-lv3  the HP stream is a Level-1 XQueue with priority 1, the LP queue has priority 0;
                   no application code in the scheduling path (fully transparent)
+         auto-lv1 as glb-*, but no XQueue is created by the application at all: XSCHED_AUTO_XQUEUE=1
+         auto-lv3 gives every stream that is used an XQueue (HP Level-1 priority 1, LP Level-1/3
+                  priority 0) -- the deployment mode for unmodified frameworks
 
   Every HP token sequence must equal the solo golden; every LP iteration must be bit-exact.
 
@@ -119,7 +122,7 @@ def lp_main(args):
            "lp_tokens_per_step": args.lp_batch * args.lp_seq}
 
     xs = hwq = xq = None
-    if args.mode != "native":
+    if args.mode != "native" and not args.mode.startswith("auto"):
         xs = Bridge()
         level = 1 if args.mode.endswith("lv1") else 3
         hwq, xq = xs.create(lp, level, prio=0 if args.mode.startswith("glb") else None)
@@ -306,7 +309,7 @@ def hp_main(args):
 def run(args):
     env = dict(os.environ)
     xserver = None
-    if args.mode.startswith("glb"):
+    if args.mode.startswith("glb") or args.mode.startswith("auto"):
         env["XSCHED_SCHEDULER"] = "GLB"
         xbin = os.path.join(os.environ.get("XSCHED", ""), "bin", "xserver")
         # xserver's IPC channel is SysV message queue key 1, one per host. If it belongs to another
@@ -336,8 +339,13 @@ def run(args):
     lp = None
     res = None
     try:
+        if args.mode.startswith("auto"):
+            env.update(XSCHED_AUTO_XQUEUE="1", XSCHED_AUTO_XQUEUE_LEVEL="1", XSCHED_AUTO_XQUEUE_PRIORITY="1")
         if args.mode != "solo":
             lp_env = dict(env)
+            if args.mode.startswith("auto"):
+                lp_env.update(XSCHED_AUTO_XQUEUE_LEVEL="1" if args.mode == "auto-lv1" else "3",
+                              XSCHED_AUTO_XQUEUE_PRIORITY="0")
             for kv in args.lp_env:          # experiments: settings that only the LP process gets
                 k, _, v = kv.partition("=")
                 lp_env[k] = v
@@ -399,7 +407,7 @@ def main():
     sub = p.add_subparsers(dest="cmd", required=True)
     for name in ("run", "role"):
         r = sub.add_parser(name)
-        r.add_argument("--mode", required=True, choices=["solo", "native", "req-lv1", "req-lv3", "glb-lv1", "glb-lv3"])
+        r.add_argument("--mode", required=True, choices=["solo", "native", "req-lv1", "req-lv3", "glb-lv1", "glb-lv3", "auto-lv1", "auto-lv3"])
         r.add_argument("--lp", default="ppl", choices=["ppl", "prefill"])
         r.add_argument("--model", default=os.environ.get("REAL_LLM_MODEL", "Qwen/Qwen2.5-0.5B-Instruct"))
         r.add_argument("--n-req", type=int, default=20)

@@ -1,0 +1,63 @@
+# RTX 5060 full regressions, Phase 3.5 round 2 (XSCHED_SM120_FOREIGN_CTX=allow: single-user desktop GPU opts in to pulses)
+
+## regress_5060d (2026-11-27T06:35:37)
+build: DEF-38 (gate), before DEF-39/40; failures all with display-GPU Xid 109 (OBS-14), reruns 6/6 pass
+| suite | pass / total | failing tests |
+|---|---:|---|
+| SYN | 18/19 | `SYN-stress-g8`(rc=1) |
+| S1 | 45/45 | - |
+| S4 | 6/6 | - |
+| S5 | 8/8 | - |
+| S6 | 9/9 | - |
+| S7 | 143/145 | `S7-softmax-lv3`(rc=124), `S7-conv3x3_nhwc-lv3m5`(rc=124) |
+| S8 | 16/16 | - |
+| S9 | 8/8 | - |
+| ACC | 28/28 | - |
+| **all** | **281/284** | |
+<<< [SYN-stress-g8] rc=1 wall=6.0s
+<<< [S7-softmax-lv3] rc=124 wall=300.8s
+<<< [S7-conv3x3_nhwc-lv3m5] rc=124 wall=300.8s
+
+## regress_5060f (2026-11-27T07:47:21)
+build: DEF-38 + DEF-39 + DEF-40 + host-wide lock
+| suite | pass / total | failing tests |
+|---|---:|---|
+| SYN | 20/20 | - |
+| S1 | 45/45 | - |
+| S4 | 6/6 | - |
+| S5 | 8/8 | - |
+| S6 | 9/9 | - |
+| S7 | 145/145 | - |
+| S8 | 16/16 | - |
+| S9 | 8/8 | - |
+| ACC | 28/28 | - |
+| **all** | **285/285** | |
+
+## regress_5060g (2026-11-27T08:24:48)
+build: + DEF-41 peer rule
+| suite | pass / total | failing tests |
+|---|---:|---|
+| SYN | 20/20 | - |
+| S1 | 45/45 | - |
+| S4 | 6/6 | - |
+| S5 | 8/8 | - |
+| S6 | 9/9 | - |
+| S7 | 145/145 | - |
+| S8 | 16/16 | - |
+| S9 | 8/8 | - |
+| ACC | 28/28 | - |
+| **all** | **285/285** | |
+
+## final build (+ peer rule limited to Level-3 processes): SYN + S9
+| suite | pass / total | failing tests |
+|---|---:|---|
+| SYN | 18/20 | `SYN-graph-relaunch-flat`(rc=1), `SYN-multiq-lv3`(rc=1) |
+| S9 | 8/8 | - |
+| **all** | **26/28** | |
+2 failures with display-GPU Xid 109 (OBS-14); reruns:
+<<< [SYN-graph-relaunch-flat-r1] rc=0 wall=3.0s
+<<< [SYN-multiq-lv3-r1] rc=0 wall=6.0s
+<<< [SYN-graph-relaunch-flat-r2] rc=0 wall=3.0s
+<<< [SYN-multiq-lv3-r2] rc=0 wall=6.0s
+<<< [SYN-graph-relaunch-flat-r3] rc=0 wall=3.0s
+<<< [SYN-multiq-lv3-r3] rc=0 wall=6.0s

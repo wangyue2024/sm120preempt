@@ -1,0 +1,18 @@
+>>> [L3-lv3-0] 10:24:33
+[VLLM-MP glb-lv3 delay=0us] PASS | HP E2E p50 29.9 p99 30.3 max 30.3 ms, TTFT p50 3.1 p99 3.5 ms, exact 40/40 | LP iters 173 bad 0 tput 92.0% of solo 
+<<< [L3-lv3-0] rc=0 wall=47.0s
+>>> [L3-lv3-5000] 10:25:20
+[VLLM-MP glb-lv3 delay=5000us] PASS | HP E2E p50 30.4 p99 30.9 max 30.9 ms, TTFT p50 3.3 p99 4.2 ms, exact 40/40 | LP iters 166 bad 0 tput 89.4% of solo 
+<<< [L3-lv3-5000] rc=0 wall=46.6s
+>>> [L3-lv1-5000] 10:26:07
+[VLLM-MP glb-lv1 delay=5000us] PASS | HP E2E p50 30.0 p99 36.5 max 36.5 ms, TTFT p50 5.4 p99 9.0 ms, exact 40/40 | LP iters 193 bad 0 tput 88.2% of solo 
+<<< [L3-lv1-5000] rc=0 wall=45.6s
+>>> [L7-lv3-0] 10:26:52
+[VLLM-MP glb-lv3 delay=0us] PASS | HP E2E p50 31.5 p99 33.6 max 33.6 ms, TTFT p50 3.9 p99 7.8 ms, exact 40/40 | LP iters 8 bad 0 tput 88.8% of solo 
+<<< [L7-lv3-0] rc=0 wall=57.9s
+>>> [L7-lv3-5000] 10:27:50
+[VLLM-MP glb-lv3 delay=5000us] PASS | HP E2E p50 29.8 p99 36.1 max 36.1 ms, TTFT p50 4.2 p99 5.3 ms, exact 40/40 | LP iters 8 bad 0 tput 87.5% of solo 
+<<< [L7-lv3-5000] rc=0 wall=57.9s
+>>> [L7-lv1-5000] 10:28:48
+[VLLM-MP glb-lv1 delay=5000us] PASS | HP E2E p50 35.9 p99 56.8 max 56.8 ms, TTFT p50 7.9 p99 9.0 ms, exact 40/40 | LP iters 9 bad 0 tput 89.4% of solo 
+<<< [L7-lv1-5000] rc=0 wall=58.2s

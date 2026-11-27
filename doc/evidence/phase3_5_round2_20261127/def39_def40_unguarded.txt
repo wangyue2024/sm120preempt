@@ -1,0 +1,92 @@
+# DEF-39 build (copy-engine control writes), RTX 5080: probe 2, gate off vs on (q=4, steps 3000, gap 600 us, hold 150 us), foreign-context test WITHOUT the DEF-40 guard
+>>> [CEPROBE2] 13:58:04
+[CE-VS-SM] SMs 84 full (spin kernel running: yes)
+[CE-VS-SM] cuMemcpyHtoDAsync 4B                             completes while SMs are full
+[CE-VS-SM] cuMemcpyDtoHAsync 80B                            completes while SMs are full
+[CE-VS-SM] cuMemsetD8Async 32B                              completes while SMs are full
+[CE-VS-SM] cuMemsetD32Async 1 word                          completes while SMs are full
+[CE-VS-SM] cuMemsetD2D32Async 256 x 1 (stride 128B)         BLOCKED until SMs free
+[CE-VS-SM] cuMemsetD8Async 32KB                             BLOCKED until SMs free
+[CE-VS-SM] cuMemcpyDtoDAsync 4KB                            BLOCKED until SMs free
+[CE-VS-SM] cuMemcpy2DAsync HtoD 4B x 256 (dst pitch 128B)   completes while SMs are full
+[CE-VS-SM] cuMemcpyHtoDAsync 32KB                           completes while SMs are full
+[CE-VS-SM] cuMemcpyHtoDAsync 1MB                            completes while SMs are full
+[CE-VS-SM] cuMemsetD32Async 64 words                        completes while SMs are full
+[CE-VS-SM] cuMemsetD32Async 256 words                       completes while SMs are full
+[CE-VS-SM] cuMemsetD8Async 4KB                              completes while SMs are full
+[CE-VS-SM] cuMemsetD8Async 1MB                              BLOCKED until SMs free
+[CE-VS-SM] done (no error)
+<<< [CEPROBE2] rc=0 wall=3.1s
+>>> [CE-OFF-q4-1] 13:59:07
+[XSCHED WARN @ T 2423591 @ 13:59:11.425321] sm120_trap_engine: stream still busy after 8 recovery pulses (ev=74 dr=3 m1=0 cmd=5 active=6516 max_ctas=65536 inflight=0 ctrl=0x7d06fc808000)
+<<< [CE-OFF-q4-1] rc=124 wall=95.0s
+>>> [CE-OFF-q4-2] 14:01:43
+[XSCHED WARN @ T 2425094 @ 14:01:47.321144] sm120_trap_engine: stream still busy after 8 recovery pulses (ev=82 dr=46 m1=0 cmd=5 active=10638 max_ctas=65536 inflight=0 ctrl=0x73e76a808000)
+<<< [CE-OFF-q4-2] rc=124 wall=95.0s
+>>> [CE-OFF-q4-3] 14:04:18
+[MULTIQ-LV3 q=4 pulse_gate=0] PASS | steps 3000 | wrong queues [] | preemptions [951, 946, 936, 953] | wall 0.91s | native deterministic True
+<<< [CE-OFF-q4-3] rc=0 wall=5.1s
+>>> [CE-OFF-q4-4] 14:05:23
+[XSCHED WARN @ T 2426684 @ 14:05:27.264543] sm120_trap_engine: stream still busy after 8 recovery pulses (ev=65 dr=0 m1=0 cmd=5 active=6414 max_ctas=65536 inflight=0 ctrl=0x7ebdb7028400)
+<<< [CE-OFF-q4-4] rc=124 wall=95.0s
+>>> [CE-OFF-q4-5] 14:07:58
+[MULTIQ-LV3 q=4 pulse_gate=0] PASS | steps 3000 | wrong queues [] | preemptions [949, 943, 930, 949] | wall 0.91s | native deterministic True
+<<< [CE-OFF-q4-5] rc=0 wall=5.1s
+>>> [CE-OFF-q4-6] 14:09:04
+[XSCHED WARN @ T 2428268 @ 14:09:08.005727] sm120_trap_engine: stream still busy after 8 recovery pulses (ev=37 dr=122 m1=0 cmd=5 active=7554 max_ctas=65536 inflight=0 ctrl=0x79b5ce208000)
+[XSCHED WARN @ T 2428267 @ 14:09:08.126266] sm120_trap_engine: stream still busy after 8 recovery pulses (ev=78 dr=43 m1=0 cmd=5 active=8582 max_ctas=65536 inflight=0 ctrl=0x79b5c1028400)
+[XSCHED WARN @ T 2428270 @ 14:09:08.318493] sm120_trap_engine: stream still busy after 8 recovery pulses (ev=76 dr=83 m1=0 cmd=5 active=10918 max_ctas=65536 inflight=0 ctrl=0x79b5ce808000)
+<<< [CE-OFF-q4-6] rc=124 wall=95.0s
+>>> [CE-OFF-q4-7] 14:11:39
+[MULTIQ-LV3 q=4 pulse_gate=0] PASS | steps 3000 | wrong queues [] | preemptions [947, 941, 931, 949] | wall 0.91s | native deterministic True
+<<< [CE-OFF-q4-7] rc=0 wall=5.1s
+>>> [CE-OFF-q4-8] 14:12:44
+[XSCHED WARN @ T 2429850 @ 14:12:48.778556] sm120_trap_engine: stream still busy after 8 recovery pulses (ev=48 dr=0 m1=0 cmd=5 active=8932 max_ctas=65536 inflight=0 ctrl=0x7c52f9028400)
+<<< [CE-OFF-q4-8] rc=124 wall=95.0s
+>>> [CE-ON-q4-1] 14:15:19
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [891, 891, 879, 890] | wall 0.89s | native deterministic True
+<<< [CE-ON-q4-1] rc=0 wall=5.1s
+>>> [CE-ON-q4-2] 14:16:25
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [897, 897, 885, 897] | wall 0.90s | native deterministic True
+<<< [CE-ON-q4-2] rc=0 wall=5.1s
+>>> [CE-ON-q4-3] 14:17:30
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [893, 894, 880, 897] | wall 0.89s | native deterministic True
+<<< [CE-ON-q4-3] rc=0 wall=5.1s
+>>> [CE-ON-q4-4] 14:18:35
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [894, 890, 883, 899] | wall 0.89s | native deterministic True
+<<< [CE-ON-q4-4] rc=0 wall=5.1s
+>>> [CE-ON-q4-5] 14:19:41
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [889, 895, 879, 891] | wall 0.89s | native deterministic True
+<<< [CE-ON-q4-5] rc=0 wall=5.1s
+>>> [CE-ON-q4-6] 14:20:46
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [894, 890, 882, 892] | wall 0.89s | native deterministic True
+<<< [CE-ON-q4-6] rc=0 wall=5.1s
+>>> [CE-ON-q4-7] 14:21:51
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [888, 889, 878, 889] | wall 0.89s | native deterministic True
+<<< [CE-ON-q4-7] rc=0 wall=5.1s
+>>> [CE-ON-q4-8] 14:22:57
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [894, 895, 881, 894] | wall 0.89s | native deterministic True
+<<< [CE-ON-q4-8] rc=0 wall=5.1s
+>>> [FOREIGN-ctl] 14:24:02
+[FOREIGN-CTX victim-only] victim unaffected | victim iters 5028 wrong 0 rc 0 error '' | aggressor suspensions 0 error ''
+<<< [FOREIGN-ctl] rc=0 wall=20.4s
+>>> [FOREIGN-lv3-1] 14:25:23
+[FOREIGN-CTX aggressor lv3 gap 600 us] victim HIT | victim iters 1381 wrong 0 rc 0 error 'AcceleratorError: CUDA error: unspecified launch failure' | aggressor suspensions 8272 error ''
+<<< [FOREIGN-lv3-1] rc=0 wall=20.4s
+>>> [FOREIGN-lv3-2] 14:26:43
+[FOREIGN-CTX aggressor lv3 gap 600 us] victim HIT | victim iters 1668 wrong 0 rc 0 error 'AcceleratorError: CUDA error: unspecified launch failure' | aggressor suspensions 6843 error ''
+<<< [FOREIGN-lv3-2] rc=0 wall=20.4s
+>>> [AL-ref] 14:28:04
+[AUTO-LEGACY ref] written
+<<< [AL-ref] rc=0 wall=2.0s
+>>> [AL-lv3] 14:29:06
+[AUTO-LEGACY] PASS | proxy xqueue yes | steps 60 wrong 0 | suspensions 425 | commands legacy 0 unmanaged 0 xqueue 2344
+<<< [AL-lv3] rc=0 wall=3.1s
+>>> [RP255] 14:30:09
+[REGPRESS255 lv3 nacc=250 ctas/sm=2] PASS | calls 600 wrong 0 | preemptions 301 | kernel 0.75 ms | native deterministic True
+<<< [RP255] rc=0 wall=2.0s
+>>> [FLASH] 14:31:12
+[LV3-STRESS flash lv3] PASS | calls 4800 wrong 0 | preemptions 412 | kernel 0.11 ms | native deterministic True
+<<< [FLASH] rc=0 wall=2.0s
+## dmesg (victim channels)
+Xid 109 pid=<victim run 1> CTX SWITCH TIMEOUT (14:25:14); Xid 109 pid=<victim run 2> CTX SWITCH TIMEOUT (14:26:37)

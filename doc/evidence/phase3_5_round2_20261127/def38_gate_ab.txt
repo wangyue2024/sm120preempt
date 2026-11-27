@@ -1,0 +1,65 @@
+# DEF-38 pulse gate A/B (RTX 5080, same build): test_multiqueue_lv3_p35.py --queues 4 --steps 3000 --gap-us 600 --hold-us 150, 60 s timeout (rc=124 = hung)
+# CE-vs-SM probe (native): which control-path operations need a free SM
+>>> [CEPROBE] 13:37:41
+[CE-VS-SM] SMs 84 full (spin kernel running: yes)
+[CE-VS-SM] cuMemcpyHtoDAsync 4B                       completes while SMs are full
+[CE-VS-SM] cuMemcpyDtoHAsync 80B                      completes while SMs are full
+[CE-VS-SM] cuMemsetD8Async 32B                        completes while SMs are full
+[CE-VS-SM] cuMemsetD32Async 1 word                    completes while SMs are full
+[CE-VS-SM] cuMemsetD2D32Async 256 x 1 (stride 128B)   BLOCKED until SMs free
+[CE-VS-SM] cuMemsetD8Async 32KB                       BLOCKED until SMs free
+[CE-VS-SM] cuMemcpyDtoDAsync 4KB                      BLOCKED until SMs free
+[CE-VS-SM] done (no error)
+<<< [CEPROBE] rc=0 wall=2.1s
+>>> [OFF-q4-1] 13:38:43
+[MULTIQ-LV3 q=4 pulse_gate=0] PASS | steps 3000 | wrong queues [] | preemptions [921, 914, 907, 923] | wall 0.89s | native deterministic True
+<<< [OFF-q4-1] rc=0 wall=5.1s
+>>> [OFF-q4-2] 13:39:48
+[MULTIQ-LV3 q=4 pulse_gate=0] PASS | steps 3000 | wrong queues [] | preemptions [920, 919, 907, 921] | wall 0.89s | native deterministic True
+<<< [OFF-q4-2] rc=0 wall=5.1s
+>>> [OFF-q4-3] 13:40:54
+[XSCHED WARN @ T 2418183 @ 13:41:00.550917] sm120_dump_streams (watchdog: trap operation stalled): 4 stream contexts
+[XSCHED WARN @ T 2418183 @ 13:41:00.551508] sm120_dump[0]: stage=4 (3070 ms) stream=busy restore_pending=1 | cmd=5 evicted=0 restored=0 drained=0 m1exit=0 inflight=0 restore_wave=0 active=0 max_slots=160 ovf=0 | CTA states 0:65536 1:0 2:0 3:0 5:0 other:0 entry_dec=4:0 warp_mask!=0:0
+[XSCHED WARN @ T 2418183 @ 13:41:00.551962] sm120_dump[1]: stage=4 (3070 ms) stream=busy restore_pending=1 | cmd=5 evicted=0 restored=0 drained=0 m1exit=0 inflight=0 restore_wave=0 active=0 max_slots=160 ovf=0 | CTA states 0:65536 1:0 2:0 3:0 5:0 other:0 entry_dec=4:0 warp_mask!=0:0
+[XSCHED WARN @ T 2418183 @ 13:41:00.552397] sm120_dump[2]: stage=20 (3071 ms) stream=idle restore_pending=1 | cmd=0 evicted=0 restored=0 drained=0 m1exit=0 inflight=0 restore_wave=0 active=0 max_slots=160 ovf=0 | CTA states 0:65536 1:0 2:0 3:0 5:0 other:0 entry_dec=4:0 warp_mask!=0:0
+[XSCHED WARN @ T 2418183 @ 13:41:00.552644] sm120_dump[3]: stage=4 (3078 ms) stream=busy restore_pending=1 | cmd=5 evicted=54 restored=0 drained=11 m1exit=0 inflight=0 restore_wave=0 active=8398 max_slots=160 ovf=0 | CTA states 0:65471 1:0 2:11 3:0 5:54 other:0 entry_dec=4:0 warp_mask!=0:54
+<<< [OFF-q4-3] rc=124 wall=65.0s
+>>> [OFF-q4-4] 13:42:59
+[MULTIQ-LV3 q=4 pulse_gate=0] PASS | steps 3000 | wrong queues [] | preemptions [920, 917, 907, 929] | wall 0.89s | native deterministic True
+<<< [OFF-q4-4] rc=0 wall=5.1s
+>>> [ON-q4-1] 13:44:04
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [877, 880, 864, 878] | wall 0.88s | native deterministic True
+<<< [ON-q4-1] rc=0 wall=5.1s
+>>> [ON-q4-2] 13:45:09
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [886, 885, 877, 881] | wall 0.89s | native deterministic True
+<<< [ON-q4-2] rc=0 wall=5.1s
+>>> [ON-q4-3] 13:46:15
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [885, 884, 872, 886] | wall 0.89s | native deterministic True
+<<< [ON-q4-3] rc=0 wall=5.1s
+>>> [ON-q4-4] 13:47:20
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [887, 884, 872, 885] | wall 0.89s | native deterministic True
+<<< [ON-q4-4] rc=0 wall=5.1s
+>>> [ON-q4-5] 13:48:25
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [881, 880, 870, 878] | wall 0.88s | native deterministic True
+<<< [ON-q4-5] rc=0 wall=5.1s
+>>> [ON-q4-6] 13:49:31
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [875, 875, 868, 877] | wall 0.88s | native deterministic True
+<<< [ON-q4-6] rc=0 wall=5.1s
+>>> [ON-q4-7] 13:50:36
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [884, 889, 873, 881] | wall 0.89s | native deterministic True
+<<< [ON-q4-7] rc=0 wall=5.1s
+>>> [ON-q4-8] 13:51:41
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [878, 881, 867, 878] | wall 0.88s | native deterministic True
+<<< [ON-q4-8] rc=0 wall=5.1s
+>>> [ON-q4-9] 13:52:47
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [886, 881, 873, 885] | wall 0.89s | native deterministic True
+<<< [ON-q4-9] rc=0 wall=5.1s
+>>> [ON-q4-10] 13:53:52
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [881, 883, 865, 876] | wall 0.88s | native deterministic True
+<<< [ON-q4-10] rc=0 wall=5.1s
+>>> [ON-q4-11] 13:54:57
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [876, 878, 866, 878] | wall 0.88s | native deterministic True
+<<< [ON-q4-11] rc=0 wall=5.1s
+>>> [ON-q4-12] 13:56:03
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [881, 883, 868, 882] | wall 0.88s | native deterministic True
+<<< [ON-q4-12] rc=0 wall=5.1s

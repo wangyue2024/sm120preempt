@@ -67,9 +67,15 @@ int64_t GetCaptureCounter();
 #define CHECK_STREAM(stream, fallback) \
 { \
     if (stream == nullptr || stream == CU_STREAM_LEGACY) { \
-        stream = CU_STREAM_LEGACY; \
-        if (GetCaptureCounter() == 0) WaitBlockingXQueues(); \
-        return fallback; \
+        CUstream proxy__ = LegacyProxyStream(); \
+        if (proxy__ != nullptr) { \
+            stream = proxy__; \
+        } else { \
+            stream = CU_STREAM_LEGACY; \
+            g_shim_legacy_cmds.fetch_add(1, std::memory_order_relaxed); \
+            if (GetCaptureCounter() == 0) WaitBlockingXQueues(); \
+            return fallback; \
+        } \
     } \
     if (stream == CU_STREAM_PER_THREAD) stream = GetPTDS(); \
     if (GetCaptureCounter() > 0) return fallback; \
@@ -78,17 +84,48 @@ int64_t GetCaptureCounter();
 #define CHECK_STREAM_PTSZ(stream, fallback) \
 { \
     if (stream == CU_STREAM_LEGACY) { \
-        if (GetCaptureCounter() == 0) WaitBlockingXQueues(); \
-        return fallback; \
+        CUstream proxy__ = LegacyProxyStream(); \
+        if (proxy__ != nullptr) { \
+            stream = proxy__; \
+        } else { \
+            g_shim_legacy_cmds.fetch_add(1, std::memory_order_relaxed); \
+            if (GetCaptureCounter() == 0) WaitBlockingXQueues(); \
+            return fallback; \
+        } \
     } \
     if (stream == nullptr || stream == CU_STREAM_PER_THREAD) stream = GetPTDS(); \
     if (GetCaptureCounter() > 0) return fallback; \
 }
 
+/// Phase 3.5 diagnostics (XCudaShimStats): commands submitted to the legacy default stream (never
+/// scheduled by XSched), to streams without an XQueue, and to XQueues.
+extern std::atomic<uint64_t> g_shim_legacy_cmds, g_shim_unmanaged_cmds, g_shim_managed_cmds;
+
+/// DEF-37: with XSCHED_AUTO_XQUEUE (and XSCHED_AUTO_XQUEUE_LEGACY, default on), work submitted to the
+/// legacy default stream goes to one process-wide *blocking* proxy stream per context that has an
+/// XQueue, so that default-stream applications (plain PyTorch) are scheduled like any other stream.
+/// Synchronous APIs keep their legacy semantics: they first wait for all blocking XQueues (which
+/// include the proxy) and then call the driver; the proxy being a blocking stream, the driver orders
+/// it with the legacy stream. Returns nullptr when disabled or while a graph capture is active.
+CUstream LegacyProxyStream();
+/// Synchronous memcpy / memset APIs: wait for blocking XQueues (when any exist) first.
+void SyncApiPrologue();
+
+/// The XQueue of a stream for submitting work to it. With XSCHED_AUTO_XQUEUE, streams get their XQueue
+/// lazily at their first submission (DEF-36: PyTorch creates pools of 32+ streams per priority, and
+/// one Level-3 XQueue per unused pool stream was suspended - and pulsed - by the global scheduler on
+/// every high-priority request). Returns nullptr for unmanaged streams.
+std::shared_ptr<xsched::preempt::XQueue> StreamXQueue(CUstream stream);
+/// Register a newly created stream for lazy automatic XQueue creation (or create it now when
+/// XSCHED_AUTO_XQUEUE_LAZY=0); no-op without XSCHED_AUTO_XQUEUE.
+void AutoXQueueOnStreamCreate(CUstream stream);
+/// Forget a lazily registered stream that is being destroyed.
+void AutoXQueueOnStreamDestroy(CUstream stream);
+
 #define CUDA_SHIM_FUNC(name, cmd, ...) \
 inline CUresult X##name##Impl(FOR_EACH_PAIR_COMMA(DECLARE_PARAM, __VA_ARGS__), CUstream stream) \
 { \
-    auto xq = xsched::preempt::HwQueueManager::GetXQueue(GetHwQueueHandle(stream)); \
+    auto xq = StreamXQueue(stream); \
     if (xq == nullptr) return Driver::name(FOR_EACH_PAIR_COMMA(DECLARE_ARG, __VA_ARGS__), stream); \
     ScopedStreamContext scoped_ctx(stream); \
     auto hw_cmd = std::make_shared<cmd>(FOR_EACH_PAIR_COMMA(DECLARE_ARG, __VA_ARGS__)); \

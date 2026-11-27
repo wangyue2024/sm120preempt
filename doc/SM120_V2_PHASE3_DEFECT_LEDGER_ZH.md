@@ -162,9 +162,9 @@
 - **影响**：若 Trap 发生在 `CALL.ABS` 调用的函数内部且该函数使用了栈（`R1` 下移 + `STL`），恢复后栈内容丢失。当前观察到的 `CALL.ABS` 均位于断言失败路径（`LEPC` + `CALL.ABS.NOINC`），正常执行不会进入，因此**尚未触发**。
 - **修复**：检测中加入 `0x343`（并审查其他调用形式）。**难度：代码容易**；但会让更多内核启用 Cave 7 栈保存（arena 变大、驱逐变慢），需要性能复测。
 
-### 2.7 DEF-20b（P3，残留）：255 寄存器内核的 R254
+### 2.7 DEF-20b（已关闭，不可达）：255 寄存器内核的 R254
 
-见 §2.1“剩余风险”。可选修复：对 255 寄存器内核在 Cave 2/5 单独以 32 位存取 `R254`（需确认 R254 是否被 Trap 机制保留）。
+见 §2.1“剩余风险”。Phase 3.5 第二轮确认：ptxas 在 sm_120 上**从不分配 R253 / R254**，报告 255 寄存器的 272 个 PyTorch flash 内核与合成内核（`kernels/regpress255.cu`）的最高寄存器都是 `R252`。曾实现的 R254 保存已撤回。见 §10.13。
 
 ---
 
@@ -401,3 +401,24 @@
 - 最终构建两卡全量回归：5060 **295/295**，5080 **294/295**（OBS-21），均无新增 Xid。
 - **T-25**：从未 record 的 CUDA 事件查询为“完成”，计时探针必须先确认事件已 record（DEF-30 与按时长展平的第一版都因此失效）。
 - **T-26**：PyTorch 流池中的流是 non-blocking 的，在默认流上生成的输入必须先同步再在其他流上使用；否则 GPU 争用时金标准不确定，整进程“全部损坏”。
+
+### 10.13 Phase 3.5 第二轮：透明部署流程（2026-11-27）
+
+完整报告：[`SM120_V2_PHASE3_5_TIER1_ZH.md`](SM120_V2_PHASE3_5_TIER1_ZH.md) §8。
+
+- **DEF-36（已修复）**：自动 XQueue（`XSCHED_AUTO_XQUEUE=1`）为每个创建的流建队列，PyTorch 每进程预建 128 条池流 → 128 个 XQueue；`xserver` 每次挂起 LP 的全部 Level-3 队列，空闲队列也发 BAR0 脉冲（`Interrupt()` 只在最后一个内核不可 Trap 时跳过）。透明 vLLM `glb-lv3`：LP 1/11 批错误、HP E2E P50 79.8 ms（比 native 差）、门控超时。修复：流第一次提交时才建 XQueue（`XSCHED_AUTO_XQUEUE_LAZY`，默认开），空闲队列（发射线程已暂停、`cuStreamQuery` 空闲）不发脉冲。
+- **DEF-37（已修复）**：传统默认流上的工作永远绕过 XSched。shim 计数（新增导出 `XCudaShimStats`）显示 3B LP 的 46% 命令在默认流上，LP 挂起后仍与 HP 时间片轮转，HP 46 ms（独占 30.5）。修复：自动 XQueue 模式下默认流的异步工作转到每个上下文一个带 XQueue 的阻塞代理流（`XSCHED_AUTO_XQUEUE_LEGACY`，默认开）；57 个同步拷贝 / 置零 API 先排空阻塞 XQueue；应用一旦创建自己的阻塞流即退回原路径（传统流与阻塞流的隐式同步）。新测试 `test_auto_legacy_p35.py`（默认流 PyTorch：GEMM 链、整数 cumsum、`.item()`、pinned 拷贝、`wait_stream`、事件，挂起 / 恢复约 450 次，60 步全部一致）。修复后两个 vLLM 进程：HP E2E P50 29.9 ms（独占 30.5）、LP 吞吐 88–92%，两侧输出全部一致。
+- **DEF-34（硬件限制，检测 + 可选路由）**：SM 的寄存器文件分配到最后一个寄存器时 Trap 不被接受（空闲 1,024 个寄存器时 45/59 驱逐，空闲 0 个时 0/61；与每线程寄存器数无关）。挂起退化为等内核结束，数据正确（108 次运行 0 错）。按几何形状检测并计入 `rf_full`；`XSCHED_SM120_RF_FULL=lv1` 路由到 Level-1。受影响：cutlass INT8 GEMM（Suite 7 `int8_mm`）、vLLM Marlin AWQ GEMM（255 × 8 线程束 × 1 CTA）、`_topk_topp_kernel`、`_penalties_kernel`。
+- **DEF-35（已修复）**：循环检测漏掉统一谓词分支 `BRA.U`（`0x547`），这类循环被判为 loop-free（影响短 CTA 路由）。Suite 7 49 个内核分类不变。
+- **DEF-20b 关闭**（见 §2.7）。
+- **DEF-38（已修复）**：同一进程内多个 Level-3 队列各自挂起 / 恢复时 GPU 卡死（`test_multiqueue_lv3_p35.py` 4 队列、约 6,600 次脉冲 / 秒：5080 5/8 次挂死、GPU 100%、所有线程停在 `cuStreamSynchronize`；2 队列 0/8；5060 触发 Xid 109）。看门狗转储（`XSCHED_SM120_WATCHDOG_MS`）：三个队列停在 `PreemptStream` 第 4 阶段（`cmd=5` 已写入控制头，但门控镜像的跨步 memset 没有完成，脉冲尚未发出），其中两个 `evicted=0`；第四个停在 `ResetControlSync` 的 memset。机理：脉冲同时打断一个 SM 上的全部线程束，各线程束随即读 cmd；**队列 B 的脉冲恰在队列 A 的 cmd 写入落地时到达**，A 的同一 CTA 中一部分线程束读到 0（返回用户代码，停在用户 `BAR.SYNC`），另一部分读到 5（停在处理程序的 `BAR.SYNC.TRAP`），CTA 卡住、占着 SM。单队列时“先写 cmd、同步、再发脉冲”保证不会发生；A 自己的脉冲本可再次打断用户态线程束使 CTA 汇合，但它发不出去（DEF-39）。修复：引擎级脉冲互斥（`PreemptStream()` 整段与 `PrepareRestore()` 持有），发脉冲前等待同上下文其他队列的 Mode 5 恢复完成（`XSCHED_SM120_CTX_PULSE_GATE`，默认开）；跨进程用主机级 `flock`（`/dev/shm/xsched-sm120/<PCI>.pulse`）串行；新增停滞看门狗与导出 `XSm120DumpStreams()`。结果：门控开启 26/26 通过，关闭 13/23 挂死，只串行化 10/10 通过。门控关闭时的看门狗转储：一个队列 83 个 CTA 已保存、54 个已排空，正好少一个 SM 上的 CTA，8 次恢复脉冲后仍不结束——卡住的 CTA 不能靠脉冲修复，竞争必须预防。
+- **DEF-39（已修复）**：控制流中的跨步 memset（门控镜像 `cuMemsetD2D32Async`）、32 KB / 1 MB memset 与设备内拷贝由**SM 上的内核**执行（`kernels/ce_vs_sm_probe.cu`：SM 全部被占时这三类操作阻塞，主机↔设备拷贝与小 memset 不阻塞）。因此 SM 被卡住时 `PreemptStream` 无法发出脉冲、也无法发恢复脉冲（DEF-38 的卡死因此是永久的）；平时每次挂起也要等某个 SM 有空位。修复：门控镜像改为固定内存的 2D 主机→设备拷贝（只写 cmd 字或 {cmd, is_restore_wave} 两字），`ResetControlSync` 改为主机→设备拷贝清零，且只清自上次复位以来发射过的 CTA 范围；自上次复位以来未发生脉冲 / 恢复时直接跳过（`XSCHED_SM120_CE_CONTROL`，默认开）。
+
+- **DEF-40（已修复，P0 安全）**：BAR0 脉冲打断**发出时驻留在 GPU 上的任何上下文**。`test_foreign_ctx_p35.py`：同一 5080 上的原生 GEMM 进程在 Level-3 挂起压力下 2/2 次被杀死（CUDA 719，受害者通道 Xid 109），对照组无误。桌面 Xid 31（`faulted @ 0x0`，OBS-8 / OBS-14）、5060 桌面冻结与 13:13 共享 5080 上的 Xid 109 都与此一致：没有 XSched 处理程序的上下文被打断。修复：任何级别的 XQueue 都为其上下文安装处理程序并在 `/dev/shm/xsched-sm120/` 登记；NVML 每 100 ms 列出 GPU 上的进程，存在未登记进程时不发脉冲（挂起退化为 Level-1；`XSCHED_SM120_FOREIGN_CTX=allow` 放行）。5060 桌面上默认即禁止脉冲（列出 gnome-shell、Xwayland、nautilus、ghostty），回归环境显式放行。
+- **DEF-41（已缓解，默认安全）**：同一 GPU 上**两个同时运行 Level-3 队列的进程**：`test_multiqueue_lv3_p35.py --procs 2 --queues 2`（两个进程同步开始各自的挂起压力）14/14 次运行都有一个进程收到 Xid 109 `CTX SWITCH TIMEOUT`、随后 CUDA 719 与 SIGSEGV；主机级脉冲锁关闭 6/6、开启 8/8，没有区别。这是 DEF-27 的机理：两个进程是两个分时的上下文，时间片切换恰在一方的线程束位于 Trap 处理程序中时到达便超时。就绪门控只覆盖“等挂起完成再发射”的 Level-1 对端（HP 进程），对两个对等的 Level-3 进程（例如 `xserver` 下的两个 LP 租户）不起作用；串行化脉冲也无法阻止上下文切换。缓解：DEF-40 的租户登记中，运行 Level-2/3 内核的进程另建 `.lv3` 标记；GPU 上存在另一个 Level-3 进程时不发脉冲，双方都退化为 Level-1 语义（`XSCHED_SM120_LV3_PEERS=allow` 放行）。支持的部署形态：每块 GPU 一个 Level-3 进程（其余进程 Level-1，经 GLB 就绪门控），或所有 Level-3 工作在同一个进程内（DEF-38 门控）。
+- **OBS-21（开放）**：交替 A/B（当前构建 vs f29aab3）各 30 次 `S8-prefill-lv3-slo`，共 9,635 个 LP 迭代 0 错。累计约 1/12,000，原因未定。
+- **OBS-14 扩展（环境）**：RTX 5060 驱动桌面，高频抢占（多队列约 6,600 次 / 秒、flash 压测约 11,000 次 / 秒、`SYN-stress-g8`）时出现 Xid 109（`CTX SWITCH TIMEOUT`），桌面进程同时 Xid 31；2026-11-27 一次桌面冻结后整机重启。与 DEF-27 同一机理，但另一方是不受 XSched 管理的桌面。无显示的 5080 上，同样的测试只在另一用户的作业同时运行时出现过一次 Xid 109。
+- **T-26（再次出现两次）**：`test_regpress255` 中 `out.zero_()` 在默认流上、内核在非阻塞流上，出现“整批错误”；跟踪显示该批次没有任何驱逐才定位为测试问题。测试改为在内核流上清零。
+- **T-27**：首版合成测试 `regpress255` 用 `__launch_bounds__` 时 nvcc 忽略 `-maxrregcount`（寄存器数不变）；以宏去掉 launch bounds。
+- **环境（共享 5080）**：另一用户以数秒间隔连续提交短作业，守护脚本只在每个条目开始前检查，曾有作业在测试中途启动（同时出现我方 Xid 109）。`p3_guarded_run.sh` 改为：条目开始前要求 GPU 连续空闲 `QUIET_S`（60 s）；运行中每秒轮询，出现非本测试进程树的计算进程时立即终止本测试（`ABORTED_FOREIGN_GPU_JOB`）；`GUARD_IGNORE` 排除本地桌面进程。
+

@@ -1,0 +1,122 @@
+# DEF-40 build, RTX 5080: gate off with watchdog dumps, serialize-only gate (mode 2), gate on, S7 confirmation, foreign-context test WITH the DEF-40 guard
+>>> [WD-OFF-q4-1] 14:33:50
+[XSCHED WARN @ T 2435866 @ 14:33:54.198972] sm120_trap_engine: stream still busy after 8 recovery pulses (ev=83 dr=54 m1=0 cmd=5 active=6102 max_ctas=65536 inflight=0 ctrl=0x7c702e808000)
+[MULTIQ-LV3] watchdog: run not finished after 15 s
+[XSCHED WARN @ T 2435867 @ 14:34:08.700085] sm120_dump_streams (XSm120DumpStreams): 4 stream contexts
+[XSCHED WARN @ T 2435867 @ 14:34:08.700921] sm120_dump[0]: stage=0 (0 ms) stream=idle restore_pending=0 | cmd=0 evicted=0 restored=0 drained=0 m1exit=0 inflight=0 restore_wave=0 active=0 max_slots=160 ovf=0 | CTA states 0:65536 1:0 2:0 3:0 5:0 other:0 entry_dec=4:0 warp_mask!=0:0
+[XSCHED WARN @ T 2435867 @ 14:34:08.701143] sm120_dump[1]: stage=0 (0 ms) stream=idle restore_pending=0 | cmd=0 evicted=0 restored=0 drained=0 m1exit=0 inflight=0 restore_wave=0 active=0 max_slots=160 ovf=0 | CTA states 0:65536 1:0 2:0 3:0 5:0 other:0 entry_dec=4:0 warp_mask!=0:0
+[XSCHED WARN @ T 2435867 @ 14:34:08.701310] sm120_dump[2]: stage=0 (0 ms) stream=idle restore_pending=0 | cmd=0 evicted=0 restored=0 drained=0 m1exit=0 inflight=0 restore_wave=0 active=0 max_slots=160 ovf=0 | CTA states 0:65536 1:0 2:0 3:0 5:0 other:0 entry_dec=4:0 warp_mask!=0:0
+[XSCHED WARN @ T 2435867 @ 14:34:08.701520] sm120_dump[3]: stage=0 (0 ms) stream=busy restore_pending=1 | cmd=5 evicted=83 restored=0 drained=54 m1exit=0 inflight=0 restore_wave=0 active=6102 max_slots=160 ovf=0 | CTA states 0:65399 1:0 2:54 3:0 5:83 other:0 entry_dec=4:0 warp_mask!=0:83
+[MULTIQ-LV3] watchdog: GPU 100 %, 47.93 W
+[MULTIQ-LV3] watchdog: run not finished after 25 s
+[XSCHED WARN @ T 2435867 @ 14:34:18.720061] sm120_dump_streams (XSm120DumpStreams): 4 stream contexts
+[XSCHED WARN @ T 2435867 @ 14:34:18.720311] sm120_dump[0]: stage=0 (0 ms) stream=idle restore_pending=0 | cmd=0 evicted=0 restored=0 drained=0 m1exit=0 inflight=0 restore_wave=0 active=0 max_slots=160 ovf=0 | CTA states 0:65536 1:0 2:0 3:0 5:0 other:0 entry_dec=4:0 warp_mask!=0:0
+[XSCHED WARN @ T 2435867 @ 14:34:18.720525] sm120_dump[1]: stage=0 (0 ms) stream=idle restore_pending=0 | cmd=0 evicted=0 restored=0 drained=0 m1exit=0 inflight=0 restore_wave=0 active=0 max_slots=160 ovf=0 | CTA states 0:65536 1:0 2:0 3:0 5:0 other:0 entry_dec=4:0 warp_mask!=0:0
+[XSCHED WARN @ T 2435867 @ 14:34:18.720741] sm120_dump[2]: stage=0 (0 ms) stream=idle restore_pending=0 | cmd=0 evicted=0 restored=0 drained=0 m1exit=0 inflight=0 restore_wave=0 active=0 max_slots=160 ovf=0 | CTA states 0:65536 1:0 2:0 3:0 5:0 other:0 entry_dec=4:0 warp_mask!=0:0
+[XSCHED WARN @ T 2435867 @ 14:34:18.720948] sm120_dump[3]: stage=0 (0 ms) stream=busy restore_pending=1 | cmd=5 evicted=83 restored=0 drained=54 m1exit=0 inflight=0 restore_wave=0 active=6102 max_slots=160 ovf=0 | CTA states 0:65399 1:0 2:54 3:0 5:83 other:0 entry_dec=4:0 warp_mask!=0:83
+[MULTIQ-LV3] watchdog: GPU 100 %, 48.03 W
+[MULTIQ-LV3] watchdog: run not finished after 35 s
+[XSCHED WARN @ T 2435867 @ 14:34:28.738759] sm120_dump_streams (XSm120DumpStreams): 4 stream contexts
+[XSCHED WARN @ T 2435867 @ 14:34:28.739001] sm120_dump[0]: stage=0 (0 ms) stream=idle restore_pending=0 | cmd=0 evicted=0 restored=0 drained=0 m1exit=0 inflight=0 restore_wave=0 active=0 max_slots=160 ovf=0 | CTA states 0:65536 1:0 2:0 3:0 5:0 other:0 entry_dec=4:0 warp_mask!=0:0
+[XSCHED WARN @ T 2435867 @ 14:34:28.739215] sm120_dump[1]: stage=0 (0 ms) stream=idle restore_pending=0 | cmd=0 evicted=0 restored=0 drained=0 m1exit=0 inflight=0 restore_wave=0 active=0 max_slots=160 ovf=0 | CTA states 0:65536 1:0 2:0 3:0 5:0 other:0 entry_dec=4:0 warp_mask!=0:0
+[XSCHED WARN @ T 2435867 @ 14:34:28.739425] sm120_dump[2]: stage=0 (0 ms) stream=idle restore_pending=0 | cmd=0 evicted=0 restored=0 drained=0 m1exit=0 inflight=0 restore_wave=0 active=0 max_slots=160 ovf=0 | CTA states 0:65536 1:0 2:0 3:0 5:0 other:0 entry_dec=4:0 warp_mask!=0:0
+[XSCHED WARN @ T 2435867 @ 14:34:28.739637] sm120_dump[3]: stage=0 (0 ms) stream=busy restore_pending=1 | cmd=5 evicted=83 restored=0 drained=54 m1exit=0 inflight=0 restore_wave=0 active=6102 max_slots=160 ovf=0 | CTA states 0:65399 1:0 2:54 3:0 5:83 other:0 entry_dec=4:0 warp_mask!=0:83
+[MULTIQ-LV3] watchdog: GPU 100 %, 48.00 W
+<<< [WD-OFF-q4-1] rc=124 wall=95.0s
+>>> [WD-OFF-q4-2] 14:36:25
+[XSCHED WARN @ T 2437258 @ 14:36:29.795154] sm120_trap_engine: stream still busy after 8 recovery pulses (ev=77 dr=1 m1=0 cmd=5 active=8406 max_ctas=65536 inflight=0 ctrl=0x7c0866808000)
+[MULTIQ-LV3] watchdog: run not finished after 15 s
+[XSCHED WARN @ T 2437259 @ 14:36:43.952493] sm120_dump_streams (XSm120DumpStreams): 4 stream contexts
+[XSCHED WARN @ T 2437259 @ 14:36:43.953307] sm120_dump[0]: stage=0 (0 ms) stream=idle restore_pending=0 | cmd=0 evicted=0 restored=0 drained=0 m1exit=0 inflight=0 restore_wave=0 active=0 max_slots=160 ovf=0 | CTA states 0:65536 1:0 2:0 3:0 5:0 other:0 entry_dec=4:0 warp_mask!=0:0
+[XSCHED WARN @ T 2437259 @ 14:36:43.953528] sm120_dump[1]: stage=0 (0 ms) stream=idle restore_pending=0 | cmd=0 evicted=0 restored=0 drained=0 m1exit=0 inflight=0 restore_wave=0 active=0 max_slots=160 ovf=0 | CTA states 0:65536 1:0 2:0 3:0 5:0 other:0 entry_dec=4:0 warp_mask!=0:0
+[XSCHED WARN @ T 2437259 @ 14:36:43.953732] sm120_dump[2]: stage=0 (0 ms) stream=idle restore_pending=0 | cmd=0 evicted=0 restored=0 drained=0 m1exit=0 inflight=0 restore_wave=0 active=0 max_slots=160 ovf=0 | CTA states 0:65536 1:0 2:0 3:0 5:0 other:0 entry_dec=4:0 warp_mask!=0:0
+[XSCHED WARN @ T 2437259 @ 14:36:43.953940] sm120_dump[3]: stage=0 (0 ms) stream=busy restore_pending=0 | cmd=5 evicted=77 restored=0 drained=1 m1exit=0 inflight=0 restore_wave=0 active=8406 max_slots=160 ovf=0 | CTA states 0:65458 1:0 2:1 3:0 5:77 other:0 entry_dec=4:1 warp_mask!=0:77
+[MULTIQ-LV3] watchdog: GPU 100 %, 48.01 W
+[MULTIQ-LV3] watchdog: run not finished after 25 s
+[XSCHED WARN @ T 2437259 @ 14:36:53.972210] sm120_dump_streams (XSm120DumpStreams): 4 stream contexts
+[XSCHED WARN @ T 2437259 @ 14:36:53.972452] sm120_dump[0]: stage=0 (0 ms) stream=idle restore_pending=0 | cmd=0 evicted=0 restored=0 drained=0 m1exit=0 inflight=0 restore_wave=0 active=0 max_slots=160 ovf=0 | CTA states 0:65536 1:0 2:0 3:0 5:0 other:0 entry_dec=4:0 warp_mask!=0:0
+[XSCHED WARN @ T 2437259 @ 14:36:53.972667] sm120_dump[1]: stage=0 (0 ms) stream=idle restore_pending=0 | cmd=0 evicted=0 restored=0 drained=0 m1exit=0 inflight=0 restore_wave=0 active=0 max_slots=160 ovf=0 | CTA states 0:65536 1:0 2:0 3:0 5:0 other:0 entry_dec=4:0 warp_mask!=0:0
+[XSCHED WARN @ T 2437259 @ 14:36:53.972873] sm120_dump[2]: stage=0 (0 ms) stream=idle restore_pending=0 | cmd=0 evicted=0 restored=0 drained=0 m1exit=0 inflight=0 restore_wave=0 active=0 max_slots=160 ovf=0 | CTA states 0:65536 1:0 2:0 3:0 5:0 other:0 entry_dec=4:0 warp_mask!=0:0
+[XSCHED WARN @ T 2437259 @ 14:36:53.973081] sm120_dump[3]: stage=0 (0 ms) stream=busy restore_pending=0 | cmd=5 evicted=77 restored=0 drained=1 m1exit=0 inflight=0 restore_wave=0 active=8406 max_slots=160 ovf=0 | CTA states 0:65458 1:0 2:1 3:0 5:77 other:0 entry_dec=4:1 warp_mask!=0:77
+[MULTIQ-LV3] watchdog: GPU 100 %, 48.08 W
+[MULTIQ-LV3] watchdog: run not finished after 35 s
+[XSCHED WARN @ T 2437259 @ 14:37:03.991079] sm120_dump_streams (XSm120DumpStreams): 4 stream contexts
+[XSCHED WARN @ T 2437259 @ 14:37:03.991324] sm120_dump[0]: stage=0 (0 ms) stream=idle restore_pending=0 | cmd=0 evicted=0 restored=0 drained=0 m1exit=0 inflight=0 restore_wave=0 active=0 max_slots=160 ovf=0 | CTA states 0:65536 1:0 2:0 3:0 5:0 other:0 entry_dec=4:0 warp_mask!=0:0
+[XSCHED WARN @ T 2437259 @ 14:37:03.991545] sm120_dump[1]: stage=0 (0 ms) stream=idle restore_pending=0 | cmd=0 evicted=0 restored=0 drained=0 m1exit=0 inflight=0 restore_wave=0 active=0 max_slots=160 ovf=0 | CTA states 0:65536 1:0 2:0 3:0 5:0 other:0 entry_dec=4:0 warp_mask!=0:0
+[XSCHED WARN @ T 2437259 @ 14:37:03.991749] sm120_dump[2]: stage=0 (0 ms) stream=idle restore_pending=0 | cmd=0 evicted=0 restored=0 drained=0 m1exit=0 inflight=0 restore_wave=0 active=0 max_slots=160 ovf=0 | CTA states 0:65536 1:0 2:0 3:0 5:0 other:0 entry_dec=4:0 warp_mask!=0:0
+[XSCHED WARN @ T 2437259 @ 14:37:03.991953] sm120_dump[3]: stage=0 (0 ms) stream=busy restore_pending=0 | cmd=5 evicted=77 restored=0 drained=1 m1exit=0 inflight=0 restore_wave=0 active=8406 max_slots=160 ovf=0 | CTA states 0:65458 1:0 2:1 3:0 5:77 other:0 entry_dec=4:1 warp_mask!=0:77
+[MULTIQ-LV3] watchdog: GPU 100 %, 48.09 W
+<<< [WD-OFF-q4-2] rc=124 wall=95.0s
+>>> [WD-OFF-q4-3] 14:39:01
+[MULTIQ-LV3 q=4 pulse_gate=0] PASS | steps 3000 | wrong queues [] | preemptions [953, 944, 935, 954] | wall 0.91s | native deterministic True
+<<< [WD-OFF-q4-3] rc=0 wall=5.1s
+>>> [MODE2-q4-1] 14:40:06
+[MULTIQ-LV3 q=4 pulse_gate=2] PASS | steps 3000 | wrong queues [] | preemptions [934, 930, 916, 934] | wall 0.91s | native deterministic True
+<<< [MODE2-q4-1] rc=0 wall=5.1s
+>>> [MODE2-q4-2] 14:41:11
+[MULTIQ-LV3 q=4 pulse_gate=2] PASS | steps 3000 | wrong queues [] | preemptions [937, 933, 920, 936] | wall 0.91s | native deterministic True
+<<< [MODE2-q4-2] rc=0 wall=5.1s
+>>> [MODE2-q4-3] 14:42:17
+[MULTIQ-LV3 q=4 pulse_gate=2] PASS | steps 3000 | wrong queues [] | preemptions [937, 928, 918, 933] | wall 0.91s | native deterministic True
+<<< [MODE2-q4-3] rc=0 wall=5.1s
+>>> [MODE2-q4-4] 14:43:22
+[MULTIQ-LV3 q=4 pulse_gate=2] PASS | steps 3000 | wrong queues [] | preemptions [935, 930, 920, 939] | wall 0.91s | native deterministic True
+<<< [MODE2-q4-4] rc=0 wall=5.1s
+>>> [MODE2-q4-5] 14:44:27
+[MULTIQ-LV3 q=4 pulse_gate=2] PASS | steps 3000 | wrong queues [] | preemptions [924, 920, 909, 926] | wall 0.90s | native deterministic True
+<<< [MODE2-q4-5] rc=0 wall=5.1s
+>>> [MODE2-q4-6] 14:45:32
+[MULTIQ-LV3 q=4 pulse_gate=2] PASS | steps 3000 | wrong queues [] | preemptions [939, 934, 924, 936] | wall 0.91s | native deterministic True
+<<< [MODE2-q4-6] rc=0 wall=5.1s
+>>> [MODE2-q4-7] 14:46:38
+[MULTIQ-LV3 q=4 pulse_gate=2] PASS | steps 3000 | wrong queues [] | preemptions [933, 930, 917, 934] | wall 0.91s | native deterministic True
+<<< [MODE2-q4-7] rc=0 wall=5.1s
+>>> [MODE2-q4-8] 14:47:43
+[MULTIQ-LV3 q=4 pulse_gate=2] PASS | steps 3000 | wrong queues [] | preemptions [934, 930, 919, 933] | wall 0.91s | native deterministic True
+<<< [MODE2-q4-8] rc=0 wall=5.1s
+>>> [MODE2-q4-9] 14:48:48
+[MULTIQ-LV3 q=4 pulse_gate=2] PASS | steps 3000 | wrong queues [] | preemptions [938, 934, 923, 940] | wall 0.91s | native deterministic True
+<<< [MODE2-q4-9] rc=0 wall=5.1s
+>>> [MODE2-q4-10] 14:49:54
+[MULTIQ-LV3 q=4 pulse_gate=2] PASS | steps 3000 | wrong queues [] | preemptions [939, 932, 919, 939] | wall 0.91s | native deterministic True
+<<< [MODE2-q4-10] rc=0 wall=5.1s
+>>> [FIN-ON-q4-1] 14:50:59
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [896, 893, 880, 895] | wall 0.89s | native deterministic True
+<<< [FIN-ON-q4-1] rc=0 wall=5.1s
+>>> [FIN-ON-q4-2] 14:52:04
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [887, 891, 880, 893] | wall 0.89s | native deterministic True
+<<< [FIN-ON-q4-2] rc=0 wall=5.1s
+>>> [FIN-ON-q4-3] 14:53:10
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [896, 895, 884, 898] | wall 0.89s | native deterministic True
+<<< [FIN-ON-q4-3] rc=0 wall=5.1s
+>>> [FIN-ON-q4-4] 14:54:15
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [887, 892, 878, 891] | wall 0.89s | native deterministic True
+<<< [FIN-ON-q4-4] rc=0 wall=5.1s
+>>> [FIN-ON-q4-5] 14:55:20
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [889, 888, 879, 895] | wall 0.89s | native deterministic True
+<<< [FIN-ON-q4-5] rc=0 wall=5.1s
+>>> [FIN-ON-q4-6] 14:56:26
+[MULTIQ-LV3 q=4 pulse_gate=1] PASS | steps 3000 | wrong queues [] | preemptions [896, 890, 881, 891] | wall 0.89s | native deterministic True
+<<< [FIN-ON-q4-6] rc=0 wall=5.1s
+>>> [S7-softmax-lv3-1] 14:57:31
+[OPS softmax mode=lv3] PASS batch=346.7us single=359.2us susp_p50=0.240ms hp_p50=0.31ms cov=100% ok=5/5 
+<<< [S7-softmax-lv3-1] rc=0 wall=3.1s
+>>> [S7-conv3x3_nhwc-lv3m5-1] 14:58:34
+[OPS conv3x3_nhwc mode=lv3] PASS batch=1045.5us single=1057.0us susp_p50=0.122ms hp_p50=0.18ms cov=100% ok=5/5 
+<<< [S7-conv3x3_nhwc-lv3m5-1] rc=0 wall=3.1s
+>>> [S7-softmax-lv3-2] 14:59:37
+[OPS softmax mode=lv3] PASS batch=346.8us single=359.2us susp_p50=0.219ms hp_p50=0.31ms cov=100% ok=5/5 
+<<< [S7-softmax-lv3-2] rc=0 wall=3.1s
+>>> [S7-conv3x3_nhwc-lv3m5-2] 15:00:41
+[OPS conv3x3_nhwc mode=lv3] PASS batch=1045.4us single=1056.5us susp_p50=0.119ms hp_p50=0.17ms cov=100% ok=5/5 
+<<< [S7-conv3x3_nhwc-lv3m5-2] rc=0 wall=3.1s
+>>> [FOREIGN-guard-1] 15:01:44
+[XSCHED WARN @ T 2445549 @ 15:01:49.401327] sm120 DEF-40: GPU 0000:01:00.0 has context(s) outside XSched (2445431 python): Level-3 pulses withheld, suspension waits for running kernels (XSCHED_SM120_FOREIGN_CTX=allow to override)
+[FOREIGN-CTX aggressor lv3 gap 600 us] victim unaffected | victim iters 2648 wrong 0 rc 0 error '' | aggressor suspensions 1668 error ''
+[XSCHED INFO @ T 2445549 @ 15:02:04.638472] sm120 DEF-40: GPU 0000:01:00.0 has only XSched tenants again: Level-3 pulses enabled
+<<< [FOREIGN-guard-1] rc=0 wall=20.4s
+>>> [FOREIGN-guard-2] 15:03:05
+[XSCHED WARN @ T 2446140 @ 15:03:10.061866] sm120 DEF-40: GPU 0000:01:00.0 has context(s) outside XSched (2446021 python): Level-3 pulses withheld, suspension waits for running kernels (XSCHED_SM120_FOREIGN_CTX=allow to override)
+[FOREIGN-CTX aggressor lv3 gap 600 us] victim unaffected | victim iters 2646 wrong 0 rc 0 error '' | aggressor suspensions 1670 error ''
+[XSCHED INFO @ T 2446140 @ 15:03:25.276579] sm120 DEF-40: GPU 0000:01:00.0 has only XSched tenants again: Level-3 pulses enabled
+<<< [FOREIGN-guard-2] rc=0 wall=20.4s

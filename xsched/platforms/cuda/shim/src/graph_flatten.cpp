@@ -532,7 +532,7 @@ static CUresult PassThroughGraphLaunch(CUgraphExec exec, CUstream stream)
 
 static CUresult XGraphLaunchImpl(CUgraphExec exec, CUstream stream)
 {
-    auto xq = preempt::HwQueueManager::GetXQueue(GetHwQueueHandle(stream));
+    auto xq = StreamXQueue(stream);
     if (xq == nullptr) return PassThroughGraphLaunch(exec, stream);
     ScopedStreamContext scoped_ctx(stream);
     if (GraphFlattenSubmit(exec, xq)) return CUDA_SUCCESS;

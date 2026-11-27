@@ -47,6 +47,8 @@ enum Sm120RouteStat : int {
     kRouteLv1Uninstrumentable, // Entry Guardian instrumentation failed -> Level-1 boundary
     kRouteLv1ShortCta,      // DEF-17: loop-free multi-wave kernel (short CTAs) -> Level-1 boundary
     kRouteLv1GlobalSched,   // DEF-27: cross-process global scheduler (XSCHED_SCHEDULER=GLB) -> Level-1
+    kRouteRfFull,           // DEF-34: killable kernel whose resident CTAs allocate the whole register file
+    kRouteLv1RfFull,        // DEF-34: ... routed to the Level-1 boundary (XSCHED_SM120_RF_FULL=lv1)
     kRouteStatCount,
 };
 std::atomic<uint64_t> g_sm120_route_stats[kRouteStatCount] = {};
@@ -60,6 +62,7 @@ std::atomic<uint64_t> g_sm120_route_stats[kRouteStatCount] = {};
 // A measurement inflated by a preemption classifies the kernel as long (the safe side).
 struct ShortCtaProbe
 {
+    int rf_full = -1;         // DEF-34: resident CTAs allocate the whole register file (-1 not computed)
     int window = -1;          // wave-window decision for this (function, geometry): -1 not computed
     int state = 0;            // 0 unknown, 1 short (route Level-1), 2 long (stay Level-3)
     bool pending = false;     // a timed launch was submitted
@@ -129,6 +132,7 @@ CudaQueueLv3Trap::CudaQueueLv3Trap(CUstream stream)
 {
     if (is_sm120_) {
         Driver::DeviceGetAttribute(&sm_count_, CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT, cudevice_);
+        Driver::DeviceGetAttribute(&rf_regs_per_sm_, CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_MULTIPROCESSOR, cudevice_);
         sm120_engine_ = sm120::Sm120TrapEngine::Instance(context_);
         sm120_stream_ = std::make_unique<sm120::Sm120StreamContext>(
             context_, cudevice_, sm120_engine_);
@@ -271,6 +275,14 @@ void CudaQueueLv3Trap::Interrupt()
             // fall back cleanly to Level-1 boundary synchronization.
             return;
         }
+        // DEF-36: no pulse for a queue with nothing on the GPU. The BAR0 pulse is GPU-wide: every
+        // running warp of every context traps (and, if not this queue's, returns). The launch worker
+        // is already paused here, so an idle stream stays idle until Reactivate(). Under the global
+        // scheduler a vLLM process had 128 Level-3 queues (one per PyTorch pool stream), and each
+        // high-priority request pulsed once per queue.
+        if (cur == nullptr || Driver::StreamQuery(kStream) == CUDA_SUCCESS) {
+            return;
+        }
         last_preempt_mode_ = SelectSm120Mode(cur);
         sm120_stream_->PreemptStream(last_preempt_mode_);
         return;
@@ -325,9 +337,10 @@ void CudaQueueLv3Trap::Reactivate(const CommandLog &log)
                 kinds += std::to_string(c->GetIdx()) + k + " ";
                 if (kinds.size() > 400) { kinds += "..."; break; }
             }
-            XINFO("sm120_trace: reactivate cmd=%u evicted=%u restored=%u drained=%u m1exit=%u "
-                  "restore_wave=%u active_idx=%llu preempted=%d arena_bytes=%zu log=[%s]",
+            XINFO("sm120_trace: reactivate cmd=%u evicted=%u restored=%u drained=%u m1exit=%u ovf=%u "
+                  "inflight=%u restore_wave=%u active_idx=%llu preempted=%d arena_bytes=%zu log=[%s]",
                   t.cmd, t.evicted_slots, t.restored_slots, t.drained_cnt, t.mode1_exit_cnt,
+                  t.overflow_err, t.trap_inflight,
                   t.is_restore_wave, static_cast<unsigned long long>(t.active_kernel_idx),
                   has_preempted ? 1 : 0, t.arena_bytes, kinds.c_str());
             if (t.evicted_slots > 0) {
@@ -566,6 +579,57 @@ void CudaQueueLv3Trap::OnHwCommandSubmit(std::shared_ptr<preempt::HwCommand> hw_
                     kernel->killable = false;
                     kernel->ClearProps(kCommandPropertyDeactivatable);
                     return;
+                }
+            }
+            // DEF-34: an SM whose register file is allocated to the last register does not take the
+            // Level-3 trap (measured: 0 evictions with 0 free registers, normal evictions with 1024
+            // free). Detect such geometries (occupancy x warps x per-warp allocation, granularity
+            // 256 registers per warp); XSCHED_SM120_RF_FULL = count (default: only counted, see
+            // DEF-34 in the ledger) | lv1 (route to the Level-1 boundary).
+            if (rf_regs_per_sm_ > 0 && sm_count_ > 0) {
+                const int64_t ctas = static_cast<int64_t>(kernel->BlockCnt());
+                uint64_t key = reinterpret_cast<uint64_t>(kernel->kFuncHandle) ^ 0x5bd1e995ULL;
+                key = key * 1000003ULL ^ static_cast<uint64_t>(ctas);
+                key = key * 1000003ULL ^ static_cast<uint64_t>(kernel->ThreadCnt());
+                key = key * 1000003ULL ^ static_cast<uint64_t>(kernel->DynSmemBytes());
+                bool full = false;
+                {
+                    std::lock_guard<std::mutex> lk(g_probe_mtx);
+                    ShortCtaProbe &p = g_probes[key];
+                    if (p.rf_full < 0) {
+                        int bps = 0, regs = 0;
+                        Driver::OccupancyMaxActiveBlocksPerMultiprocessor(
+                            &bps, kernel->kFuncHandle, static_cast<int>(kernel->ThreadCnt()), kernel->DynSmemBytes());
+                        Driver::FuncGetAttribute(&regs, CU_FUNC_ATTRIBUTE_NUM_REGS, kernel->kFuncHandle);
+                        const int64_t warps = (static_cast<int64_t>(kernel->ThreadCnt()) + 31) / 32;
+                        const int64_t per_warp = ((static_cast<int64_t>(regs) * 32 + 255) / 256) * 256;
+                        const int64_t resident = std::min<int64_t>(bps, (ctas + sm_count_ - 1) / sm_count_);
+                        p.rf_full = (bps > 0 && regs > 0 && resident * warps * per_warp >= rf_regs_per_sm_) ? 1 : 0;
+                        static int logged = 0;
+                        if (p.rf_full == 1 && logged < 64) {
+                            ++logged;
+                            const char *fname = nullptr;
+                            if (Driver::FuncGetName(&fname, kernel->kFuncHandle) != CUDA_SUCCESS) fname = nullptr;
+                            XINFO("sm120 DEF-34: register file full (%d regs x %lld warps x %lld CTAs/SM = %lld of %d): "
+                                  "the Level-3 trap is not taken on these SMs: %.120s", regs, (long long)warps,
+                                  (long long)resident, (long long)(resident * warps * per_warp), rf_regs_per_sm_,
+                                  fname ? fname : "?");
+                        }
+                    }
+                    full = p.rf_full == 1;
+                }
+                if (full) {
+                    CountRoute(kRouteRfFull);
+                    static const bool to_lv1 = [] {
+                        const char *v = getenv("XSCHED_SM120_RF_FULL");
+                        return v != nullptr && std::string(v) == "lv1";
+                    }();
+                    if (to_lv1) {
+                        CountRoute(kRouteLv1RfFull);
+                        kernel->killable = false;
+                        kernel->ClearProps(kCommandPropertyDeactivatable);
+                        return;
+                    }
                 }
             }
             CountRoute(kRouteLv3Killable);

@@ -1,0 +1,52 @@
+Thread 9 (Thread 0x769e897fd6c0 (LWP 2376347) "python"):
+#9  cuStreamSynchronize @ /lib/x86_64-linux-gnu/libcuda.so
+#10 xsched::cuda::CudaQueueLv1::Synchronize() @ <xsched_install>/lib/libhalcuda.so
+#11 xsched::cuda::CudaQueueLv3Trap::Synchronize() @ <xsched_install>/lib/libhalcuda.so
+#12 xsched::preempt::LaunchWorker::SyncAllWithLock(std::unique_lock<xsched::utils::MutexLock>) @ <xsched_install>/lib/libpreempt.so
+#13 xsched::preempt::LaunchWorker::LaunchHwCommand(std::shared_ptr<xsched::preempt::HwCommand>) @ <xsched_install>/lib/libpreempt.so
+Thread 8 (Thread 0x769e88ffc6c0 (LWP 2376348) "python"):
+#9  cuStreamSynchronize @ /lib/x86_64-linux-gnu/libcuda.so
+#10 xsched::cuda::CudaQueueLv1::Synchronize() @ <xsched_install>/lib/libhalcuda.so
+#11 xsched::cuda::CudaQueueLv3Trap::Synchronize() @ <xsched_install>/lib/libhalcuda.so
+#12 xsched::preempt::LaunchWorker::SyncAllWithLock(std::unique_lock<xsched::utils::MutexLock>) @ <xsched_install>/lib/libpreempt.so
+#13 xsched::preempt::LaunchWorker::LaunchHwCommand(std::shared_ptr<xsched::preempt::HwCommand>) @ <xsched_install>/lib/libpreempt.so
+Thread 7 (Thread 0x769e82fff6c0 (LWP 2376349) "python"):
+#5  xsched::preempt::LaunchWorker::SyncAllWithLock(std::unique_lock<xsched::utils::MutexLock>) @ <xsched_install>/lib/libpreempt.so
+#6  xsched::preempt::LaunchWorker::LaunchHwCommand(std::shared_ptr<xsched::preempt::HwCommand>) @ <xsched_install>/lib/libpreempt.so
+#7  xsched::preempt::LaunchWorker::WorkerLoop() @ <xsched_install>/lib/libpreempt.so
+Thread 6 (Thread 0x769e827fe6c0 (LWP 2376350) "python"):
+#7  cuStreamSynchronize @ /lib/x86_64-linux-gnu/libcuda.so
+#8  xsched::cuda::CudaQueueLv1::Synchronize() @ <xsched_install>/lib/libhalcuda.so
+#9  xsched::cuda::CudaQueueLv3Trap::Synchronize() @ <xsched_install>/lib/libhalcuda.so
+#10 xsched::preempt::LaunchWorker::SyncAllWithLock(std::unique_lock<xsched::utils::MutexLock>) @ <xsched_install>/lib/libpreempt.so
+#11 xsched::preempt::LaunchWorker::LaunchHwCommand(std::shared_ptr<xsched::preempt::HwCommand>) @ <xsched_install>/lib/libpreempt.so
+#12 xsched::preempt::LaunchWorker::WorkerLoop() @ <xsched_install>/lib/libpreempt.so
+Thread 5 (Thread 0x769e81ffd6c0 (LWP 2376351) "python"):
+#9  cuStreamSynchronize @ /lib/x86_64-linux-gnu/libcuda.so
+#10 xsched::cuda::sm120::Sm120StreamContext::PreemptStream(xsched::cuda::sm120::Sm120PreemptMode) @ <xsched_install>/lib/libhalcuda.so
+#11 xsched::cuda::CudaQueueLv3Trap::Interrupt() @ <xsched_install>/lib/libhalcuda.so
+#12 xsched::preempt::AsyncXQueue::Suspend(long) @ <xsched_install>/lib/libpreempt.so
+#13 XQueueSuspend @ <xsched_install>/lib/libpreempt.so
+Thread 4 (Thread 0x769e817fc6c0 (LWP 2376352) "python"):
+#4  cuStreamSynchronize @ /lib/x86_64-linux-gnu/libcuda.so
+#5  xsched::cuda::sm120::Sm120StreamContext::PreemptStream(xsched::cuda::sm120::Sm120PreemptMode) @ <xsched_install>/lib/libhalcuda.so
+#6  xsched::cuda::CudaQueueLv3Trap::Interrupt() @ <xsched_install>/lib/libhalcuda.so
+#7  xsched::preempt::AsyncXQueue::Suspend(long) @ <xsched_install>/lib/libpreempt.so
+#8  XQueueSuspend @ <xsched_install>/lib/libpreempt.so
+Thread 3 (Thread 0x769e80ffb6c0 (LWP 2376353) "python"):
+#9  cuStreamSynchronize @ /lib/x86_64-linux-gnu/libcuda.so
+#10 xsched::cuda::sm120::Sm120StreamContext::ResetControlSync() @ <xsched_install>/lib/libhalcuda.so
+#11 xsched::cuda::CudaQueueLv3Trap::Reactivate(std::__cxx11::list<std::shared_ptr<xsched::preempt::HwCommand>, std::allocator<std::shared_ptr<xsched::preempt::HwCommand> > > const&) @ <xsched_install>/lib/libhalcuda.so
+#12 xsched::preempt::AsyncXQueue::Resume(long) @ <xsched_install>/lib/libpreempt.so
+#13 XQueueResume @ <xsched_install>/lib/libpreempt.so
+Thread 2 (Thread 0x769e5bfff6c0 (LWP 2376354) "python"):
+#9  cuStreamSynchronize @ /lib/x86_64-linux-gnu/libcuda.so
+#10 xsched::cuda::sm120::Sm120StreamContext::PreemptStream(xsched::cuda::sm120::Sm120PreemptMode) @ <xsched_install>/lib/libhalcuda.so
+#11 xsched::cuda::CudaQueueLv3Trap::Interrupt() @ <xsched_install>/lib/libhalcuda.so
+#12 xsched::preempt::AsyncXQueue::Suspend(long) @ <xsched_install>/lib/libpreempt.so
+#13 XQueueSuspend @ <xsched_install>/lib/libpreempt.so
+Thread 1 (Thread 0x76a22364d300 (LWP 2376316) "python"):
+#5  xsched::preempt::XCommand::WaitUntil(xsched::preempt::XCommandState) @ <xsched_install>/lib/libpreempt.so
+#6  xsched::preempt::AsyncXQueue::WaitAll() @ <xsched_install>/lib/libpreempt.so
+#7  xsched::cuda::XStreamSynchronize(CUstream_st*) @ <xsched_install>/lib/libcuda.so.1
+#11 THCPStream_synchronize(_object*, _object*) @ ~/.venv_sm120/lib/python3.12/site-packages/torch/lib/libtorch_python.so

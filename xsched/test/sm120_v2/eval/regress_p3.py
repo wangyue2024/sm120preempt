@@ -92,6 +92,19 @@ def plan(args):
             # DEF-31: a whole CUDA graph must never run twice when a Level-3 queue is restored.
             L("SYN-graph-relaunch-whole", 600, "XSCHED_CUDA_GRAPH_FLATTEN=0 $PY $EVAL/test_graph_relaunch_p35.py --iters 60")
             L("SYN-graph-relaunch-flat", 600, "$PY $EVAL/test_graph_relaunch_p35.py --iters 60")
+            # Maximum-register kernel (255 reported, R0..R252 live through a long loop) restored
+            # bit-exactly while HP work scrubs the register files during every suspension.
+            L("SYN-regpress255", 900, "$PY $EVAL/test_regpress255_p35.py --calls 600")
+            # Production 255-register kernel (PyTorch flash attention) under frequent preemption.
+            L("SYN-flash-stress", 900, "$PY $EVAL/test_lv3_stress_kernel_p35.py --kernel flash --iters 600 --gap-us 1500")
+            # DEF-38: four Level-3 queues of one process suspended / resumed independently (moderate
+            # pulse rate: the RTX 5060 drives the desktop, see OBS-14).
+            L("SYN-multiq-lv3", 600, "XSCHED_SM120_WATCHDOG_MS=5000 $PY $EVAL/test_multiqueue_lv3_p35.py --queues 4 "
+                                     "--steps 1500 --gap-us 1500 --hold-us 300")
+            # DEF-37: default-stream PyTorch under automatic Level-3 XQueues (native reference first).
+            L("SYN-auto-legacy-lv3", 600, f"{nat} $PY $EVAL/test_auto_legacy_p35.py --ref {out_dir}/auto_legacy_ref.json "
+                                          f"--write && XSCHED_AUTO_XQUEUE=1 XSCHED_AUTO_XQUEUE_LEVEL=3 $PY "
+                                          f"$EVAL/test_auto_legacy_p35.py --ref {out_dir}/auto_legacy_ref.json")
             L("SYN-event-bridge-hazard", 600, "XSCHED_CUDA_ASYNC_EVENT_WAIT=2 $PY $EVAL/test_event_bridge_p35.py --level 3 --iters 10 --expect-fail")
             L("SYN-stress-trim", 900, f"{M5} XSCHED_SM120_ARENA_TRIM_MIN_MB=1 GRID_MULT=8 CHAIN=6 GAP_US=1000 TARGET_MS=4 $OUT/test_convbar_p3 all 3 10")
         elif g == "acc":
@@ -135,7 +148,7 @@ def plan(args):
             res = os.path.join(out_dir, "suite9_mp.jsonl")
             L("S9-ppl-solo", 600, f"{nat} HF_HUB_OFFLINE=1 $PY $EVAL/bench_mp_serving_p34.py run --mode solo --lp ppl --out {res}")
             L("S9-ppl-native", 600, f"{nat} HF_HUB_OFFLINE=1 $PY $EVAL/bench_mp_serving_p34.py run --mode native --lp ppl --out {res}")
-            for m in ("req-lv1", "req-lv3", "glb-lv1", "glb-lv3"):
+            for m in ("req-lv1", "req-lv3", "glb-lv1", "glb-lv3", "auto-lv1", "auto-lv3"):
                 L(f"S9-ppl-{m}", 600, f"HF_HUB_OFFLINE=1 $PY $EVAL/bench_mp_serving_p34.py run --mode {m} --lp ppl --out {res}")
         elif g == "s8":
             res = os.path.join(out_dir, "suite8.jsonl")
